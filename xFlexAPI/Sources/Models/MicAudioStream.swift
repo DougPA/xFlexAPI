@@ -1,0 +1,424 @@
+//
+//  MicAudioStream.swift
+//  xFlexAPI
+//
+//  Created by Mario Illgen on 27.03.17.
+//  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
+//
+
+import Cocoa
+
+public protocol MicAudioStreamHandler {
+    
+    // method to process audio data stream
+    func micAudioStreamHandler(_ frame: MicAudioStreamFrame) -> Void
+    
+}
+
+final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
+
+    // ------------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    fileprivate weak var _radio: Radio?                 // The Radio that owns this MicAudioStream
+    fileprivate var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
+    fileprivate var _shouldBeRemoved = false            // True if being removed
+    
+    fileprivate var rxSeq: Int?                         // Rx sequence number
+    public var rxLostPacketCount = 0                    // Rx lost packet count
+    
+    // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+    //                                                                                              //
+    fileprivate var __inUse = false                     // true = in use                            //
+    fileprivate var __ip = ""                           // Ip Address                               //
+    fileprivate var __port = 0                          // Port number                              //
+    fileprivate var __radioAck = false                  // has the radio acknowledged this stream   //
+    fileprivate var __micGain = 50                      // rx gain of stream                        //
+    fileprivate var __micGainScalar: Float = 1.0        // scalar gain value for multiplying        //
+    fileprivate var __streamId: Radio.DaxStreamId = ""  // Stream Id                                //
+    //
+    fileprivate var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                //
+    //                                                                                              //
+    // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ----//
+    
+    // constants
+    fileprivate let _log = Log.sharedInstance           // shared Log
+    fileprivate let kModule = "MicAudioStream"          // Module Name reported in log messages
+    fileprivate let kNoError = "0"                      // response without error
+    
+    fileprivate let kMicStreamCreateCmd = "stream create daxmic"
+    
+    // see FlexLib
+    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    
+    /// Initialize an Mic Audio Stream
+    ///
+    /// - Parameters:
+    ///   - radio:              the Radio instance
+    ///   - queue:              MicAudioStreams concurrent Queue
+    ///
+    init(radio: Radio, queue: DispatchQueue) {
+        
+        self._radio = radio
+        self._micAudioStreamsQ = queue
+        
+        super.init()
+    }
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Public methods that send commands to the Radio (hardware)
+    
+    public func requestMicAudioStream() -> Bool {
+        
+        // check to see if this object has already been activated
+        if _radioAck { return false }
+        
+        // check to ensure this object is tied to a radio object
+        if _radio == nil { return false }
+        
+        // check to make sure the radio is connected
+        switch _radio!.connectionState {
+        case .clientConnected:
+            _radio!.send(kMicStreamCreateCmd, replyTo: updateStreamId)
+            return true
+        default:
+            return false
+        }
+    }
+    public func removeMicAudioStream() {      
+        
+        _radio?.send("stream remove 0x\(streamId)")
+        _radio?.removeAudioStream(streamId)
+    }
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Private methods
+    
+    /// Process the Reply to a Stream Create command, reply format: <value>,<value>,...<value>
+    ///
+    /// - Parameters:
+    ///   - seqNum:         the Sequence Number of the original command
+    ///   - responseValue:  the response value
+    ///   - reply:          the reply
+    ///
+    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
+        
+        guard responseValue == kNoError else {
+            // Anything other than 0 is an error, log it and ignore the Reply
+            _log.entry(#function + " - \(responseValue)", level: .error, source: kModule)
+            return
+        }
+        
+        //get the streamId (remove the "0x" prefix)
+        //_streamId = String(reply.characters.dropFirst(2))
+        // DL3LSM: there is no 0x prefix -> don't drop anything
+        // but make the string 8 characters long -> add "0" at the beginning
+        let fillCnt = 8 - reply.characters.count
+        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
+        _streamId = fills + reply
+        
+        // add the Audio Stream to the collection if not existing
+        if let _ = _radio?.micAudioStreams[_streamId] {
+            _log.entry(#function + " - Attempted to Add MicAudioStream already in Radio micAudioStreams List",
+                       level: .warning, source: kModule)
+            return // already in the list
+        }
+        
+        _radio?.micAudioStreams[_streamId] = self
+    }
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - KeyValueParser Protocol methods
+    //     called by Radio, executes on the radioQ
+    
+    /// Parse Mic Audio Stream key/value pairs
+    ///
+    /// - parameter keyValues: a KeyValuesArray
+    ///
+    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+        
+        var setRadioAck = false
+        
+        // process each key/value pair, <key=value>
+        for kv in keyValues {
+            
+            // check for unknown keys
+            guard let token = Token(rawValue: kv.key.lowercased()) else {
+                // unknown Key, log it and ignore the Key
+                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                continue
+            }
+            // get the Int and Bool versions of the value
+            let iValue = (kv.value).iValue()
+            let bValue = (kv.value).bValue()
+            
+            // known keys, in alphabetical order
+            switch token {
+                
+            case .inUse:
+                willChangeValue(forKey: "inUse")
+                _inUse = bValue
+                didChangeValue(forKey: "inUse")
+                
+            case .ip:
+                willChangeValue(forKey: "ip")
+                _ip = kv.value
+                didChangeValue(forKey: "ip")
+                
+                if !_radioAck {
+                    setRadioAck = true
+                }
+                
+            case .port:
+                willChangeValue(forKey: "port")
+                _port = iValue
+                didChangeValue(forKey: "port")
+                
+            }
+        }
+        // if this is an initialized AudioStream and inUse becomes false
+        if _radioAck && _shouldBeRemoved == false && _inUse == false {
+            
+            // mark it for removal
+            _shouldBeRemoved = true
+            
+            _radio?.removeMicAudioStream(self.streamId)
+        }
+        
+        // is the AudioStream acknowledged by the radio?
+        if setRadioAck {
+            
+            // YES, the Radio (hardware) has acknowledged this Audio Stream
+            radioAck = true
+            
+            // notify all observers
+            NC.post(.micAudioStreamInitialized, object: self as Any?)
+        }
+    }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - VitaHandler Protocol method
+    
+    //      called by udpManager on the udpQ
+    //      passes data to the AudioStream on the panadapterQ
+    //
+    //      The Vita Payload is in the format of a AudioStreamPayload struct
+    //      (defined inside the AudioStreamFrame struct below)
+    
+    /// Process the AudioStream Vita Packets
+    ///
+    /// - parameter vitaPacket: a AudioStream Vita packet
+    ///
+    func vitaHandler(_ vitaPacket: Vita) {
+        
+        if vitaPacket.classCode != .daxAudio {
+            // not for us
+            return
+        }
+        
+        // if there is a delegate, process the Panadapter stream
+        if let delegate = delegate {
+            
+            // initialize a data frame
+            var dataFrame = MicAudioStreamFrame(payload: vitaPacket.payload!, numberOfBytes: vitaPacket.payloadSize)
+            
+            // get a pointer to the data in the payload
+            guard let wordsPtr = vitaPacket.payload?.bindMemory(to: UInt32.self, capacity: dataFrame.samples * 2) else {
+                
+                return
+            }
+            
+            // allocate temporary data arrays
+            var dataLeft = [UInt32](repeating: 0, count: dataFrame.samples)
+            var dataRight = [UInt32](repeating: 0, count: dataFrame.samples)
+            
+            // swap endianess on the bytes
+            // for each sample if we are dealing with DAX audio
+            
+            // Swap the byte ordering of the samples & place it in the dataFrame left and right samples
+            for i in 0..<dataFrame.samples {
+                
+                dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
+                dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
+            }
+            
+            if (Int(vitaPacket.classCode.rawValue) & 0x200) == 0 {
+                // FIXME: should not be necessary
+                // convert the payload data from 2s complement to float
+                // for each sample...
+                for i in 0..<dataFrame.samples {
+                    
+                    dataFrame.leftAudio[i] = Float(dataLeft[i]) * kOneOverZeroDBfs
+                    dataFrame.rightAudio[i] = Float(dataRight[i]) * kOneOverZeroDBfs
+                }
+            } else {
+                // copy the data as is -- it is already floating point
+                memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
+                memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
+                
+            }
+            
+            // scale with rx gain
+            let scale = self._micGainScalar
+            for i in 0..<dataFrame.samples {
+                
+                dataFrame.leftAudio[i] = dataFrame.leftAudio[i] * scale
+                dataFrame.rightAudio[i] = dataFrame.rightAudio[i] * scale
+            }
+            
+            // Pass the data frame to this AudioSream's delegate
+            delegate.micAudioStreamHandler(dataFrame)
+        }
+        
+        // calculate the next Sequence Number
+        let expectedSequenceNumber = (rxSeq == nil ? vitaPacket.sequence : (rxSeq! + 1) % 16)
+        
+        // is the received Sequence Number correct?
+        if vitaPacket.sequence != expectedSequenceNumber {
+            
+            // NO, log the issue
+            _log.entry("Missing packet(s), rcvdSeq: \(vitaPacket.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, source: kModule)
+            
+            rxSeq = nil
+            rxLostPacketCount += 1
+        } else {
+            
+            rxSeq = expectedSequenceNumber
+        }
+    }
+}
+
+// --------------------------------------------------------------------------------
+// MARK: - MicAudioStreamFrame struct implementation
+// --------------------------------------------------------------------------------
+//
+//      populated by the Mic Audio streamHandler
+//      passed to the client
+//
+
+/// Struct containing Mic Audio Stream data
+///
+public struct MicAudioStreamFrame {
+    
+    public private(set) var samples = 0                     /// number of samples (L/R) in this frame
+    public var leftAudio = [Float]()                        /// Array of left audio samples
+    public var rightAudio = [Float]()                       /// Array of right audio samples
+    
+    /// Initialize a AudioStreamFrame
+    ///
+    /// - parameter payload: pointer to a Vita packet payload
+    /// - parameter numberOfWords: number of 32-bit Words in the payload
+    ///
+    public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
+        
+        // 4 byte each for left and right sample (4 * 2)
+        self.samples = numberOfBytes / (4 * 2)
+        
+        // allocate the samples arrays
+        self.leftAudio = [Float](repeating: 0, count: samples)
+        self.rightAudio = [Float](repeating: 0, count: samples)
+    }
+}
+
+// --------------------------------------------------------------------------------
+// MARK: - MicAudioStream Class extensions
+//              - Synchronized internal properties
+//              - Dynamic public properties
+//              - AudioStream message enum
+// --------------------------------------------------------------------------------
+
+extension MicAudioStream {
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Private properties - with synchronization
+    
+    // listed in alphabetical order
+    fileprivate var _inUse: Bool {
+        get { return _micAudioStreamsQ.sync { __inUse } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
+    
+    fileprivate var _ip: String {
+        get { return _micAudioStreamsQ.sync { __ip } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
+    
+    fileprivate var _port: Int {
+        get { return _micAudioStreamsQ.sync { __port } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
+    
+    fileprivate var _radioAck: Bool {
+        get { return _micAudioStreamsQ.sync { __radioAck } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __radioAck = newValue } } }
+    
+    fileprivate var _micGain: Int {
+        get { return _micAudioStreamsQ.sync { __micGain } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __micGain = newValue } } }
+    
+    fileprivate var _micGainScalar: Float {
+        get { return _micAudioStreamsQ.sync { __micGainScalar } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
+    
+    fileprivate var _streamId: String {
+        get { return _micAudioStreamsQ.sync { __streamId } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant with Radio update
+    
+    // listed in alphabetical order
+    dynamic public var inUse: Bool {
+        get { return _inUse }
+        set { _inUse = newValue } }
+    
+    dynamic public var ip: String {
+        get { return _ip }
+        set { if _ip != newValue { _ip = newValue } } }
+    
+    dynamic public var port: Int {
+        get { return _port  }
+        set { if _port != newValue { _port = newValue } } }
+    
+    dynamic public var radioAck: Bool {
+        get { return _radioAck }
+        set { _radioAck = newValue } }
+    
+    dynamic public var micGain: Int {
+        get { return _micGain  }
+        set {
+            if _micGain != newValue {
+                let value = newValue.bound(0, 100)
+                if _micGain != value {
+                    _micGain = value
+                    if _micGain == 0 {
+                        _micGainScalar = 0.0
+                        return
+                    }
+                    let db_min:Float = -10.0;
+                    let db_max:Float = +10.0;
+                    let db:Float = db_min + (Float(_micGain) / 100.0) * (db_max - db_min);
+                    _micGainScalar = pow(10.0, db / 20.0);
+                }
+            }
+        }
+    }
+    
+    dynamic public var streamId: String {
+        get { return _streamId }
+        set { if _streamId != newValue { _streamId = newValue } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
+    // DL3LSM
+    
+    public var delegate: MicAudioStreamHandler? {
+        get { return _micAudioStreamsQ.sync { _delegate } }
+        set { _micAudioStreamsQ.sync(flags: .barrier) { _delegate = newValue } } }
+    
+    // ----------------------------------------------------------------------------
+    // Mark: - Tokens for MicAudioStream messages (only populate values that != case value)
+    
+    enum Token: String {
+        case inUse = "in_use"
+        case ip
+        case port
+    }
+}
