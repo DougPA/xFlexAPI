@@ -16,5 +16,5 @@ FOUNDATION_EXPORT const unsigned char xFlexAPIVersionString[];
 
 // In this header, you should import all the public headers of your framework using statements like #import <xFlexAPI/PublicHeader.h>
 
-#import <xFlexAPI/Sources/CocoaAsyncSocket/GCDAsyncSocket.h>
-#import <xFlexAPI/Sources/CocoaAsyncSocket/GCDAsyncUDPSocket.h>
+#import <xFlexAPI/GCDAsyncSocket.h>
+#import <xFlexAPI/GCDAsyncUDPSocket.h>
