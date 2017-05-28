@@ -78,7 +78,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
 
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
-    //     called by Radio, executes on the radioQ
+    //     called by Radio, executes on the parseQ
     
     /// Parse Waterfall key/value pairs
     ///
@@ -127,7 +127,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
                 _lineDuration = iValue
                 didChangeValue(forKey: "lineDuration")
             
-            case .panadapter:
+            case .panadapterId:
                 willChangeValue(forKey: "panadapterId")
                 _panadapterId = kv.value
                 didChangeValue(forKey: "panadapterId")
@@ -152,24 +152,23 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler protocol methods
 
-    //      called by udpManager on the udpQ
-    //      if delegate set, executes on the waterfallQ
+    //      called by Radio on the udpQ
     //
-    //      The Vita Payload is in the format of a WaterfallPayload struct
-    //      (defined inside the WaterfallFrame struct below)
+    //      The payload of the incoming Vita struct is converted to a WaterfallFrame and
+    //      passed to the Waterfall Stream Handler
     
-    /// Process the Waterfall Vita Packets
+    /// Process the Waterfall Vita struct
     ///
-    /// - parameter vitaPacket: a Waterfall Vita packet
+    /// - parameter vita:   a Vita struct
     ///
-    func vitaHandler(_ vitaPacket: Vita) {
+    func vitaHandler(_ vita: Vita) {
         let kByteOffsetToBins = 32              // Bins are located 32 bytes into payload
         
         // if there is a delegate, process the Waterfall stream
         if let delegate = delegate {
             
             // initialize a data frame
-            var dataFrame = WaterfallFrame(payload: vitaPacket.payload!)
+            var dataFrame = WaterfallFrame(payload: vita.payload!)
             
             // If the time code is out-of-sequence, ignore the packet
             if dataFrame.timeCode < self.lastTimecode {
@@ -182,7 +181,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
             
             // get a pointer to the data in the payload
             //                let binsPtr = UnsafePointer<UInt16>( vitaPacket.payload!.advanced(by: kByteOffsetToBins) )
-            if let binsPtr = vitaPacket.payload?.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: dataFrame.numberOfBins) {
+            if let binsPtr = vita.payload?.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: dataFrame.numberOfBins) {
                 
                 // Swap the byte ordering of the data & place it in the dataFrame bins
                 for i in 0..<dataFrame.numberOfBins * dataFrame.lineHeight {
@@ -201,11 +200,10 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
 // MARK: - WaterfallFrame struct implementation
 // --------------------------------------------------------------------------------
 //
-//      populated by the Waterfall streamHandler
-//      passed to the Waterfall View in the UI
+//  Populated by the Waterfall vitaHandler
 //
 
-/// Struct containing one frame of Waterfall Stream data
+/// Struct containing Waterfall Stream data
 ///
 public struct WaterfallFrame {
     
@@ -239,7 +237,7 @@ public struct WaterfallFrame {
 
     /// Initialize a WaterfallFrame
     ///
-    /// - parameter payload: pointer to a Vita packet payload
+    /// - parameter payload:    pointer to a Vita payload
     ///
     public init(payload: UnsafeRawPointer) {
         
@@ -358,7 +356,7 @@ extension Waterfall {
         case lineDuration = "line_duration"
         case loopA = "loopa"
         case loopB = "loopb"
-        case panadapter
+        case panadapterId = "panadapter"
         case rfGain = "rfgain"
         case rxAnt = "rxant"
         case wide

@@ -101,7 +101,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
 
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
-    //     called by Radio, executes on the radioQ
+    //     called by Radio, executes on the parseQ
     //
     
     ///  Parse Opus key/value pairs
@@ -176,22 +176,31 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
             NC.post(.opusInitialized, object: self as Any?)
         }
     }
-    ///  Process Opus Vita packets
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - VitaHandler protocol methods
+    
+    //      called by Radio on the udpQ
+    //
+    //      The payload of the incoming Vita struct is converted to an OpusFrame and
+    //      passed to the Opus Stream Handler
+
+    ///  Process the Opus Vita struct
     ///
-    /// - parameter vitaPacket:     an Opus Vita packet
+    /// - parameter vita:     an Opus Vita struct
     ///
-    public func vitaHandler(_ vitaPacket: Vita) {
+    public func vitaHandler(_ vita: Vita) {
         
         // is this the first packet?
-        if rxSeq == nil { rxSeq = vitaPacket.sequence }
+        if rxSeq == nil { rxSeq = vita.sequence }
         
         // is the received Sequence Number correct?
-        if vitaPacket.sequence != rxSeq {
+        if vita.sequence != rxSeq {
             
             // NO, log the issue
-            _log.entry("Missing packet(s), rcvdSeq: \(vitaPacket.sequence) != expectedSeq: \(rxSeq!)", level: .warning, source: self.kModule)
+            _log.entry("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(rxSeq!)", level: .warning, source: self.kModule)
             
-            if vitaPacket.sequence < rxSeq! {
+            if vita.sequence < rxSeq! {
                 
                 // less than expected, packet is old, ignore it
                 rxSeq = nil
@@ -201,7 +210,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
             } else {
                 
                 // greater than expected, one or more packets were lost, resync & process it
-                rxSeq = vitaPacket.sequence
+                rxSeq = vita.sequence
                 rxLostPacketCount += 1
             }
         }
@@ -209,7 +218,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
         rxSeq = (rxSeq! + 1) % 16
         
         // Pass the data frame to the Opus delegate
-        delegate?.opusStreamHandler( OpusFrame(payload: vitaPacket.payload!, numberOfSamples: vitaPacket.payloadSize) )
+        delegate?.opusStreamHandler( OpusFrame(payload: vita.payload!, numberOfSamples: vita.payloadSize) )
     }
 }
 
@@ -217,9 +226,11 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
 // MARK: - OpusFrame struct implementation
 // ------------------------------------------------------------------------------
 //
-//      populated by the Opus vitaHandler
+//  Populated by the Opus vitaHandler
 //
 
+/// Struct containing Opus Stream data
+///
 public struct OpusFrame {
     
     public var samples: [UInt8]                     // array of samples

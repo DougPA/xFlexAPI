@@ -386,12 +386,12 @@ public class Slice : NSObject, KeyValueParser {
                 _dfmPreDeEmphasisEnabled = bValue
                 didChangeValue(forKey: "dfmPreDeEmphasisEnabled")
             
-            case .diglOffset:
+            case .digitalLowerOffset:
                 willChangeValue(forKey: "digitalLowerOffset")
                 _digitalLowerOffset = iValue
                 didChangeValue(forKey: "digitalLowerOffset")
             
-            case .diguOffset:
+            case .digitalUpperOffset:
                 willChangeValue(forKey: "digitalUpperOffset")
                 _digitalUpperOffset = iValue
                 didChangeValue(forKey: "digitalUpperOffset")
@@ -441,7 +441,7 @@ public class Slice : NSObject, KeyValueParser {
                 _fmToneMode = kv.value
                 didChangeValue(forKey: "fmToneMode")
             
-            case .fmToneValue:
+            case .fmToneFreq:
                 willChangeValue(forKey: "fmToneFreq")
                 _fmToneFreq = fValue
                 didChangeValue(forKey: "fmToneFreq")
@@ -460,7 +460,7 @@ public class Slice : NSObject, KeyValueParser {
                 _inUse = bValue
                 didChangeValue(forKey: "inUse")
             
-            case .lock:
+            case .locked:
                 willChangeValue(forKey: "locked")
                 _locked = bValue
                 didChangeValue(forKey: "locked")
@@ -510,7 +510,7 @@ public class Slice : NSObject, KeyValueParser {
                 _owner = iValue
                 didChangeValue(forKey: "owner")
             
-            case .pan:
+            case .panadapterId:
                 //get the streamId (remove the "0x" prefix)
                 willChangeValue(forKey: "panadapterId")
                 _panadapterId = String(kv.value.characters.dropFirst(2))
@@ -546,7 +546,7 @@ public class Slice : NSObject, KeyValueParser {
                 _recordEnabled = bValue
                 didChangeValue(forKey: "recordEnabled")
             
-            case .repeaterOffsetDir:
+            case .repeaterOffsetDirection:
                 willChangeValue(forKey: "repeaterOffsetDirection")
                 _repeaterOffsetDirection = kv.value
                 didChangeValue(forKey: "repeaterOffsetDirection")
@@ -556,7 +556,7 @@ public class Slice : NSObject, KeyValueParser {
                 _rfGain = iValue
                 didChangeValue(forKey: "rfGain")
                 
-            case .ritFreq:
+            case .ritOffset:
                 willChangeValue(forKey: "ritOffset")
                 _ritOffset = iValue
                 didChangeValue(forKey: "ritOffset")
@@ -641,7 +641,7 @@ public class Slice : NSObject, KeyValueParser {
                 _wnbLevel = iValue
                 didChangeValue(forKey: "wnbLevel")
                 
-            case .xitFreq:
+            case .xitOffset:
                 willChangeValue(forKey: "xitOffset")
                 _xitOffset = iValue
                 didChangeValue(forKey: "xitOffset")
@@ -1277,8 +1277,8 @@ extension xFlexAPI.Slice {
         case daxClients = "dax_clients"
         case daxTxEnabled = "dax_tx"
         case dfmPreDeEmphasisEnabled = "dfm_pre_de_emphasis"
-        case diglOffset = "digl_offset"
-        case diguOffset = "digu_offset"
+        case digitalLowerOffset = "digl_offset"
+        case digitalUpperOffset = "digu_offset"
         case diversityEnabled = "diversity"
         case diversityChild = "diversity_child"
         case diversityIndex = "diversity_index"
@@ -1289,11 +1289,11 @@ extension xFlexAPI.Slice {
         case fmRepeaterOffset = "fm_repeater_offset_freq"
         case fmToneBurstEnabled = "fm_tone_burst"
         case fmToneMode = "fm_tone_mode"
-        case fmToneValue = "fm_tone_value"
+        case fmToneFreq = "fm_tone_value"
         case frequency = "rf_frequency"
         case ghost
         case inUse = "in_use"
-        case lock
+        case locked = "lock"
         case loopAEnabled = "loopa"
         case loopBEnabled = "loopb"
         case mode
@@ -1303,7 +1303,7 @@ extension xFlexAPI.Slice {
         case nrEnabled = "nr"
         case nrLevel = "nr_level"
         case owner
-        case pan
+        case panadapterId = "pan"
         case playbackEnabled = "play"
         case postDemodBypassEnabled = "post_demod_bypass"
         case postDemodHigh = "post_demod_high"
@@ -1311,10 +1311,10 @@ extension xFlexAPI.Slice {
         case qskEnabled = "qsk"
         case recordEnabled = "record"
         case recordTime = "record_time"
-        case repeaterOffsetDir = "repeater_offset_dir"
+        case repeaterOffsetDirection = "repeater_offset_dir"
         case rfGain = "rfgain"
         case ritEnabled = "rit_on"
-        case ritFreq = "rit_freq"
+        case ritOffset = "rit_freq"
         case rttyMark = "rtty_mark"
         case rttyShift = "rtty_shift"
         case rxAnt = "rxant"
@@ -1330,7 +1330,7 @@ extension xFlexAPI.Slice {
         case wnbEnabled = "wnb"
         case wnbLevel = "wnb_level"
         case xitEnabled = "xit_on"
-        case xitFreq = "xit_freq"
+        case xitOffset = "xit_freq"
     }
     
     // ----------------------------------------------------------------------------

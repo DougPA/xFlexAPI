@@ -70,7 +70,7 @@ public final class Equalizer : NSObject, KeyValueParser {
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
-    //      called by Radio, executes on the radioQ
+    //      called by Radio, executes on the parseQ
     
     /// Parse Equalizer key/value pairs
     ///

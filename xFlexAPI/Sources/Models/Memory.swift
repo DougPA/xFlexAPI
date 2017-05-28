@@ -49,14 +49,13 @@ public final class Memory : NSObject, KeyValueParser {
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
     fileprivate weak var _radio: Radio!                 // The Radio that owns this Memory
-    private var _initialized = false                    // True if initialized by Radio hardware
+    fileprivate var _initialized = false                // True if initialized by Radio hardware
     
     // constants
-    private let _log = Log.sharedInstance               // shared log
-    private let kModule = "Memory"                      // Module Name reported in log messages
+    fileprivate let _log = Log.sharedInstance           // shared log
+    fileprivate let kModule = "Memory"                  // Module Name reported in log messages
     fileprivate let kMinLevel = 0                       // control range
     fileprivate let kMaxLevel = 100
-    
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -140,7 +139,6 @@ public final class Memory : NSObject, KeyValueParser {
         }
         return newValue
     }
-    
     /// Validate the Tone Value
     ///
     /// - Parameter value:  a Tone Value
@@ -150,12 +148,13 @@ public final class Memory : NSObject, KeyValueParser {
         
         return toneMode == ToneMode.ctcssTx.rawValue && toneValue.within(0, 301)
     }
+    
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser protocol methods
     
     //
     // Parse Memory key/value pairs
-    //     called by Radio, executes on the radioQ
+    //     called by Radio, executes on the parseQ
     //
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
         
@@ -219,7 +218,7 @@ public final class Memory : NSObject, KeyValueParser {
                 _owner = sValue
                 didChangeValue(forKey: "owner")
             
-            case .repeater:
+            case .repeaterOffsetDirection:
                 willChangeValue(forKey: "offsetDirection")
                 _offsetDirection = kv.value.lowercased()
                 didChangeValue(forKey: "offsetDirection")
@@ -467,7 +466,7 @@ extension Memory {
         case mode
         case name
         case owner
-        case repeater
+        case repeaterOffsetDirection = "repeater"
         case repeaterOffset = "repeater_offset"
         case rfPower = "power"
         case rttyMark = "rtty_mark"

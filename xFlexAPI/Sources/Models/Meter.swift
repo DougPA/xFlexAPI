@@ -17,14 +17,14 @@ public class Meter : KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public private(set) weak var radio: Radio?                      // The Radio that owns this Meter
     public private(set) var id = ""                                 // Id that uniquely identifies this Meter
-    public private(set) var meterQ: DispatchQueue                   // GCD queue that guards this object
 
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
+    fileprivate weak var _radio: Radio?                              // The Radio that owns this Meter
     fileprivate var _initialized = false                             // True if initialized by Radio (hardware)
+    fileprivate var _meterQ: DispatchQueue                           // GCD queue that guards this object
 
     // constants
     fileprivate let _log = Log.sharedInstance                        // shared log
@@ -57,10 +57,10 @@ public class Meter : KeyValueParser {
     ///
     public init(radio: Radio, id: Radio.MeterId, queue: DispatchQueue) {
         
-        self.radio = radio
+        self._radio = radio
         self.id = id
         
-        self.meterQ = queue
+        self._meterQ = queue
     }
     
     // ----------------------------------------------------------------------------
@@ -99,7 +99,7 @@ public class Meter : KeyValueParser {
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
-    //      called by Radio, executes on the meterQ (concurrent, barrier)
+    //      called by Radio, executes on the parseQ (serial)
     
     //
     /// Parse Meter key/value pairs
@@ -186,44 +186,44 @@ extension Meter {
     
     // listed in alphabetical order
     dynamic public var description: String {
-        get { return meterQ.sync { _description } }
-        set { meterQ.sync(flags: .barrier) { _description = newValue } } }
+        get { return _meterQ.sync { _description } }
+        set { _meterQ.sync(flags: .barrier) { _description = newValue } } }
     
     dynamic public var fps: Int {
-        get { return meterQ.sync { _fps } }
-        set { meterQ.sync(flags: .barrier) { _fps = newValue } } }
+        get { return _meterQ.sync { _fps } }
+        set { _meterQ.sync(flags: .barrier) { _fps = newValue } } }
     
     dynamic public var high: Float {
-        get { return meterQ.sync { _high } }
-        set { meterQ.sync(flags: .barrier) { _high = newValue } } }
+        get { return _meterQ.sync { _high } }
+        set { _meterQ.sync(flags: .barrier) { _high = newValue } } }
     
     dynamic public var low: Float {
-        get { return meterQ.sync { _low } }
-        set { meterQ.sync(flags: .barrier) { _low = newValue } } }
+        get { return _meterQ.sync { _low } }
+        set { _meterQ.sync(flags: .barrier) { _low = newValue } } }
     
     dynamic public var name: String {
-        get { return meterQ.sync { _name } }
-        set { meterQ.sync(flags: .barrier) { _name = newValue } } }
+        get { return _meterQ.sync { _name } }
+        set { _meterQ.sync(flags: .barrier) { _name = newValue } } }
     
     dynamic public var number: String {
-        get { return meterQ.sync { _number } }
-        set { meterQ.sync(flags: .barrier) { _number = newValue } } }
+        get { return _meterQ.sync { _number } }
+        set { _meterQ.sync(flags: .barrier) { _number = newValue } } }
     
     dynamic public var peak: Float {
-        get { return meterQ.sync { _peak } }
-        set { meterQ.sync(flags: .barrier) { _peak = newValue } } }
+        get { return _meterQ.sync { _peak } }
+        set { _meterQ.sync(flags: .barrier) { _peak = newValue } } }
     
     dynamic public var source: String {
-        get { return meterQ.sync { _source } }
-        set { meterQ.sync(flags: .barrier) { _source = newValue } } }
+        get { return _meterQ.sync { _source } }
+        set { _meterQ.sync(flags: .barrier) { _source = newValue } } }
     
     dynamic public var units: String {
-        get { return meterQ.sync { _units } }
-        set { meterQ.sync(flags: .barrier) { _units = newValue } } }
+        get { return _meterQ.sync { _units } }
+        set { _meterQ.sync(flags: .barrier) { _units = newValue } } }
     
     dynamic public var value: Float {
-        get { return meterQ.sync { _value } }
-        set { meterQ.sync(flags: .barrier) { _value = newValue } } }
+        get { return _meterQ.sync { _value } }
+        set { _meterQ.sync(flags: .barrier) { _value = newValue } } }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Meter messages (only populate values that != case value)

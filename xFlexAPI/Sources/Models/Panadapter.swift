@@ -30,8 +30,8 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     public private(set) weak var radio: Radio?                  // The Radio that owns this Panadapter
     public private(set) var id: String = ""                     // Id that uniquely identifies this Panadapter (StreamId)
     
-    public var lastFrameIndex: Int = 0                          // Frame index of previous Vita payload
-    public var droppedPackets: Int = 0                          // Number of dropped (out of sequence) packets
+    public private(set) var lastFrameIndex: Int = 0             // Frame index of previous Vita payload
+    public private(set) var droppedPackets: Int = 0             // Number of dropped (out of sequence) packets
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
@@ -105,11 +105,6 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
         super.init()
     }
     
-    deinit {
-        
-//        print("Panadapter - deinit")
-    }
-    
     // ----------------------------------------------------------------------------
     // MARK: - Public methods that send commands to the Radio (hardware)
     
@@ -118,7 +113,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Panadapter Reply Handler
     
-    /// Process the Reply to an Rg Gain Info command, reply format: <value>,<value>,...<value>
+    /// Process the Reply to an Rf Gain Info command, reply format: <value>,<value>,...<value>
     ///
     /// - Parameters:
     ///   - seqNum:         the Sequence Number of the original command
@@ -247,7 +242,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
                 _minDbm = CGFloat(fValue)
                 didChangeValue(forKey: "minDbm")
                 
-            case .pre:
+            case .preamp:
                 willChangeValue(forKey: "preamp")
                 _preamp = kv.value
                 didChangeValue(forKey: "preamp")
@@ -297,7 +292,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
                 _panDimensions.width = CGFloat(fValue)
                 didChangeValue(forKey: "panDimensions")
                 
-            case .xvtr:
+            case .xvtrLabel:
                 willChangeValue(forKey: "xvtrLabel")
                 _xvtrLabel = kv.value
                 didChangeValue(forKey: "xvtrLabel")
@@ -322,24 +317,23 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler Protocol method
 
-    //      called by udpManager on the udpQ
-    //      passes data to the Panadapter on the panadapterQ
+    //      called by Radio on the udpQ
     //
-    //      The Vita Payload is in the format of a PanadapterPayload struct
-    //      (defined inside the PanadapterFrame struct below)
+    //      The payload of the incoming Vita struct is converted to a PanadapterFrame and
+    //      passed to the Panadapter Stream Handler
     
-    /// Process the Panadapter Vita Packets
+    /// Process the Panadapter Vita struct
     ///
-    /// - parameter vitaPacket: a Panadapter Vita packet
+    /// - parameter vita:     a Vita struct
     ///
-    func vitaHandler(_ vitaPacket: Vita) {
+    func vitaHandler(_ vita: Vita) {
         let kByteOffsetToBins = 16              // Bins are located 16 bytes into payload
         
         // if there is a delegate, process the Panadapter stream
         if let delegate = delegate {
             
             // initialize a data frame
-            var dataFrame = PanadapterFrame(payload: vitaPacket.payload!)
+            var dataFrame = PanadapterFrame(payload: vita.payload!)
             
             // If the frame index is out-of-sequence, ignore the packet
             if dataFrame.frameIndex < self.lastFrameIndex {
@@ -350,7 +344,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
             self.lastFrameIndex = dataFrame.frameIndex
             
             // get a pointer to the data in the payload
-            if let binsPtr = vitaPacket.payload?.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: dataFrame.numberOfBins) {
+            if let binsPtr = vita.payload?.advanced(by: kByteOffsetToBins).bindMemory(to: UInt16.self, capacity: dataFrame.numberOfBins) {
                 
                 // Swap the byte ordering of the data & place it in the dataFrame bins
                 for i in 0..<dataFrame.numberOfBins {
@@ -367,8 +361,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
 // MARK: - PanadapterFrame struct implementation
 // --------------------------------------------------------------------------------
 //
-//      populated by the Panadapter streamHandler
-//      passed to the Panadapter View in the UI
+//  Populated by the Panadapter vitaHandler
 //
 
 /// Struct containing Panadapter Stream data
@@ -390,7 +383,7 @@ public struct PanadapterFrame {
     
     /// Initialize a PanadapterFRame
     ///
-    /// - parameter payload: pointer to a Vita packet payload
+    /// - parameter payload:    pointer to a Vita payload
     ///
     public init(payload: UnsafeRawPointer) {
         
@@ -707,7 +700,7 @@ extension Panadapter {
         case maxDbm = "max_dbm"
         case minBw = "min_bw"
         case minDbm = "min_dbm"
-        case pre
+        case preamp = "pre"
         case rfGain = "rfgain"
         case rxAnt = "rxant"
         case waterfallId = "waterfall"
@@ -717,7 +710,7 @@ extension Panadapter {
         case wnbLevel = "wnb_level"
         case wnbUpdating = "wnb_updating"
         case xPixels = "x_pixels"
-        case xvtr
+        case xvtrLabel = "xvtr"
         case yPixels = "y_pixels"
     }
 
