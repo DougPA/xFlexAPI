@@ -336,7 +336,7 @@ public struct Vita {
     ///
     public func parseDiscoveryPacket() -> RadioParameters? {
         
-        var params = RadioParameters(lastSeen: Date(), ipAddress: "", port: 0)
+        let params = RadioParameters(lastSeen: Date(), ipAddress: "", port: 0)
         
         // is this a Discovery packet?
         if classIdPresent && classCode == .discovery {

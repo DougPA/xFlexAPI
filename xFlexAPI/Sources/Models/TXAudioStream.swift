@@ -158,7 +158,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.entry(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
             return
         }
         
@@ -172,7 +172,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         
         // add the Audio Stream to the collection if not existing
         if let _ = _radio?.txAudioStreams[_streamId] {
-            _log.entry(#function + " - Attempted to Add TXAudioStream already in Radio txAudioStreams List",
+            _log.message(#function + " - Attempted to Add TXAudioStream already in Radio txAudioStreams List",
                        level: .warning, source: kModule)
             return // already in the list
         }
@@ -198,7 +198,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             // get the Int and Bool versions of the value

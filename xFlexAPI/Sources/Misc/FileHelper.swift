@@ -54,7 +54,7 @@ public class FileHelper : NSObject {
             do {
                 try fileManager.createDirectory( at: appFolder, withIntermediateDirectories: false, attributes: nil)
             } catch let error as NSError {
-                Log.sharedInstance.entry("Error creating App Support folder: \(error.localizedDescription)", level: .debug, source: "FileHelper")
+                Log.sharedInstance.message("Error creating App Support folder: \(error.localizedDescription)", level: .debug, source: "FileHelper")
             }
         }
         return appFolder

@@ -164,7 +164,7 @@ public final class Memory : NSObject, KeyValueParser {
             // Check for Unknown token
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown token, log it and ignore the token
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             

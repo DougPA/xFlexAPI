@@ -79,7 +79,7 @@ final public class IqStream: NSObject {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.entry(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
             return
         }
         //get the streamId (remove the "0x" prefix)
@@ -101,7 +101,7 @@ final public class IqStream: NSObject {
             
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             // get the Int and Bool versions of the value

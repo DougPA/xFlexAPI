@@ -110,7 +110,7 @@ public final class Tnf : NSObject, KeyValueParser {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             // known keys, in alphabetical order

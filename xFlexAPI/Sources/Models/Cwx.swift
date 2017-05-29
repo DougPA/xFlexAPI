@@ -197,7 +197,7 @@ public final class Cwx : NSObject, KeyValueParser {
         // zero or anything greater than 2 is an error, log it and ignore the Reply
         guard components == 1 || components == 2 else {
             
-            _log.entry("Invalid message reply", level: .warning, source: kModule)
+            _log.message("Invalid message reply", level: .warning, source: kModule)
             return
         }
         // get the character position
@@ -206,7 +206,7 @@ public final class Cwx : NSObject, KeyValueParser {
         // not an integer, log it and ignore the Reply
         guard charPos != nil else {
             
-            _log.entry("Invalid character position", level: .warning, source: kModule)
+            _log.message("Invalid character position", level: .warning, source: kModule)
             return
         }
         
@@ -225,7 +225,7 @@ public final class Cwx : NSObject, KeyValueParser {
             // not an integer, log it and ignore the Reply
             guard block != nil else {
 
-                _log.entry("Invalid block", level: .warning, source: kModule)
+                _log.message("Invalid block", level: .warning, source: kModule)
                 return
             }
             // inform the Event Handler (if any)
@@ -290,7 +290,7 @@ public final class Cwx : NSObject, KeyValueParser {
                 guard let token = Token(rawValue: kv.key.lowercased()) else {
                     
                     // unknown token, log it and ignore the token
-                    _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                    _log.message(" - \(kv.key)", level: .debug, source: kModule)
                     continue
                 }
                 

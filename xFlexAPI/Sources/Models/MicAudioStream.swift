@@ -111,7 +111,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 //        
 //        guard responseValue == kNoError else {
 //            // Anything other than 0 is an error, log it and ignore the Reply
-//            _log.entry(#function + " - \(responseValue)", level: .error, source: kModule)
+//            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
 //            return
 //        }
 //        
@@ -125,7 +125,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 //        
 //        // add the Audio Stream to the collection if not existing
 //        if let _ = _radio?.micAudioStreams[_streamId] {
-//            _log.entry(#function + " - Attempted to Add MicAudioStream already in Radio micAudioStreams List",
+//            _log.message(#function + " - Attempted to Add MicAudioStream already in Radio micAudioStreams List",
 //                       level: .warning, source: kModule)
 //            return // already in the list
 //        }
@@ -151,7 +151,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             // get the Int and Bool versions of the value
@@ -283,7 +283,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
         if vita.sequence != expectedSequenceNumber {
             
             // NO, log the issue
-            _log.entry("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, source: kModule)
+            _log.message("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, source: kModule)
             
             rxSeq = nil
             rxLostPacketCount += 1

@@ -85,7 +85,7 @@ public final class Equalizer : NSObject, KeyValueParser {
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             // get the Integer & Bool versions of the value

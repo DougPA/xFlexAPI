@@ -225,7 +225,7 @@ public class Slice : NSObject, KeyValueParser {
             switch modeType {
             
             case .fm, .nfm:
-                _log.entry("Cannot change Filter width in FM mode", level: .warning, source: kModule)
+                _log.message("Cannot change Filter width in FM mode", level: .warning, source: kModule)
                 newValue = value
                 
             case .cw:
@@ -261,7 +261,7 @@ public class Slice : NSObject, KeyValueParser {
             switch modeType {
                 
             case .fm, .nfm:
-                _log.entry("Cannot change Filter width in FM mode", level: .warning, source: kModule)
+                _log.message("Cannot change Filter width in FM mode", level: .warning, source: kModule)
                 newValue = value
                 
             case .cw:
@@ -305,7 +305,7 @@ public class Slice : NSObject, KeyValueParser {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
                 continue
             }
             // get the Int, Bool and Float versions of the value
@@ -453,7 +453,7 @@ public class Slice : NSObject, KeyValueParser {
             
             case .ghost:
                 // FIXME: Is this needed?
-                _log.entry(" - \(kv.key)", level: .token, source: kModule)
+                _log.message(" - \(kv.key)", level: .debug, source: kModule)
             
             case .inUse:
                 willChangeValue(forKey: "inUse")
