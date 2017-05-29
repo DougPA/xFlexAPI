@@ -1042,7 +1042,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // FIXME: Should parsers ignore Status message sent to other connection handles?
 
-    /// <#Description#>
+    /// Prepare to parse an AudioStream status message
     ///
     /// - Parameters:
     ///   - streamId:       an Audio Stream Id
@@ -1052,22 +1052,20 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseAudioStream(_ keyValues: KeyValuesArray, isMyHandle: Bool, notInUse: Bool) {
         
-        //        // Ignore status updates that are not our own
-        //        if isMyHandle == false { return }
-        
         //get the AudioStreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
         
         // is it marked for removal?
         if notInUse {
             
-            // inform any listeners
+            // YES, inform any listeners
             NC.post(.audioStreamWillBeRemoved, object: audioStreams[streamId] as Any)
             
-            // YES, remove it
+            // remove it
             audioStreams[streamId] = nil
             
         } else {
+            
             // NO, does the AudioStream exist?
             if audioStreams[streamId] == nil {
                 
@@ -1075,13 +1073,12 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 // NO, create a new AudioStream & add it to the AudioStreams collection
                 audioStreams[streamId] = AudioStream(channel: channel, radio: self, id: streamId, queue: _audioStreamsQ)
-                //            audioStreams[streamId]?.streamId = streamId
             }
             // pass the remaining key values to the AudioStream for parsing
             audioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
-    /// Parse Atu tokens
+    /// Parse an Atu status message
     ///
     /// - Parameters:
     ///   - keyValues: a KeyValuesArray
@@ -1132,7 +1129,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Parse Cwx tokens. format:
+    /// Prepare to parse a Cwx status message
     ///
     /// - parameter keyValues: a KeyValuesArray
     ///
@@ -1142,7 +1139,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         cwx.parseKeyValues(keyValues)
     }
     
-    /// Parse Dax Iq tokens. format:
+    /// Prepare to parse a DaxIq status message
     ///
     /// - Parameters:
     ///   - channel:        a dax channel number
@@ -1167,7 +1164,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the key values to the IqStream for parsing
         iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
-    /// Parse Display tokens. format: <DisplayType> <StreamId> <key=value> <key=value> ...<key=value>
+    /// Prepare to parse a Display status message
     ///
     /// - Parameters:
     ///   - displayType: a Display type
@@ -1241,7 +1238,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Parse Equalizer tokens. format: <key=value> <key=value> ...<key=value>
+    /// Parse an Equalizer status message
     ///
     /// - Parameters:
     ///   - type:      an Equalizer type
@@ -1280,7 +1277,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             equalizer.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
-    /// Parse Gps tokens. format: <key=value> <key=value> ...<key=value>
+    /// Parse a Gps status message
     ///
     /// - Parameters:
     ///   - keyValues: a KeyValuesArray
@@ -1363,7 +1360,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         }
 
     }
-    /// Parse Interlock tokens. format: <key=value> <key=value> ...<key=value>
+    /// Parse an Interlock status message
     ///
     /// - Parameters:
     ///   - keyValues: a KeyValuesArray
@@ -1484,7 +1481,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Parse Memory tokens. format:
+    /// Prepare to parse a Memory status message
     ///
     /// - Parameters:
     ///   - memoryId:         a Memory Id
@@ -1517,7 +1514,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             memory!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
-    /// Parse Meter tokens. format of remainder: <MeterNumber> "removed" OR format of keyValues: <MeterNumber>.<key=value>
+    /// Prepare to parse a Meter status message
     ///
     /// - Parameters:
     ///   - remainder: remainder of the command String
@@ -1586,7 +1583,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             meter!.parseKeyValues( keyValues )
         }
     }
-    /// Parse MicAudioStream Tokens. format: <StreamId> <key=value> <key=value> ...<key=value>
+    /// Prepare to parse a MicAudioStream status message
     ///
     /// - Parameters:
     ///   - streamId:       an Audio Stream Id
@@ -1623,7 +1620,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             micAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
-    /// Parse Opus Tokens. format: <StreamId> <key=value> <key=value> ...<key=value>
+    /// Prepare to parse an Opus status message
     ///
     /// - Parameters:
     ///   - id:        an Opus Stream Id
@@ -1648,7 +1645,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the key values to Opus for parsing
         opus!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
-    /// Parse Profile Tokens. format: <type> list=<value>^<value>^...<value>^   OR   format: <type> current=<value>
+    /// Parse a Profile status message
     ///
     /// - parameter remainder: remainder of the command String
     ///
@@ -1703,7 +1700,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             _log.message(" - \(remainder)", level: .debug, source: kModule)
         }
     }
-    /// Parse Radio tokens. format: <key=value> <key=value> ...<key=value>
+    /// Parse a Radio status message
     ///
     /// - parameter keyValues: a KeyValuesArray
     ///
@@ -1918,7 +1915,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             NC.post(.radioInitialized, object: self as Any?)
         }
     }
-    /// Parse Slice tokens. format: <StreamId> <key=value> <key=value> ...<key=value>
+    /// Prepare to parse a Slice status message
     ///
     /// - parameter sliceId:   a Slice Id
     /// - parameter keyValues: a KeyValuesArray
@@ -1948,7 +1945,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the remaining key values to the Slice for parsing
         slices[sliceId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
-    /// Parse Tnf tokens
+    /// Prepare to parse a Tnf status message
     ///
     /// - Parameters:
     ///   - tnfId:     a Tnf Id
@@ -1969,7 +1966,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         tnfs[tnfId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
     
-    /// Parse Transmit tokens
+    /// Parse a Transmit status message
     ///
     /// - Parameters:
     ///   - keyValues: a KeyValuesArray
@@ -2220,7 +2217,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Parse TXAudioStream Tokens. format: <StreamId> <key=value> <key=value> ...<key=value>
+    /// Prepare to parse a TxAudioStream status message
     ///
     /// - Parameters:
     ///   - streamId:       an Audio Stream Id
@@ -2248,7 +2245,12 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the remaining key values to the AudioStream for parsing
         txAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
-    
+    /// Parse a Waveform status message
+    ///
+    /// - Parameters:
+    ///   - keyValues: a KeyValuesArray
+    ///   - isMyHandle:  true if command directed to my Handle, otherwise false
+    ///
     private func parseWaveform(_ keyValues: KeyValuesArray, isMyHandle: Bool) {
         
         // Ignore status updates that are not our own
