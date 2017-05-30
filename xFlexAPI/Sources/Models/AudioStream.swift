@@ -30,7 +30,7 @@ final public class AudioStream: NSObject {
     // MARK: - Private properties
     
     fileprivate var _id: Radio.DaxStreamId = ""         // The Audio stream id
-    fileprivate var _initialized = false                // True if initialized by Radio hardware
+//    fileprivate var _initialized = false                // True if initialized by Radio hardware
 
     fileprivate weak var _radio: Radio?                 // The Radio that owns this Audio stream
     fileprivate var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
@@ -45,7 +45,7 @@ final public class AudioStream: NSObject {
     fileprivate var __inUse = false                     // true = in use                            //
     fileprivate var __ip = ""                           // Ip Address                               //
     fileprivate var __port = 0                          // Port number                              //
-//    fileprivate var __radioAck = false                  // has the radio acknowledged this stream   //
+    fileprivate var __radioAck = false                  // has the radio acknowledged this stream   //
     fileprivate var __rxGain = 50                       // rx gain of stream                        //
     fileprivate var __slice: xFlexAPI.Slice?            // Source Slice                             //
     fileprivate var __streamId: Radio.DaxStreamId = ""  // Stream Id                                //
@@ -59,7 +59,7 @@ final public class AudioStream: NSObject {
     fileprivate let kModule = "AudioStream"             // Module Name reported in log messages
     fileprivate let kNoError = "0"                      // response without error
 
-//    fileprivate let kStreamCreateCmd = "stream create "
+    fileprivate let kStreamCreateCmd = "stream create "
     
     // see FlexLib
     fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
@@ -72,15 +72,15 @@ final public class AudioStream: NSObject {
     ///   - radio:              the Radio instance
     ///   - queue:              AudioStreams concurrent Queue
     ///
-    init(channel: Radio.DaxChannel, radio: Radio, id: String, queue: DispatchQueue) {
+    init(channel: Radio.DaxChannel, radio: Radio, queue: DispatchQueue) {
         
-        super.init()
-
-        self._id = id
         self._radio = radio
         self._audioStreamsQ = queue
         
-        self._daxChannel = channel          // must be set after the queue
+        super.init()
+
+        self._daxChannel = channel
+        
         
         _slice = radio.findSliceBy(daxChannel: channel)
     }
@@ -88,28 +88,28 @@ final public class AudioStream: NSObject {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods that send commands to the Radio (hardware)
     
-//    public func requestAudioStream() -> Bool {          // DL3LSM
-//        
-//        // check to see if this object has already been activated
-//        if _radioAck { return false }
-//        
-//        // check to ensure this object is tied to a radio object
-//        if _radio == nil { return false }
-//        
-//        // check to make sure the radio is connected
-//        switch _radio!.connectionState {
-//        case .clientConnected:
-//            _radio!.send(kStreamCreateCmd + "dax=\(_daxChannel)", replyTo: updateStreamId)
-//            return true
-//        default:
-//            return false
-//        }
-//    }
-//    public func removeAudioStream() {           // DL3LSM
-//        
-//        _radio?.send("stream remove 0x\(streamId)")
-//        _radio?.removeAudioStream(streamId)
-//    }
+    public func requestAudioStream() -> Bool {          // DL3LSM
+        
+        // check to see if this object has already been activated
+        if _radioAck { return false }
+        
+        // check to ensure this object is tied to a radio object
+        if _radio == nil { return false }
+        
+        // check to make sure the radio is connected
+        switch _radio!.connectionState {
+        case .clientConnected:
+            _radio!.send(kStreamCreateCmd + "dax=\(_daxChannel)", replyTo: updateStreamId)
+            return true
+        default:
+            return false
+        }
+    }
+    public func removeAudioStream() {           // DL3LSM
+        
+        _radio?.send("stream remove 0x\(streamId)")
+        _radio?.removeAudioStream(streamId)
+    }
     
     // ------------------------------------------------------------------------------
     // MARK: - Private methods
@@ -121,28 +121,28 @@ final public class AudioStream: NSObject {
     ///   - responseValue:  the response value
     ///   - reply:          the reply
     ///
-//    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {       // DL3LSM
-//        
-//        guard responseValue == kNoError else {
-//            // Anything other than 0 is an error, log it and ignore the Reply
-//            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
-//            return
-//        }
-//        
-//        // make the string 8 characters long -> add "0" at the beginning
-//        let fillCnt = 8 - reply.characters.count
-//        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
-//        _streamId = fills + reply
-//        
-//        // add the Audio Stream to the collection if not existing
-//        if let _ = _radio?.audioStreams[_streamId] {
-//            _log.message(#function + " - Attempted to Add AudioStream already in Radio audioStreams List",
-//                       level: .warning, source: kModule)
-//            return // already in the list
-//        }
-//        
-//        _radio?.audioStreams[_streamId] = self
-//    }
+    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {       // DL3LSM
+        
+        guard responseValue == kNoError else {
+            // Anything other than 0 is an error, log it and ignore the Reply
+            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
+            return
+        }
+        
+        // make the string 8 characters long -> add "0" at the beginning
+        let fillCnt = 8 - reply.characters.count
+        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
+        _streamId = fills + reply
+        
+        // add the Audio Stream to the collection if not existing
+        if let _ = _radio?.audioStreams[_streamId] {
+            _log.message(#function + " - Attempted to Add AudioStream already in Radio audioStreams List",
+                       level: .warning, source: kModule)
+            return // already in the list
+        }
+        
+        _radio?.audioStreams[_streamId] = self
+    }
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
@@ -154,7 +154,7 @@ final public class AudioStream: NSObject {
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
-//        var setRadioAck = false
+        var setRadioAck = false
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -192,10 +192,10 @@ final public class AudioStream: NSObject {
                 _ip = kv.value
                 didChangeValue(forKey: "ip")
                 
-//                if !_radioAck {
-//                    setRadioAck = true
-//                }
-//                
+                if !_radioAck {
+                    setRadioAck = true
+                }
+                
             case .port:
                 willChangeValue(forKey: "port")
                 _port = iValue
@@ -208,20 +208,20 @@ final public class AudioStream: NSObject {
                 didChangeValue(forKey: "slice")
             }
         }
-//        // if this is an initialized AudioStream and inUse becomes false
-//        if _initialized && _shouldBeRemoved == false && _inUse == false {
-//            
-//            // mark it for removal
-//            _shouldBeRemoved = true
-//            
-//            _radio?.removeAudioStream(self.streamId)
-//        }
+        // if this is an initialized AudioStream and inUse becomes false
+        if _radioAck && _shouldBeRemoved == false && _inUse == false {
+            
+            // mark it for removal
+            _shouldBeRemoved = true
+            
+            _radio?.removeAudioStream(self.streamId)
+        }
         
         // is the AudioStream acknowledged by the radio?
-        if !_initialized {
+        if setRadioAck {
             
             // YES, the Radio (hardware) has acknowledged this Audio Stream
-            _initialized = true
+            radioAck = true
             
             // notify all observers
             NC.post(.audioStreamInitialized, object: self as Any?)
@@ -378,9 +378,9 @@ extension AudioStream {
         get { return _audioStreamsQ.sync { __port } }
         set { _audioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-//    fileprivate var _radioAck: Bool {
-//        get { return _audioStreamsQ.sync { __radioAck } }
-//        set { _audioStreamsQ.sync(flags: .barrier) { __radioAck = newValue } } }
+    fileprivate var _radioAck: Bool {
+        get { return _audioStreamsQ.sync { __radioAck } }
+        set { _audioStreamsQ.sync(flags: .barrier) { __radioAck = newValue } } }
     
     fileprivate var _rxGain: Int {
         get { return _audioStreamsQ.sync { __rxGain } }
@@ -390,9 +390,9 @@ extension AudioStream {
         get { return _audioStreamsQ.sync { __slice } }
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
     
-//    fileprivate var _streamId: String {
-//        get { return _audioStreamsQ.sync { __streamId } }
-//        set { _audioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
+    fileprivate var _streamId: String {
+        get { return _audioStreamsQ.sync { __streamId } }
+        set { _audioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant with Radio update
@@ -426,9 +426,9 @@ extension AudioStream {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
 
-//    dynamic public var radioAck: Bool {     // DL3LSM
-//        get { return _radioAck }
-//        set { _radioAck = newValue } }
+    dynamic public var radioAck: Bool {     // DL3LSM
+        get { return _radioAck }
+        set { _radioAck = newValue } }
     
     dynamic public var rxGain: Int {        // DL3LSM
         get { return _rxGain  }
@@ -437,7 +437,7 @@ extension AudioStream {
                 let value = newValue.bound(0, 100)
                 if _rxGain != value {
                     _rxGain = value
-                    _radio?.send("audio stream 0x" + _id + " slice " + _slice!.id + " gain \(value)")
+                    _radio?.send("audio stream 0x" + _streamId + " slice " + _slice!.id + " gain \(value)")
                 }
             }
         }
@@ -457,9 +457,9 @@ extension AudioStream {
         }
     }
     
-//    dynamic public var streamId: String {
-//        get { return _streamId }
-//        set { if _streamId != newValue { _streamId = newValue } } }
+    dynamic public var streamId: String {
+        get { return _streamId }
+        set { if _streamId != newValue { _streamId = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization

@@ -46,12 +46,13 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
 
 //    fileprivate var _vita = Vita()                          // a Vita-49 packet
     fileprivate var _udpSocket: GCDAsyncUdpSocket!          // socket for Vita UDP data
-//    fileprivate var _udpSendSocket: GCDAsyncUdpSocket?      // socket for sending Vita UDP data
+    fileprivate var _udpSendSocket: GCDAsyncUdpSocket?      // socket for sending Vita UDP data
     fileprivate var _streamTimer: DispatchSourceTimer!      // periodic timer for stream activity
     
     // constants
     fileprivate let kModule = "UdpManager"                  // Module Name reported in log messages
     fileprivate let kBroadcastAddress = "255.255.255.255"
+    fileprivate let kUdpSendPort: UInt16 = 4991
     
     // ----------------------------------------------------------------------------
     // MARK: - Initialization
@@ -85,6 +86,12 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
                 canBroadcast = false
             }
         }
+        
+        // get a socket for sending Vita Data
+        // TODO: use a seperate queue??
+        _udpSendSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpQ)
+        _udpSendSocket?.setIPv4Enabled(true)
+        _udpSendSocket?.setIPv6Enabled(false)
     }
     
     // ----------------------------------------------------------------------------
@@ -96,7 +103,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     ///
     public func sendBroadcast(data: Data) {
         
-        _udpSocket?.send(data, toHost: kBroadcastAddress, port: port, withTimeout: -1, tag: 0)
+        _udpSendSocket?.send(data, toHost: kBroadcastAddress, port: port, withTimeout: -1, tag: 0)
     }
     /// Send Vita packet to radio
     ///
@@ -104,7 +111,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     ///
     public func sendData(_ data: Data) {
         
-        _udpSocket?.send(data, withTimeout: -1, tag: 0)
+        _udpSendSocket?.send(data, withTimeout: -1, tag: 0)
     }
     /// Bind to the UDP Port
     ///
@@ -134,16 +141,16 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
         // capture the number of the actual port in use
         port = tmpPort
         
-//        // connect send socket
-//        do {
-//            try _udpSendSocket?.connect(toHost: _parameters.ipAddress, onPort: 4991)
-//        } catch let error {
-//            
-//            _delegate.udpError("Unable to connect to UDP address = \(_parameters.ipAddress ) (port 4991) - \(error.localizedDescription)")
-//            // FIXME: implement logic to try again later
-//            _udpSendSocket?.close()
-//            _udpSendSocket = nil
-//        }
+        // connect send socket
+        do {
+            try _udpSendSocket?.connect(toHost: _parameters.ipAddress, onPort: kUdpSendPort)
+        } catch let error {
+            
+            _delegate.udpError("Unable to connect to UDP address = \(_parameters.ipAddress ) (port \(kUdpSendPort)) - \(error.localizedDescription)")
+            // FIXME: implement logic to try again later
+            _udpSendSocket?.close()
+            _udpSendSocket = nil
+        }
 
         
         // change the state
@@ -169,9 +176,9 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
         // tell the receive socket to close
         _udpSocket.close()
         
-//        // tell the send socket to close
-//        _udpSendSocket?.close()
-//        _udpSendSocket = nil
+        // tell the send socket to close
+        _udpSendSocket?.close()
+        _udpSendSocket = nil
 
         _delegate.udpState(bound: false, port: 0, error: "")
     }

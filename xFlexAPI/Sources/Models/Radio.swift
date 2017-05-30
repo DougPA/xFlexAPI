@@ -501,47 +501,47 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func requestAntennaList() { send(kAntListCmd, replyTo: replyHandler) }       // Antenna List
     public func atuStart() { send(kAtuCmd + "start") }
     public func atuBypass() { send(kAtuCmd + "bypass") }
-    public func createAudioStream(_ channel: String) { send(kStreamCreateCmd + "dax=\(channel)") }
-//    DL3LSM
-//    public func createAudioStream(_ channel: Radio.DaxChannel) -> AudioStream {
-//        
-//        let audioStream = AudioStream(channel: channel, radio: self, queue: _audioStreamsQ)
-//        return audioStream
-//    }
-    public func removeAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
-//    DL3LSM
-//    public func removeAudioStream(_ streamId: Radio.DaxStreamId) {
-//        
-//        if let audioStream = audioStreams[streamId] {
-//            
-//            // notify all observers
-//            NC.post(.audioStreamWillBeRemoved, object: audioStream as Any?)
-//            
-//            audioStreams[streamId] = nil
-//        }
-//    }
+//    public func createAudioStream(_ channel: String) { send(kStreamCreateCmd + "dax=\(channel)") }
+    //     DL3LSM
+    public func createAudioStream(_ channel: Radio.DaxChannel) -> AudioStream {
+        
+        let audioStream = AudioStream(channel: channel, radio: self, queue: _audioStreamsQ)
+        return audioStream
+    }
+//    public func removeAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
+    //     DL3LSM
+    public func removeAudioStream(_ streamId: Radio.DaxStreamId) {
+        
+        if let audioStream = audioStreams[streamId] {
+            
+            // notify all observers
+            NC.post(.audioStreamWillBeRemoved, object: audioStream as Any?)
+            
+            audioStreams[streamId] = nil
+        }
+    }
     // M
     public func createMemory() { send("memory create") }
     public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
-    public func createMicAudioStream() { send(kMicStreamCreateCmd) }
-    public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
+//    public func createMicAudioStream() { send(kMicStreamCreateCmd) }
+//    public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
     //     DL3LSM
-//    public func createMicAudioStream() -> MicAudioStream {
-//        
-//        let micAudioStream = MicAudioStream(radio: self, queue: _micAudioStreamsQ)
-//        return micAudioStream
-//    }
+    public func createMicAudioStream() -> MicAudioStream {
+        
+        let micAudioStream = MicAudioStream(radio: self, queue: _micAudioStreamsQ)
+        return micAudioStream
+    }
     // DL3LSM
-//    public func removeMicAudioStream(_ streamId: Radio.DaxStreamId) {
-//        
-//        if let micAudioStream = micAudioStreams[streamId] {
-//            
-//            // notify all observers
-//            NC.post(.micAudioStreamWillBeRemoved, object: micAudioStream as Any?)
-//            
-//            micAudioStreams[streamId] = nil
-//        }
-//    }
+    public func removeMicAudioStream(_ streamId: Radio.DaxStreamId) {
+        
+        if let micAudioStream = micAudioStreams[streamId] {
+            
+            // notify all observers
+            NC.post(.micAudioStreamWillBeRemoved, object: micAudioStream as Any?)
+            
+            micAudioStreams[streamId] = nil
+        }
+    }
     public func requestMicList() { send(kMicListCmd, replyTo: replyHandler) }
     // O
     public func startOffset(_ value: Bool) { startOffset = value ; if value == false { send("radio pll_start") } }
@@ -1055,28 +1055,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         //get the AudioStreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
         
-        // is it marked for removal?
-        if notInUse {
+        // does the AudioStream exist?
+        if audioStreams[streamId] == nil {
             
-            // YES, inform any listeners
-            NC.post(.audioStreamWillBeRemoved, object: audioStreams[streamId] as Any)
+            if notInUse { return }
             
-            // remove it
-            audioStreams[streamId] = nil
+            let channel = keyValues[0].value.iValue()
             
-        } else {
-            
-            // NO, does the AudioStream exist?
-            if audioStreams[streamId] == nil {
-                
-                let channel = keyValues[0].value.iValue()
-                
-                // NO, create a new AudioStream & add it to the AudioStreams collection
-                audioStreams[streamId] = AudioStream(channel: channel, radio: self, id: streamId, queue: _audioStreamsQ)
-            }
-            // pass the remaining key values to the AudioStream for parsing
-            audioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+            // NO, create a new AudioStream & add it to the AudioStreams collection
+            audioStreams[streamId] = AudioStream(channel: channel, radio: self, queue: _audioStreamsQ)
+            audioStreams[streamId]?.streamId = streamId
         }
+        // pass the remaining key values to the AudioStream for parsing
+        audioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
     /// Parse an Atu status message
     ///
@@ -1613,7 +1604,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 if notInUse { return }
                 
                 // NO, create a new AudioStream & add it to the AudioStreams collection
-                micAudioStreams[streamId] = MicAudioStream(radio: self, id: streamId, queue: _micAudioStreamsQ)
+                micAudioStreams[streamId] = MicAudioStream(radio: self, queue: _micAudioStreamsQ)
                 //            micAudioStreams[streamId]?.streamId = streamId
             }
             // pass the remaining key values to the AudioStream for parsing
@@ -2529,7 +2520,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.message(command + " - \(responseValue)", level: .error, source: kModule)
             return
         }
         // which command?
@@ -2604,7 +2595,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 sliceErrors = valuesArray(reply, delimiter: ",")
 
             } else {
-                _log.message("Unprocessed reply, \(reply)", level: .error, source: kModule)
+                _log.message(command + " - Unprocessed reply, \(reply)", level: .error, source: kModule)
             }
         }
     }
