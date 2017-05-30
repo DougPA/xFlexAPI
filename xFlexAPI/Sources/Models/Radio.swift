@@ -1086,8 +1086,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseAtu(_ keyValues: KeyValuesArray, isMyHandle: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -1148,8 +1148,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseDaxiq(_ keyValues: KeyValuesArray, isMyHandle: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         // get the Dax Channel
         let channel = Int(keyValues[0].key) ?? 0
@@ -1174,8 +1174,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseDisplay(_ keyValues: KeyValuesArray, isMyHandle: Bool, isRemoved: Bool) {
 
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         // get the Type & remove it
         let displayType = keyValues[0].key
@@ -1368,8 +1368,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseInterlock(_ keyValues: KeyValuesArray, isMyHandle: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -1593,8 +1593,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseMicAudioStream(_ keyValues: KeyValuesArray, isMyHandle: Bool, notInUse: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         //get the AudioStreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
@@ -1974,8 +1974,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseTransmit(_ keyValues: KeyValuesArray, isMyHandle: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -2227,8 +2227,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseTXAudioStream(_ keyValues: KeyValuesArray, isMyHandle: Bool, notInUse: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         //get the AudioStreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
@@ -2253,8 +2253,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseWaveform(_ keyValues: KeyValuesArray, isMyHandle: Bool) {
         
-        // Ignore status updates that are not our own
-        if isMyHandle == false { return }
+//        // Ignore status updates that are not our own
+//        if isMyHandle == false { return }
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
