@@ -36,7 +36,6 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     
     public private(set) var port: UInt16 = 0                // actual Vita port number
     public private(set) var canBroadcast = true             // True if Broadcast permitted
-    public private(set) var canReuse = true                 // True if Port Reuse permitted
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
@@ -78,14 +77,6 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
         _udpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: udpQ)
         _udpSocket.setIPv4Enabled(true)
         _udpSocket.setIPv6Enabled(false)
-        
-        if canReuse {
-            do {
-                try _udpSocket.enableReusePort(true)
-            } catch {
-                canReuse = false
-            }
-        }
         
         if enableBroadcast {
             do {
