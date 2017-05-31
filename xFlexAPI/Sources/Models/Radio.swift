@@ -3255,8 +3255,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func daxVitaHandler(_ vitaPacket: Vita) {
         
-        //print( "DAX - \(vitaPacket.desc())" )
-        
         // check if it is rx audio or mic audio
         if let audioStream = audioStreams[vitaPacket.streamId] {
             audioStream.vitaHandler(vitaPacket)
@@ -3269,9 +3267,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             return
         }
         
-        // oops
-        // TODO: should be logged
-        print("received vita dax packet but no stream existing: \(vitaPacket.desc())")
+//        // oops
+//        // TODO: should be logged
+//        print("received vita dax packet but no stream existing: \(vitaPacket.desc())")
         
     }
     /// Process the Dax Iq Vita packets
