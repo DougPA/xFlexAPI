@@ -334,7 +334,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         super.init()
         
-        _log.message("xFlexAPI initialized, isGui = \(_isGui)", level: .debug, source: kModule)
+        _log.msg("xFlexAPI initialized, isGui = \(_isGui)", level: .debug, function: #function, file: #file, line: #line)
 
         // check the version
         checkFirmwareVersion(radioParameters)
@@ -431,7 +431,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         NC.post(.tcpWillDisconnect, object: selectedRadio as Any?)
         
-        _log.message("Radio @ \(String(describing: selectedRadio?.ipAddress)) will disconnect", level: .info, source: kModule)
+         _log.msg("Radio @ \(String(describing: selectedRadio?.ipAddress)) will disconnect", level: .info, function: #function, file: #file, line: #line)
 
         // if active, stop pinging
         if pinger != nil { pinger = nil }
@@ -682,7 +682,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             case .tcpConnected(let host, let port):
                 
                 // log it
-                self._log.message("TCP connected to Radio IP \(host), Port \(port)", level: .verbose, source: self.kModule)
+                self._log.msg("TCP connected to Radio IP \(host), Port \(port)", level: .verbose, function: #function, file: #file, line: #line)
                 
                 // a tcp connection has been established
                 NC.post(.tcpDidConnect, object: nil)
@@ -695,7 +695,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             case .udpBound(let port):
                 
                 // UDP (streams) connection established, initialize the radio
-                self._log.message("UDP bound to Port \(port)", level: .verbose, source: self.kModule)
+                self._log.msg("UDP bound to Port \(port)", level: .verbose, function: #function, file: #file, line: #line)
                 
                 NC.post(.udpDidBind, object: nil)
 
@@ -704,7 +704,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
             case .clientConnected():
                 
-                self._log.message("Client connection established", level: .verbose, source: self.kModule)
+                self._log.msg("Client connection established", level: .verbose, function: #function, file: #file, line: #line)
                 
                 // send the initial commands
                 if !self._connectSimple { self.sendCommands(self.primaryCommandsArray) }
@@ -727,14 +727,14 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             case .disconnected(let reason):
                 
                 // TCP connection disconnected
-                self._log.message("Disconnected, reason = \(reason)", level: .error, source: self.kModule)
+                self._log.msg("Disconnected, reason = \(reason)", level: .error, function: #function, file: #file, line: #line)
                 
                 NC.post(.tcpDidDisconnect, object: reason)
                 
             case .update( _, _):
                 
                 // FIXME: need to handle Update State ???
-                self._log.message("Update in process", level: .info, source: self.kModule)
+                self._log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
             }
         }
     }
@@ -774,7 +774,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 self._hardwareVersion = suffix
                 
             default:    // Unknown Type
-                self._log.message("Unexpected message type from radio - " + message, level: .debug, source: kModule)
+                _log.msg("Unexpected message type from radio - " + message, level: .debug, function: #function, file: #file, line: #line)
             }
         }
     }
@@ -796,7 +796,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // ignore incorrectly formatted messages
         if components.count < 2 {
             
-            _log.message("Incomplete message, c\(commandSuffix)", level: .debug, source: kModule)
+            _log.msg("Incomplete message, c\(commandSuffix)", level: .debug, function: #function, file: #file, line: #line)
             return
         }        
         // bits 24-25 are the errorCode???
@@ -805,7 +805,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         let msgText = components[1]
         
         // log it
-        _log.message(msgText, level: MessageLevel(rawValue: errorCode) ?? MessageLevel.error, source: "Hardware")
+        _log.msg(msgText, level: MessageLevel(rawValue: errorCode) ?? MessageLevel.error, function: #function, file: #file, line: #line)
         
         // FIXME: Take action on some/all errors?
     }
@@ -821,7 +821,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // ignore incorrectly formatted replies
         if components.count < 2 {
            
-            _log.message("Incomplete reply, c\(commandSuffix)", level: .debug, source: kModule)
+            _log.msg("Incomplete reply, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
             return
         }
         
@@ -842,8 +842,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
             if components[1] != kNoError {
-//                _log.message("Unhandled non-zero reply, c\(commandSuffix)", level: MessageLevel.from(components[1]), source: kModule + ", Reply")
-                _log.message("Unhandled non-zero reply, c\(commandSuffix)", level: .warning, source: kModule)
+                _log.msg("Unhandled non-zero reply, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
             }
         }
     }
@@ -860,7 +859,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // ignore incorrectly formatted status
         guard components.count > 1 else {
             
-            _log.message("Incomplete status, c\(commandSuffix)", level: .debug, source: kModule)
+            _log.msg("Incomplete status, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
             return
         }
         
@@ -882,7 +881,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         guard let token = StatusToken(rawValue: msgType.lowercased())  else {
             
             // unknown Message Type, log it and ignore the message
-            _log.message(" - \(msgType)", level: .debug, source: kModule)
+            _log.msg("Unknown token - \(msgType)", level: .warning, function: #function, file: #file, line: #line)
             return
         }
         
@@ -909,7 +908,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             guard keyValues.count >= 2 else {
                 
-                _log.message("Invalid client status", level: .warning, source: kModule)
+                _log.msg("Invalid client status", level: .warning, function: #function, file: #file, line: #line)
                 return
             }
             
@@ -923,11 +922,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                     
                     // FIXME: Handle the disconnect
                     
-                    _log.message("Disconnect, forced=\(keyValues[2].value)", level: .verbose, source: kModule)
+                    _log.msg("Disconnect, forced=\(keyValues[2].value)", level: .verbose, function: #function, file: #file, line: #line)
                     
                 } else {
                 
-                    _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
+                    _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
                 }
             }
             
@@ -955,7 +954,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .file:
             
-            _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
         case .gps:
             //     format: <key=value>#<key=value>#...<key=value>
@@ -979,8 +978,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .mixer:
             
-            _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
-            break
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
             
         case .opusStream:
             //     format: <opusId> <key=value> <key=value> ...<key=value>
@@ -1003,7 +1001,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .stream:
             
-            _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
         
         case .tnf:
             //     format: <tnfId> <key=value> <key=value> ...<key=value>
@@ -1015,7 +1013,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .turf:
             
-            _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
             
         case .txAudioStream:
             //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
@@ -1023,7 +1021,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .usbCable:
             
-            _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
         case .waveform:
             //      format: <key=value> <key=value> ...<key=value>
@@ -1031,7 +1029,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
 
         case .xvtr:
             
-            _log.message("Unprocessed \(msgType), \(remainder)", level: .warning, source: kModule)
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
         }
     }
     
@@ -1087,7 +1085,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = AtuToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1178,7 +1176,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         guard let token = DisplayToken(rawValue: displayType.lowercased()) else {
             
             // unknown Display Type, log it and ignore the message
-            _log.message(" \(displayType)", level: .debug, source: kModule)
+            _log.msg("Unknown Display - \(displayType)", level: .debug, function: #function, file: #file, line: #line)
             return
         }
         
@@ -1258,8 +1256,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
 
         default:
             // unknown type, log & ignore it
-            _log.message("EQ - \(type)", level: .debug, source: kModule)
-            break
+            _log.msg("Unknown EQ - \(type)", level: .debug, function: #function, file: #file, line: #line)
         }
         // if an equalizer was found
         if let equalizer = equalizer {
@@ -1282,7 +1279,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = GpsToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1369,7 +1366,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = InterlockToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1688,7 +1685,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         } else {
             // unknown type
-            _log.message(" - \(remainder)", level: .debug, source: kModule)
+            _log.msg("Unknown profile - \(remainder)", level: .debug, function: #function, file: #file, line: #line)
         }
     }
     /// Parse a Radio status message
@@ -1711,7 +1708,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = RadioToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Display Type, log it and ignore this token
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1975,7 +1972,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = TransmitToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -2254,7 +2251,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = WaveformToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -2520,7 +2517,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(command + " - \(responseValue)", level: .error, source: kModule)
+            _log.msg(command + ", non-zero reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
             return
         }
         // which command?
@@ -2595,7 +2592,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 sliceErrors = valuesArray(reply, delimiter: ",")
 
             } else {
-                _log.message(command + " - Unprocessed reply, \(reply)", level: .error, source: kModule)
+                _log.msg(command + ", unprocessed reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
             }
         }
     }
@@ -2612,7 +2609,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // check for unknown Keys
             guard let token = InfoResponse(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore this Key
-                _log.message("Unknown InfoResponse item = \(kv.key)", level: .warning, source: "Radio")
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -2783,7 +2780,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // check for unknown Tokens
             guard let token = VersionToken(rawValue: kv.key.lowercased() ) else {
                 // Unknown Token, log it and ignore this Token
-                _log.message(#function + " - \(kv.key)", level: .debug, source: "Radio")
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // Known tokens, in alphabetical order
@@ -2910,7 +2907,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             do {
                 try fileManager.createDirectory( at: appFolder, withIntermediateDirectories: false, attributes: nil)
             } catch let error as NSError {
-                _log.message("Error creating App Support folder: \(error.localizedDescription)", level: .error, source: kModule)
+                _log.msg("Error creating App Support folder: \(error.localizedDescription)", level: .error, function: #function, file: #file, line: #line)
             }
         }
         return appFolder
@@ -2927,7 +2924,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // compare the versions
         if xFlexVersionParts[0] != radioVersionParts[0] || xFlexVersionParts[1] != radioVersionParts[1] || xFlexVersionParts[2] != radioVersionParts[2] {
-            _log.message("Firmware update needed, Radio Version = \(selectedRadio.firmwareVersion!), xFlexAPI Firmware Support = \(kApiFirmwareSupport)", level: .warning, source: kModule)
+             _log.msg("Firmware update needed, Radio Version = \(selectedRadio.firmwareVersion!), xFlexAPI Firmware Support = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
         }
     }
     /// Replace spaces and equal signs in a CWX Macro with alternate characters
@@ -3078,7 +3075,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     @objc private func tcpPingStarted(_ note: Notification) {
         
-        _log.message("Pinging started", level: .verbose, source: kModule)
+        _log.msg("Pinging started", level: .verbose, function: #function, file: #file, line: #line)
     }
     /// Process .tcpPingTimeout Notification
     ///
@@ -3086,7 +3083,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     @objc private func tcpPingTimeout(_ note: Notification) {
         
-        _log.message("Ping timeout", level: .error, source: kModule)
+        _log.msg("Ping timeout", level: .error, function: #function, file: #file, line: #line)
         
         // FIXME: Disconnect?
     }
@@ -3148,7 +3145,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func tcpError(_ message: String) {
 
-        _log.message("TCP error:  \(message)", level: .error, source: kModule)
+        _log.msg("TCP error:  \(message)", level: .error, function: #function, file: #file, line: #line)
     }
     
     // ----------------------------------------------------------------------------
@@ -3179,7 +3176,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func udpStream(active: Bool) {
         
         // UDP port active / timed out
-        _log.message("UDP Stream \(active ? "active" : "time out")", level: .verbose, source: kModule)
+        _log.msg("UDP Stream \(active ? "active" : "time out")", level: .verbose, function: #function, file: #file, line: #line)
     }
     /// Receive an Error message from UDP Manager
     ///
@@ -3188,7 +3185,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func udpError(_ message: String) {
         
         // UDP port encountered an error
-        _log.message("UDP error:  \(message)", level: .error, source: kModule)
+        _log.msg("UDP error:  \(message)", level: .error, function: #function, file: #file, line: #line)
     }
     
     // ----------------------------------------------------------------------------

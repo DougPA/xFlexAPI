@@ -93,7 +93,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // get the Integer version of the value
@@ -173,7 +173,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
             // If the time code is out-of-sequence, ignore the packet
             if dataFrame.timeCode < self.lastTimecode {
                 self.droppedPackets += 1
-                self._log.message("Missing packet(s), timecode: \(dataFrame.timeCode) < last timecode: \(self.lastTimecode)", level: .warning, source: kModule)
+                self._log.msg("Missing packet(s), timecode: \(dataFrame.timeCode) < last timecode: \(self.lastTimecode)", level: .warning, function: #function, file: #file, line: #line)
                 // out of sequence, ignore this packet
                 return
             }

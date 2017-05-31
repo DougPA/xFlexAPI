@@ -128,7 +128,7 @@ public class Meter : KeyValueParser {
             guard let token = Token(rawValue: key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             

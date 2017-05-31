@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		91B9F7B71ED916B300F7799D /* xFlexAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F7B51ED916B300F7799D /* xFlexAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C31ED9170B00F7799D /* Extensions.swift */; };
-		91B9F7E61ED9170B00F7799D /* FileHelper.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C41ED9170B00F7799D /* FileHelper.swift */; };
 		91B9F7E71ED9170B00F7799D /* Filters.plist in Resources */ = {isa = PBXBuildFile; fileRef = 91B9F7C51ED9170B00F7799D /* Filters.plist */; };
 		91B9F7E81ED9170B00F7799D /* FlexErrors.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C61ED9170B00F7799D /* FlexErrors.swift */; };
 		91B9F7EB1ED9170B00F7799D /* Notification.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C91ED9170B00F7799D /* Notification.swift */; };
@@ -45,7 +44,6 @@
 		91B9F7B51ED916B300F7799D /* xFlexAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xFlexAPI.h; sourceTree = "<group>"; };
 		91B9F7B61ED916B300F7799D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		91B9F7C31ED9170B00F7799D /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
-		91B9F7C41ED9170B00F7799D /* FileHelper.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileHelper.swift; sourceTree = "<group>"; };
 		91B9F7C51ED9170B00F7799D /* Filters.plist */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.plist.xml; path = Filters.plist; sourceTree = "<group>"; };
 		91B9F7C61ED9170B00F7799D /* FlexErrors.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FlexErrors.swift; sourceTree = "<group>"; };
 		91B9F7C91ED9170B00F7799D /* Notification.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Notification.swift; sourceTree = "<group>"; };
@@ -132,7 +130,6 @@
 			isa = PBXGroup;
 			children = (
 				91B9F7C31ED9170B00F7799D /* Extensions.swift */,
-				91B9F7C41ED9170B00F7799D /* FileHelper.swift */,
 				91B9F7C51ED9170B00F7799D /* Filters.plist */,
 				91B9F7C61ED9170B00F7799D /* FlexErrors.swift */,
 				91B9F7C91ED9170B00F7799D /* Notification.swift */,
@@ -301,7 +298,6 @@
 				91B9F7F81ED9170B00F7799D /* RadioFactory.swift in Sources */,
 				91B9F7F41ED9170B00F7799D /* MicAudioStream.swift in Sources */,
 				91B9F7EB1ED9170B00F7799D /* Notification.swift in Sources */,
-				91B9F7E61ED9170B00F7799D /* FileHelper.swift in Sources */,
 				91B9F7FF1ED9170B00F7799D /* UdpManager.swift in Sources */,
 				91B9F7ED1ED9170B00F7799D /* AudioStream.swift in Sources */,
 				91B9F7F51ED9170B00F7799D /* Opus.swift in Sources */,

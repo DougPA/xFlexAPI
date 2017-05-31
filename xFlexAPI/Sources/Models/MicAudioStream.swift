@@ -110,7 +110,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
             return
         }
         
@@ -124,8 +124,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
         
         // add the Audio Stream to the collection if not existing
         if let _ = _radio?.micAudioStreams[_streamId] {
-            _log.message(#function + " - Attempted to Add MicAudioStream already in Radio micAudioStreams List",
-                       level: .warning, source: kModule)
+            _log.msg(command + ", attempted to add MicAudioStream already in Radio micAudioStreams List", level: .warning, function: #function, file: #file, line: #line)
             return // already in the list
         }
         
@@ -150,7 +149,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // get the Int and Bool versions of the value
@@ -282,7 +281,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
         if vita.sequence != expectedSequenceNumber {
             
             // NO, log the issue
-            _log.message("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, source: kModule)
+            _log.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
             
             rxSeq = nil
             rxLostPacketCount += 1

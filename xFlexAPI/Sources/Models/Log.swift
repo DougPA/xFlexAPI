@@ -14,7 +14,7 @@ import Foundation
 public protocol LogHandler
 {
     // method to process Log entries
-    func message(_ msg: String, level: MessageLevel, source: String) -> Void
+    func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) -> Void
 }
 
 public enum MessageLevel: Int {
@@ -75,15 +75,18 @@ public final class Log {
     // ----------------------------------------------------------------------------
     // MARK: - Public methods
     
-    /// Create an entry in a Log (if any). May be called from any thread.
+    /// Create an entry in a Log (if any). May be called from any thread
     ///
-    /// - parameter msg:    a Description
-    /// - parameter level:  an Error Level
-    /// - parameter source: the Source of the message
+    /// - Parameters:
+    ///   - msg: a message String
+    ///   - level: the severity level
+    ///   - function: the function where the message originated
+    ///   - file: the file where the message originated
+    ///   - line: the line where the message originated
     ///
-    public func message(_ msg: String, level: MessageLevel, source: String ) {
-
+    public func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) {
+        
         // pass the entry to the delegate (if any)
-        delegate?.message(msg, level: level, source: kApiId + "." + source  )
+        delegate?.msg(msg, level: level, function: function, file: file, line: line )
     }
 }

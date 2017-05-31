@@ -125,7 +125,7 @@ final public class AudioStream: NSObject {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.msg(command + ", non-zero response - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
             return
         }
         
@@ -136,8 +136,7 @@ final public class AudioStream: NSObject {
         
         // add the Audio Stream to the collection if not existing
         if let _ = _radio?.audioStreams[_streamId] {
-            _log.message(#function + " - Attempted to Add AudioStream already in Radio audioStreams List",
-                       level: .warning, source: kModule)
+            _log.msg(command + ", Attempted to Add AudioStream already in Radio audioStreams List", level: .warning, function: #function, file: #file, line: #line)
             return // already in the list
         }
         
@@ -162,7 +161,7 @@ final public class AudioStream: NSObject {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // get the Int and Bool versions of the value
@@ -302,7 +301,7 @@ final public class AudioStream: NSObject {
         if vita.sequence != expectedSequenceNumber {
             
             // NO, log the issue
-            _log.message("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, source: kModule)
+            _log.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
             
             rxSeq = nil
             rxLostPacketCount += 1

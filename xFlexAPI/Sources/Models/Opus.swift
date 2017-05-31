@@ -117,7 +117,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -198,7 +198,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
         if vita.sequence != rxSeq {
             
             // NO, log the issue
-            _log.message("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(rxSeq!)", level: .warning, source: kModule)
+            _log.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(rxSeq!)", level: .warning, function: #function, file: #file, line: #line)
             
             if vita.sequence < rxSeq! {
                 

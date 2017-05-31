@@ -184,10 +184,10 @@ final public class TXAudioStream: NSObject, KeyValueParser {
             let numSamplesToSend = min(kMaxSamplesToSend, samples - samplesSent)
             let numFloatsToSend = numSamplesToSend * kNumberOfChannels
             
-            // scale with tx gain
-            for i in 0..<numSamplesToSend {		// TODO: use Accelerate
-                payload[2 * i + 0] = left[i + samplesSent] * _txGainScalar
-                payload[2 * i + 1] = right[i + samplesSent] * _txGainScalar
+            // interleave the payload & scale with tx gain
+            for i in 0..<numSamplesToSend {                                         // TODO: use Accelerate
+                payload[(2 * i)] = left[i + samplesSent] * _txGainScalar
+                payload[(2 * i) + 1] = right[i + samplesSent] * _txGainScalar
             }
             
             // swap endianess of the samples
@@ -232,7 +232,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.msg(command + ", un-handled non-zero reply - \(responseValue)", level: .warning, function: #function, file: #file, line: #line)
             return
         }
         
@@ -246,8 +246,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         
         // add the Audio Stream to the collection if not existing
         if let _ = _radio?.txAudioStreams[_streamId] {
-            _log.message(#function + " - Attempted to Add TXAudioStream already in Radio txAudioStreams List",
-                       level: .warning, source: kModule)
+            _log.msg(command + ", attempted to add TXAudioStream already in Radio txAudioStreams List", level: .warning, function: #function, file: #file, line: #line)
             return // already in the list
         }
         
@@ -272,7 +271,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // get the Int and Bool versions of the value

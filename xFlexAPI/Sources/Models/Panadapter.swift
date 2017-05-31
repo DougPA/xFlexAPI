@@ -124,7 +124,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
         
         guard responseValue == kNoError else {
             // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
+            _log.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
             return
         }
         // parse out the values
@@ -151,7 +151,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
             // check for unknown keys
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // get the Int, Bool and Float versions of the value
@@ -338,7 +338,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
             // If the frame index is out-of-sequence, ignore the packet
             if dataFrame.frameIndex < self.lastFrameIndex {
                 self.droppedPackets += 1
-                self._log.message("Missing packet(s), frameIndex: \(dataFrame.frameIndex) < last frameIndex: \(self.lastFrameIndex)", level: .warning, source: kModule)
+                self._log.msg("Missing packet(s), frameIndex: \(dataFrame.frameIndex) < last frameIndex: \(self.lastFrameIndex)", level: .warning, function: #function, file: #file, line: #line)
                 return
             }
             self.lastFrameIndex = dataFrame.frameIndex

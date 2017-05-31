@@ -75,16 +75,16 @@ final public class IqStream: NSObject {
     ///   - responseValue:  the response value
     ///   - reply:          the reply
     ///
-    private func updateStreamId(_ seqNum: String, responseValue: String, reply: String) {
-        
-        guard responseValue == kNoError else {
-            // Anything other than 0 is an error, log it and ignore the Reply
-            _log.message(#function + " - \(responseValue)", level: .error, source: kModule)
-            return
-        }
-        //get the streamId (remove the "0x" prefix)
-        _streamId = String(reply.characters.dropFirst(2))
-    }
+//    private func updateStreamId(_ seqNum: String, responseValue: String, reply: String) {
+//        
+//        guard responseValue == kNoError else {
+//            // Anything other than 0 is an error, log it and ignore the Reply
+//            _log.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
+//            return
+//        }
+//        //get the streamId (remove the "0x" prefix)
+//        _streamId = String(reply.characters.dropFirst(2))
+//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
@@ -101,7 +101,7 @@ final public class IqStream: NSObject {
             
             guard let token = Token(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
-                _log.message(" - \(kv.key)", level: .debug, source: kModule)
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             // get the Int and Bool versions of the value

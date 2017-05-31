@@ -74,7 +74,7 @@ public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {
                 try sock.enableReusePort(true)
             
             } catch let error as NSError {
-                _log.message("Port reuse not enabled: \(error.localizedDescription)", level: .warning, source: kModule)
+                _log.msg("Port reuse not enabled: \(error.localizedDescription)", level: .warning, function: #function, file: #file, line: #line)
             }
             
             // bind the socket to the Flex Discovery Port
