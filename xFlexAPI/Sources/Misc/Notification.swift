@@ -56,7 +56,7 @@ public enum NotificationType : String {
     case opusWillBeRemoved
     
     case panadapterInitialized
-    case panadapterShouldBeRemoved
+    case panadapterWillBeRemoved
     
     case radioInitialized
     
@@ -87,6 +87,6 @@ public enum NotificationType : String {
     case udpDidBind
     
     case waterfallInitialized
-    case waterfallShouldBeRemoved
+    case waterfallWillBeRemoved
 }
 

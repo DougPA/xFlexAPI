@@ -1190,12 +1190,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             case .panadapter:
 
                 // notify all observers
-                NC.post(.panadapterShouldBeRemoved, object: panadapters[streamId] as Any?)
+                NC.post(.panadapterWillBeRemoved, object: panadapters[streamId] as Any?)
                 
             case .waterfall:
                 
                 // notify all observers
-                NC.post(.waterfallShouldBeRemoved, object: waterfalls[streamId] as Any?)
+                NC.post(.waterfallWillBeRemoved, object: waterfalls[streamId] as Any?)
+                
+//                DispatchQueue.main.async { [unowned self] in
+//                    // remove the Waterfall & Panadapter objects from their collections
+//                    let panadapterId = self.waterfalls[streamId]?.panadapterId
+//                    self.waterfalls[streamId] = nil
+//                    self.panadapters[panadapterId!] = nil
+//                }
             }
         
         } else {
