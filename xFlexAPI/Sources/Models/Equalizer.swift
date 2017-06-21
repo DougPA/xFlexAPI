@@ -196,39 +196,39 @@ extension Equalizer {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var eqEnabled: Bool {
+    @objc dynamic public var eqEnabled: Bool {
         get { return  _eqEnabled }
         set { if _eqEnabled != newValue { _eqEnabled = newValue ; radio!.send( kEqCommand + eqType.rawValue + " mode=\(newValue.asNumber())" ) } } }
     
-    dynamic public var level63Hz: Int {
+    @objc dynamic public var level63Hz: Int {
         get { return _level63Hz }
         set { if _level63Hz != newValue { _level63Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level63Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level125Hz: Int {
+    @objc dynamic public var level125Hz: Int {
         get { return _level125Hz }
         set { if _level125Hz != newValue { _level125Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level125Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level250Hz: Int {
+    @objc dynamic public var level250Hz: Int {
         get { return _level250Hz }
         set { if _level250Hz != newValue { _level250Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level250Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level500Hz: Int {
+    @objc dynamic public var level500Hz: Int {
         get { return _level500Hz }
         set { if _level500Hz != newValue { _level500Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level500Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level1000Hz: Int {
+    @objc dynamic public var level1000Hz: Int {
         get { return _level1000Hz }
         set { if _level1000Hz != newValue { _level1000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level1000Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level2000Hz: Int {
+    @objc dynamic public var level2000Hz: Int {
         get { return _level2000Hz }
         set { if _level2000Hz != newValue { _level2000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level2000Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level4000Hz: Int {
+    @objc dynamic public var level4000Hz: Int {
         get { return _level4000Hz }
         set { if _level4000Hz != newValue { _level4000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level4000Hz.rawValue)=\(newValue)") } } }
     
-    dynamic public var level8000Hz: Int {
+    @objc dynamic public var level8000Hz: Int {
         get { return _level8000Hz }
         set { if _level8000Hz != newValue { _level8000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level8000Hz.rawValue)=\(newValue)") } } }
     

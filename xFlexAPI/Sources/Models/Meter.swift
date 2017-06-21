@@ -185,43 +185,43 @@ extension Meter {
     // MARK: - Public properties - KVO compliant Setters / Getters with synchronization
     
     // listed in alphabetical order
-    dynamic public var description: String {
+    @objc dynamic public var description: String {
         get { return _meterQ.sync { _description } }
         set { _meterQ.sync(flags: .barrier) { _description = newValue } } }
     
-    dynamic public var fps: Int {
+    @objc dynamic public var fps: Int {
         get { return _meterQ.sync { _fps } }
         set { _meterQ.sync(flags: .barrier) { _fps = newValue } } }
     
-    dynamic public var high: Float {
+    @objc dynamic public var high: Float {
         get { return _meterQ.sync { _high } }
         set { _meterQ.sync(flags: .barrier) { _high = newValue } } }
     
-    dynamic public var low: Float {
+    @objc dynamic public var low: Float {
         get { return _meterQ.sync { _low } }
         set { _meterQ.sync(flags: .barrier) { _low = newValue } } }
     
-    dynamic public var name: String {
+    @objc dynamic public var name: String {
         get { return _meterQ.sync { _name } }
         set { _meterQ.sync(flags: .barrier) { _name = newValue } } }
     
-    dynamic public var number: String {
+    @objc dynamic public var number: String {
         get { return _meterQ.sync { _number } }
         set { _meterQ.sync(flags: .barrier) { _number = newValue } } }
     
-    dynamic public var peak: Float {
+    @objc dynamic public var peak: Float {
         get { return _meterQ.sync { _peak } }
         set { _meterQ.sync(flags: .barrier) { _peak = newValue } } }
     
-    dynamic public var source: String {
+    @objc dynamic public var source: String {
         get { return _meterQ.sync { _source } }
         set { _meterQ.sync(flags: .barrier) { _source = newValue } } }
     
-    dynamic public var units: String {
+    @objc dynamic public var units: String {
         get { return _meterQ.sync { _units } }
         set { _meterQ.sync(flags: .barrier) { _units = newValue } } }
     
-    dynamic public var value: Float {
+    @objc dynamic public var value: Float {
         get { return _meterQ.sync { _value } }
         set { _meterQ.sync(flags: .barrier) { _value = newValue } } }
     

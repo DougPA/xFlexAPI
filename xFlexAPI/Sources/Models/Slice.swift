@@ -975,279 +975,279 @@ extension xFlexAPI.Slice {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var active: Bool {
+    @objc dynamic public var active: Bool {
         get { return _active }
         set { if _active != newValue { _active = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) active=" + newValue.asNumber()) } } }
     
-    dynamic public var agcMode: String {
+    @objc dynamic public var agcMode: String {
         get { return _agcMode }
         set { if _agcMode != newValue { _agcMode = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) agc_mode=\(newValue)") } } }
     
-    dynamic public var agcOffLevel: Int {
+    @objc dynamic public var agcOffLevel: Int {
         get { return _agcOffLevel }
         set { if _agcOffLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) {  _agcOffLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) agc_off_level=\(newValue)") } } } }
     
-    dynamic public var agcThreshold: Int {
+    @objc dynamic public var agcThreshold: Int {
         get { return _agcThreshold }
         set { if _agcThreshold != newValue { if newValue.within(kMinLevel, kMaxLevel) { _agcThreshold = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) agc_threshold=\(newValue)") } } } }
     
-    dynamic public var anfEnabled: Bool {
+    @objc dynamic public var anfEnabled: Bool {
         get { return _anfEnabled }
         set { if _anfEnabled != newValue { _anfEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) anf=" + newValue.asNumber()) } } }
     
-    dynamic public var anfLevel: Int {
+    @objc dynamic public var anfLevel: Int {
         get { return _anfLevel }
         set { if _anfLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) { _anfLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) anf_level=\(newValue)") } } } }
     
-    dynamic public var apfEnabled: Bool {
+    @objc dynamic public var apfEnabled: Bool {
         get { return _apfEnabled }
         set { if _apfEnabled != newValue { _apfEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) apf=" + newValue.asNumber()) } } }
     
-    dynamic public var apfLevel: Int {
+    @objc dynamic public var apfLevel: Int {
         get { return _apfLevel }
         set { if _apfLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) { _apfLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) apf_level=\(newValue)") } } } }
     
-    dynamic public var audioGain: Int {
+    @objc dynamic public var audioGain: Int {
         get { return _audioGain }
         set { if _audioGain != newValue { if newValue.within(kMinLevel, kMaxLevel) { _audioGain = newValue ; _radio!.send(kAudioClientCommand + "0 slice \(id) gain \(newValue)") } } } }
     
-    dynamic public var audioMute: Bool {
+    @objc dynamic public var audioMute: Bool {
         get { return _audioMute }
         set { if _audioMute != newValue { _audioMute = newValue ; _radio!.send(kAudioClientCommand + "0 slice  0x\(id) mute " + newValue.asNumber()) } } }
     
-    dynamic public var audioPan: Int {
+    @objc dynamic public var audioPan: Int {
         get { return _audioPan }
         set { if _audioPan != newValue { if newValue.within(kMinLevel, kMaxLevel) { _audioPan = newValue } } } }
     
-    dynamic public var autoPanEnabled: Bool {
+    @objc dynamic public var autoPanEnabled: Bool {
         get { return _autoPanEnabled }
         set { if _autoPanEnabled != newValue { _autoPanEnabled = newValue ; _radio!.send(kAudioClientCommand + "0 slice  0x\(id) audio_pan \(newValue)") } } }
     
-    dynamic public var daxChannel: Int {
+    @objc dynamic public var daxChannel: Int {
         get { return _daxChannel }
         set { if _daxChannel != newValue { _daxChannel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) dax=\(newValue)") } } }
     
-    dynamic public var daxClients: Int {
+    @objc dynamic public var daxClients: Int {
         get { return _daxClients }
         set { if _daxClients != newValue {  _daxClients = newValue } } }
     
-    dynamic public var daxTxEnabled: Bool {
+    @objc dynamic public var daxTxEnabled: Bool {
         get { return _daxTxEnabled }
         set { if _daxTxEnabled != newValue { _daxTxEnabled = newValue } } }
     
-    dynamic public var dfmPreDeEmphasisEnabled: Bool {
+    @objc dynamic public var dfmPreDeEmphasisEnabled: Bool {
         get { return _dfmPreDeEmphasisEnabled }
         set { if _dfmPreDeEmphasisEnabled != newValue { _dfmPreDeEmphasisEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) dfm_pre_de_emphasis=\(newValue.asNumber())") } } }
     
-    dynamic public var digitalLowerOffset: Int {
+    @objc dynamic public var digitalLowerOffset: Int {
         get { return _digitalLowerOffset }
         set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) digl_offset=\(newValue)") } } }
     
-    dynamic public var digitalUpperOffset: Int {
+    @objc dynamic public var digitalUpperOffset: Int {
         get { return _digitalUpperOffset }
         set { if _digitalUpperOffset != newValue { _digitalUpperOffset = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) digh_offset=\(newValue)") } } }
     
-    dynamic public var diversityChild: Bool {
+    @objc dynamic public var diversityChild: Bool {
         get { return _diversityChild }
         set { if _diversityChild != newValue { if _diversityIsAllowed { _diversityChild = newValue } } } }
     
-    dynamic public var diversityEnabled: Bool {
+    @objc dynamic public var diversityEnabled: Bool {
         get { return _diversityEnabled }
         set { if _diversityEnabled != newValue { if _diversityIsAllowed { _diversityEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) diversity=" + newValue.asNumber()) } } } }
     
-    dynamic public var diversityIndex: Int {
+    @objc dynamic public var diversityIndex: Int {
         get { return _diversityIndex }
         set { if _diversityIndex != newValue { if _diversityIsAllowed { _diversityIndex = newValue } } } }
     
-    dynamic public var diversityParent: Bool {
+    @objc dynamic public var diversityParent: Bool {
         get { return _diversityParent }
         set { if _diversityParent != newValue { if _diversityIsAllowed { _diversityParent = newValue } } } }
     
-    dynamic public var filterHigh: Int {
+    @objc dynamic public var filterHigh: Int {
         get { return _filterHigh }
         set { if _filterHigh != newValue { let value = filterHighLimits(newValue) ; _filterHigh = value ; _radio!.send(kFilterCommand + "0x\(id) \(filterLow) \(value)") } } }
     
-    dynamic public var filterLow: Int {
+    @objc dynamic public var filterLow: Int {
         get { return _filterLow }
         set { if _filterLow != newValue { let value = filterLowLimits(newValue) ; _filterLow = value ; _radio!.send(kFilterCommand + "0x\(id) \(value) \(filterHigh)") } } }
     
-    dynamic public var fmDeviation: Int {
+    @objc dynamic public var fmDeviation: Int {
         get { return _fmDeviation }
         set { if _fmDeviation != newValue { _fmDeviation = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) fm_deviation=\(newValue)") } } }
     
-    dynamic public var fmRepeaterOffset: Float {
+    @objc dynamic public var fmRepeaterOffset: Float {
         get { return _fmRepeaterOffset }
         set { if _fmRepeaterOffset != newValue { _fmRepeaterOffset = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) fm_repeater_offset_freq=\(newValue)") } } }
     
-    dynamic public var fmToneBurstEnabled: Bool {
+    @objc dynamic public var fmToneBurstEnabled: Bool {
         get { return _fmToneBurstEnabled }
         set { if _fmToneBurstEnabled != newValue { _fmToneBurstEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) fm_tone_burst=\(newValue.asNumber())") } } }
     
-    dynamic public var fmToneFreq: Float {
+    @objc dynamic public var fmToneFreq: Float {
         get { return _fmToneFreq }
         set { if _fmToneFreq != newValue { _fmToneFreq = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) fm_tone_value=\(newValue)") } } }
     
-    dynamic public var fmToneMode: String {
+    @objc dynamic public var fmToneMode: String {
         get { return _fmToneMode }
         set { if _fmToneMode != newValue { _fmToneMode = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) fm_tone_mode=\(newValue)") } } }
     
-    dynamic public var frequency: Int {
+    @objc dynamic public var frequency: Int {
         get { return _frequency }
         set { if !_locked { if _frequency != newValue { _frequency = newValue ; _radio!.send(kSliceTuneCommand + "\(id) \(newValue.hzToMhz())") } } } }
     
-    dynamic public var inUse: Bool {
+    @objc dynamic public var inUse: Bool {
         get { return _inUse }
         set { if _inUse != newValue { _inUse = newValue } } }
     
-    dynamic public var locked: Bool {
+    @objc dynamic public var locked: Bool {
         get { return _locked }
         set { if _locked != newValue { _locked = newValue ; _radio!.send(kSliceCommand + "\(newValue == true ? "lock" : "unlock")" + " 0x\(id)") } } }
     
-    dynamic public var loopAEnabled: Bool {
+    @objc dynamic public var loopAEnabled: Bool {
         get { return _loopAEnabled }
         set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; _radio!.send(kSliceCommand + "0x\(id) loopa=\(newValue.asNumber())") } } }
     
-    dynamic public var loopBEnabled: Bool {
+    @objc dynamic public var loopBEnabled: Bool {
         get { return _loopBEnabled }
         set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; _radio!.send(kSliceCommand + "0x\(id) loopb=\(newValue.asNumber())") } } }
     
-    dynamic public var mode: String {
+    @objc dynamic public var mode: String {
         get { return _mode }
         set { if _mode != newValue { _mode = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) mode=\(newValue)") } } }
     
-    dynamic public var modeList: [String] {
+    @objc dynamic public var modeList: [String] {
         get { return _modeList }
         set { if _modeList != newValue { _modeList = newValue } } }
     
-    dynamic public var nbEnabled: Bool {
+    @objc dynamic public var nbEnabled: Bool {
         get { return _nbEnabled }
         set { if _nbEnabled != newValue { _nbEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) nb=" + newValue.asNumber()) } } }
     
-    dynamic public var nbLevel: Int {
+    @objc dynamic public var nbLevel: Int {
         get { return _nbLevel }
         set { if _nbLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) {  _nbLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) nb_level=\(newValue)") } } } }
     
-    dynamic public var nrEnabled: Bool {
+    @objc dynamic public var nrEnabled: Bool {
         get { return _nrEnabled }
         set { if _nrEnabled != newValue { _nrEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) nr=" + newValue.asNumber()) } } }
     
-    dynamic public var nrLevel: Int {
+    @objc dynamic public var nrLevel: Int {
         get { return _nrLevel }
         set { if _nrLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) {  _nrLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) nr_level=\(newValue)") } } } }
     
-    dynamic public var owner: Int {
+    @objc dynamic public var owner: Int {
         get { return _owner }
         set { if _owner != newValue { _owner = newValue } } }
      
-    dynamic public var panadapterId: String {
+    @objc dynamic public var panadapterId: String {
         get { return _panadapterId }
         set {if _panadapterId != newValue {  _panadapterId = newValue } } }
     
-    dynamic public var playbackEnabled: Bool {
+    @objc dynamic public var playbackEnabled: Bool {
         get { return _playbackEnabled }
         set { if _playbackEnabled != newValue { _playbackEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) play=" + newValue.asNumber()) } } }
     
-    dynamic public var postDemodBypassEnabled: Bool {
+    @objc dynamic public var postDemodBypassEnabled: Bool {
         get { return _postDemodBypassEnabled }
         set { if _postDemodBypassEnabled != newValue { _postDemodBypassEnabled = newValue } } }
     
-    dynamic public var postDemodHigh: Int {
+    @objc dynamic public var postDemodHigh: Int {
         get { return _postDemodHigh }
         set { if _postDemodHigh != newValue { _postDemodHigh = newValue } } }
     
-    dynamic public var postDemodLow: Int {
+    @objc dynamic public var postDemodLow: Int {
         get { return _postDemodLow }
         set { if _postDemodLow != newValue { _postDemodLow = newValue } } }
     
-    dynamic public var qskEnabled: Bool {
+    @objc dynamic public var qskEnabled: Bool {
         get { return _qskEnabled }
         set { if _qskEnabled != newValue { _qskEnabled = newValue } } }
     
-    dynamic public var recordEnabled: Bool {
+    @objc dynamic public var recordEnabled: Bool {
         get { return _recordEnabled }
         set { if _recordEnabled != newValue { _recordEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) record=" + newValue.asNumber()) } } }
     
-    dynamic public var recordLength: Float {
+    @objc dynamic public var recordLength: Float {
         get { return _recordLength }
         set { if _recordLength != newValue { _recordLength = newValue } } }
     
-    dynamic public var repeaterOffsetDirection: String {
+    @objc dynamic public var repeaterOffsetDirection: String {
         get { return _repeaterOffsetDirection }
         set { if _repeaterOffsetDirection != newValue { _repeaterOffsetDirection = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) repeater_offset_dir=\(newValue)") } } }
     
-    dynamic public var rfGain: Int {
+    @objc dynamic public var rfGain: Int {
         get { return _rfGain }
         set { if _rfGain != newValue { _rfGain = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) rfgain=\(newValue)") } } }
     
-    dynamic public var ritEnabled: Bool {
+    @objc dynamic public var ritEnabled: Bool {
         get { return _ritEnabled }
         set { if _ritEnabled != newValue { _ritEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) rit_on=" + newValue.asNumber()) } } }
     
-    dynamic public var ritOffset: Int {
+    @objc dynamic public var ritOffset: Int {
         get { return _ritOffset }
         set { if _ritOffset != newValue { if newValue.within(kMinOffset, kMaxOffset) {  _ritOffset = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) rit_freq=\(newValue)") } } } }
     
-    dynamic public var rttyMark: Int {
+    @objc dynamic public var rttyMark: Int {
         get { return _rttyMark }
         set { if _rttyMark != newValue { _rttyMark = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) rtty_mark=\(newValue)") } } }
     
-    dynamic public var rttyShift: Int {
+    @objc dynamic public var rttyShift: Int {
         get { return _rttyShift }
         set { if _rttyShift != newValue { _rttyShift = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) rtty_shift=\(newValue)") } } }
     
-    dynamic public var rxAnt: Radio.AntennaPort {
+    @objc dynamic public var rxAnt: Radio.AntennaPort {
         get { return _rxAnt }
         set { if _rxAnt != newValue { _rxAnt = newValue ; _radio!.send(kSliceSetCommand + "\(id) rxant=\(newValue)") } } }
     
-    dynamic public var rxAntList: [Radio.AntennaPort] {
+    @objc dynamic public var rxAntList: [Radio.AntennaPort] {
         get { return _rxAntList }
         set { _rxAntList = newValue } }
     
-    dynamic public var step: Int {
+    @objc dynamic public var step: Int {
         get { return _step }
         set { if _step != newValue { _step = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) step=\(newValue)") } } }
     
-    dynamic public var stepList: String {
+    @objc dynamic public var stepList: String {
         get { return _stepList }
         set { if _stepList != newValue { _stepList = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) step_list=\(newValue)") } } }
     
-    dynamic public var squelchEnabled: Bool {
+    @objc dynamic public var squelchEnabled: Bool {
         get { return _squelchEnabled }
         set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) squelch=" + newValue.asNumber() ) } } }
     
-    dynamic public var squelchLevel: Int {
+    @objc dynamic public var squelchLevel: Int {
         get { return _squelchLevel }
         set { if _squelchLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) {  _squelchLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) squelch_level=\(newValue)") } } } }
     
-    dynamic public var txAnt: String {
+    @objc dynamic public var txAnt: String {
         get { return _txAnt }
         set { if _txAnt != newValue { _txAnt = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) txant=\(newValue)") } } }
     
-    dynamic public var txEnabled: Bool {
+    @objc dynamic public var txEnabled: Bool {
         get { return _txEnabled }
         set { if _txEnabled != newValue { _txEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) tx=" + newValue.asNumber()) } } }
     
-    dynamic public var txOffsetFreq: Float {
+    @objc dynamic public var txOffsetFreq: Float {
         get { return _txOffsetFreq }
         set { if _txOffsetFreq != newValue { _txOffsetFreq = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) tx_offset_freq=\(newValue)") } } }
     
-    dynamic public var wide: Bool {
+    @objc dynamic public var wide: Bool {
         get { return _wide }
         set { _wide = newValue } }
     
-    dynamic public var wnbEnabled: Bool {
+    @objc dynamic public var wnbEnabled: Bool {
         get { return _wnbEnabled }
         set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) wnb=\(newValue.asNumber())") } } }
     
-    dynamic public var wnbLevel: Int {
+    @objc dynamic public var wnbLevel: Int {
         get { return _wnbLevel }
         set { if wnbLevel != newValue { if newValue.within(kMinLevel, kMaxLevel) {  _wnbLevel = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) wnb_level=\(newValue)") } } } }
     
-    dynamic public var xitEnabled: Bool {
+    @objc dynamic public var xitEnabled: Bool {
         get { return _xitEnabled }
         set { if _xitEnabled != newValue { _xitEnabled = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) xit_on=" + newValue.asNumber()) } } }
     
-    dynamic public var xitOffset: Int {
+    @objc dynamic public var xitOffset: Int {
         get { return _xitOffset }
         set { if _xitOffset != newValue { if newValue.within(kMinOffset, kMaxOffset) {  _xitOffset = newValue ; _radio!.send(kSliceSetCommand + "0x\(id) xit_freq=\(newValue)") } } } }
 

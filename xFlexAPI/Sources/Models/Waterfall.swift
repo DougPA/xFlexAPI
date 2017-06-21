@@ -303,31 +303,31 @@ extension Waterfall {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var autoBlackEnabled: Bool {
+    @objc dynamic public var autoBlackEnabled: Bool {
         get { return _autoBlackEnabled }
         set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) auto_black=" + newValue.asNumber()) } } }
     
-    dynamic public var autoBlackLevel: UInt32 {
+    @objc dynamic public var autoBlackLevel: UInt32 {
         get { return _autoBlackLevel }
         set { if _autoBlackLevel != newValue { _autoBlackLevel = newValue } } }
     
-    dynamic public var blackLevel: Int {
+    @objc dynamic public var blackLevel: Int {
         get { return _blackLevel }
         set { if _blackLevel != newValue { _blackLevel = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) black_level=\(newValue)") } } }
     
-    dynamic public var colorGain: Int {
+    @objc dynamic public var colorGain: Int {
         get { return _colorGain }
         set { if _colorGain != newValue { _colorGain = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) color_gain=\(newValue)") } } }
     
-    dynamic public var gradientIndex: Int {
+    @objc dynamic public var gradientIndex: Int {
         get { return _gradientIndex }
         set { if _gradientIndex != newValue { _gradientIndex = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) gradient_index=\(newValue)") } } }
     
-    dynamic public var lineDuration: Int {
+    @objc dynamic public var lineDuration: Int {
         get { return _lineDuration }
         set { if _lineDuration != newValue { _lineDuration = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) line_duration=\(newValue)") } } }
     
-    dynamic public var panadapterId: String {
+    @objc dynamic public var panadapterId: String {
         get { return _panadapterId }
         set { if _panadapterId != newValue { _panadapterId = newValue } } }
     

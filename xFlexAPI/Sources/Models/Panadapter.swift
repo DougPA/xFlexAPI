@@ -545,131 +545,131 @@ extension Panadapter {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var antList: [String] {
+    @objc dynamic public var antList: [String] {
         get { return _antList }
         set { _antList = newValue } }
     
-    dynamic public var autoCenterEnabled: Bool {
+    @objc dynamic public var autoCenterEnabled: Bool {
         get { return _autoCenterEnabled }
         set { _autoCenterEnabled = newValue } }
     
-    dynamic public var available: Int {
+    @objc dynamic public var available: Int {
         get { return _available }
         set { _available = newValue } }
     
-    dynamic public var average: Int {
+    @objc dynamic public var average: Int {
         get { return _average }
         set {if _average != newValue { _average = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) average=\(newValue)") } } }
     
-    dynamic public var band: String {
+    @objc dynamic public var band: String {
         get { return _band }
         set { if _band != newValue { _band = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) band=\(newValue)") } } }
     
-    dynamic public var bandwidth: Int {
+    @objc dynamic public var bandwidth: Int {
         get { return _bandwidth }
         set { if _bandwidth != newValue { _bandwidth = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) bandwidth=\(newValue.hzToMhz()) autocenter=\(autoCenterEnabled.asNumber())") } } }
     
-    dynamic public var capacity: Int {
+    @objc dynamic public var capacity: Int {
         get { return _capacity }
         set { _capacity = newValue } }
     
-    dynamic public var center: Int {
+    @objc dynamic public var center: Int {
         get { return _center }
         set { if _center != newValue { _center = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) center=\(newValue.hzToMhz())") } } }
     
-    dynamic public var daxIqChannel: Int {
+    @objc dynamic public var daxIqChannel: Int {
         get { return _daxIqChannel }
         set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) daxiq=\(newValue)") } } }
     
-    dynamic public var daxIqRate: Int {
+    @objc dynamic public var daxIqRate: Int {
         get { return _daxIqRate }
         set { if _daxIqRate != newValue { _daxIqRate = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) daxiq_rate=\(newValue)") } } }
     
-    dynamic public var fps: Int {
+    @objc dynamic public var fps: Int {
         get { return _fps }
         set { if _fps != newValue { _fps = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) fps=\(newValue)") } } }
     
-    dynamic public var loopAEnabled: Bool {
+    @objc dynamic public var loopAEnabled: Bool {
         get { return _loopAEnabled }
         set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) loopa=\(newValue.asNumber())") } } }
     
-    dynamic public var loopBEnabled: Bool {
+    @objc dynamic public var loopBEnabled: Bool {
         get { return _loopBEnabled }
         set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) loopb=\(newValue.asNumber())") } } }
     
-    dynamic public var maxBw: Int {
+    @objc dynamic public var maxBw: Int {
         get { return _maxBw }
         set { if _maxBw != newValue { _maxBw = newValue } } }
     
-    dynamic public var maxDbm: CGFloat {
+    @objc dynamic public var maxDbm: CGFloat {
         get { return _maxDbm }
         set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) max_dbm=\(value)") } } }
     
-    dynamic public var minBw: Int {
+    @objc dynamic public var minBw: Int {
         get { return _minBw }
         set { if _minBw != newValue { _minBw = newValue } } }
     
-    dynamic public var minDbm: CGFloat {
+    @objc dynamic public var minDbm: CGFloat {
         get { return _minDbm }
         set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) min_dbm=\(value)") } } }
     
-    dynamic public var panDimensions: CGSize {
+    @objc dynamic public var panDimensions: CGSize {
         get { return _panDimensions }
         set { if _panDimensions != newValue { _panDimensions = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) xpixels=\(newValue.width) ypixels=\(newValue.height)") } } }
     
-    dynamic public var preamp: String {
+    @objc dynamic public var preamp: String {
         get { return _preamp }
         set { _preamp = newValue } }
     
-    dynamic public var rfGain: Int {
+    @objc dynamic public var rfGain: Int {
         get { return _rfGain }
         set { if _rfGain != newValue { _rfGain = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rfgain=\(newValue)") } } }
     
-    dynamic public var rfGainHigh: Int {
+    @objc dynamic public var rfGainHigh: Int {
         get { return _rfGainHigh }
         set { _rfGainHigh = newValue } }
     
-    dynamic public var rfGainLow: Int {
+    @objc dynamic public var rfGainLow: Int {
         get { return _rfGainLow }
         set { _rfGainLow = newValue } }
     
-    dynamic public var rfGainStep: Int {
+    @objc dynamic public var rfGainStep: Int {
         get { return _rfGainStep }
         set { _rfGainStep = newValue } }
     
-    dynamic public var rfGainValues: String {
+    @objc dynamic public var rfGainValues: String {
         get { return _rfGainValues }
         set { _rfGainValues = newValue } }
     
-    dynamic public var rxAnt: String {
+    @objc dynamic public var rxAnt: String {
         get { return _rxAnt }
         set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rxant=\(newValue)") } } }
     
-    dynamic public var waterfallId: String {
+    @objc dynamic public var waterfallId: String {
         get { return _waterfallId }
         set { _waterfallId = newValue } }
     
-    dynamic public var weightedAverageEnabled: Bool {
+    @objc dynamic public var weightedAverageEnabled: Bool {
         get { return _weightedAverageEnabled }
         set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) weighted_average=" + newValue.asNumber()) } } }
     
-    dynamic public var wide: Bool {
+    @objc dynamic public var wide: Bool {
         get { return _wide }
         set { _wide = newValue } }
     
-    dynamic public var wnbEnabled: Bool {
+    @objc dynamic public var wnbEnabled: Bool {
         get { return _wnbEnabled }
         set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb=\(newValue.asNumber())") } } }
     
-    dynamic public var wnbLevel: Int {
+    @objc dynamic public var wnbLevel: Int {
         get { return _wnbLevel }
         set { if _wnbLevel != newValue { _wnbLevel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb_level=\(newValue)") } } }
     
-    dynamic public var wnbUpdating: Bool {
+    @objc dynamic public var wnbUpdating: Bool {
         get { return _wnbUpdating }
         set { _wnbUpdating = newValue } }
     
-    dynamic public var xvtrLabel: String {
+    @objc dynamic public var xvtrLabel: String {
         get { return _xvtrLabel }
         set { _xvtrLabel = newValue } }
     

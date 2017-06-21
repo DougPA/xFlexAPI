@@ -183,19 +183,19 @@ extension Tnf {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var depth: Int {
+    @objc dynamic public var depth: Int {
         get { return _depth }
         set { if _depth != newValue { if depth.within(Depth.normal.rawValue, Depth.veryDeep.rawValue) { _depth = newValue ; _radio!.send(kSetCommand + "\(id) depth=\(newValue)") } } } }
     
-    dynamic public var frequency: Int {
+    @objc dynamic public var frequency: Int {
         get { return _frequency }
         set { if _frequency != newValue { _frequency = newValue ; _radio!.send(kSetCommand + "\(id) freq=\(newValue.hzToMhz())") } } }
     
-    dynamic public var permanent: Bool {
+    @objc dynamic public var permanent: Bool {
         get { return _permanent }
         set { if _permanent != newValue { _permanent = newValue ; _radio!.send(kSetCommand + "\(id) permanent=\(newValue.asNumber())") } } }
     
-    dynamic public var width: Int {
+    @objc dynamic public var width: Int {
         get { return _width  }
         set { if _width != newValue { if width.within(minWidth, maxWidth) { _width = newValue ; _radio!.send(kSetCommand + "\(id) width=\(newValue.hzToMhz())") } } } }
     

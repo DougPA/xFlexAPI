@@ -377,79 +377,79 @@ extension Memory {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var digitalLowerOffset: Int {
+    @objc dynamic public var digitalLowerOffset: Int {
         get { return _digitalLowerOffset }
         set { if _digitalLowerOffset != newValue { _digitalLowerOffset = newValue ; _radio.send("memory set \(id) digl_offset=\(newValue)") } } }
     
-    dynamic public var digitalUpperOffset: Int {
+    @objc dynamic public var digitalUpperOffset: Int {
         get { return _digitalUpperOffset }
         set { if _digitalUpperOffset != newValue { _digitalUpperOffset = newValue ; _radio.send("memory set \(id) digu_offset=\(newValue)") } } }
     
-    dynamic public var filterHigh: Int {
+    @objc dynamic public var filterHigh: Int {
         get { return _filterHigh }
         set { let value = filterHighLimits(newValue) ; if _filterHigh != value { _filterHigh = value ; _radio.send("memory set \(id) rx_filter_high=\(value)") } } }
     
-    dynamic public var filterLow: Int {
+    @objc dynamic public var filterLow: Int {
         get { return _filterLow }
         set { let value = filterLowLimits(newValue) ; if _filterLow != value { _filterLow = value ; _radio.send("memory set \(id) rx_filter_low=\(value)") } } }
     
-    dynamic public var frequency: Int {
+    @objc dynamic public var frequency: Int {
         get { return _frequency }
         set { if _frequency != newValue { _frequency = newValue ; _radio.send("memory set \(id) freq=\(newValue)") } } }
     
-    dynamic public var group: String {
+    @objc dynamic public var group: String {
         get { return _group }
         set { let value = newValue.replacingSpacesWith("\u{007F}") ; if _group != value { _group = value ; _radio.send("memory set \(id) group=\(value)") } } }
     
-    dynamic public var mode: String {
+    @objc dynamic public var mode: String {
         get { return _mode }
         set { if _mode != newValue { _mode = newValue ; _radio.send("memory set \(id) mode=\(newValue)") } } }
     
-    dynamic public var name: String {
+    @objc dynamic public var name: String {
         get { return _name }
         set { let value = newValue.replacingSpacesWith("\u{007F}") ; if _name != value { _name = newValue ; _radio.send("memory set \(id) name=\(value)") } } }
     
-    dynamic public var offset: Int {
+    @objc dynamic public var offset: Int {
         get { return _offset }
         set { if _offset != newValue { _offset = newValue ; _radio.send("memory set \(id) repeater_offset=\(newValue)") } } }
     
-    dynamic public var offsetDirection: String {
+    @objc dynamic public var offsetDirection: String {
         get { return _offsetDirection }
         set { if _offsetDirection != newValue { _offsetDirection = newValue ; _radio.send("memory set \(id) repeater=" + newValue) } } }
     
-    dynamic public var owner: String {
+    @objc dynamic public var owner: String {
         get { return _owner }
         set { let value = newValue.replacingSpacesWith("\u{007F}") ; if _owner != value { _owner = newValue ; _radio.send("memory set \(id) owner=\(value)") } } }
     
-    dynamic public var rfPower: Int {
+    @objc dynamic public var rfPower: Int {
         get { return _rfPower }
         set { if _rfPower != newValue && newValue.within(kMinLevel, kMaxLevel) { _rfPower = newValue ; _radio.send("memory set \(id) power=\(newValue)") } } }
     
-    dynamic public var rttyMark: Int {
+    @objc dynamic public var rttyMark: Int {
         get { return _rttyMark }
         set { if _rttyMark != newValue { _rttyMark = newValue ; _radio.send("memory set \(id) rtty_mark=\(newValue)") } } }
     
-    dynamic public var rttyShift: Int {
+    @objc dynamic public var rttyShift: Int {
         get { return _rttyShift }
         set { if _rttyShift != newValue { _rttyShift = newValue ; _radio.send("memory set \(id) rtty_shift=\(newValue)") } } }
     
-    dynamic public var squelchEnabled: Bool {
+    @objc dynamic public var squelchEnabled: Bool {
         get { return _squelchEnabled }
         set { if _squelchEnabled != newValue { _squelchEnabled = newValue ; _radio.send("memory set \(id) squelch=" + newValue.asNumber()) } } }
     
-    dynamic public var squelchLevel: Int {
+    @objc dynamic public var squelchLevel: Int {
         get { return _squelchLevel }
         set { if _squelchLevel != newValue && newValue.within(kMinLevel, kMaxLevel) { _squelchLevel = newValue ; _radio.send("memory set \(id) squelchLevel=\(newValue)") } } }
     
-    dynamic public var step: Int {
+    @objc dynamic public var step: Int {
         get { return _step }
         set { if _step != newValue { _step = newValue ; _radio.send("memory set \(id) step=\(newValue)") } } }
     
-    dynamic public var toneMode: String {
+    @objc dynamic public var toneMode: String {
         get { return _toneMode }
         set { if _toneMode != newValue { _toneMode = newValue ; _radio.send("memory set \(id) mode=" + newValue) } } }
     
-    dynamic public var toneValue: Int {
+    @objc dynamic public var toneValue: Int {
         get { return _toneValue }
         set { if _toneValue != newValue && toneValueValid(newValue) { _toneValue = newValue ; _radio.send("memory set \(id) tone_value=\(newValue)") } } }
     

@@ -397,7 +397,7 @@ extension AudioStream {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var daxChannel: Int {        // DL3LSM
+    @objc dynamic public var daxChannel: Int {        // DL3LSM
         get { return _daxChannel }
         set {
             if _daxChannel != newValue {
@@ -409,27 +409,27 @@ extension AudioStream {
         }
     }
     
-    dynamic public var daxClients: Int {
+    @objc dynamic public var daxClients: Int {
         get { return _daxClients  }
         set { if _daxClients != newValue { _daxClients = newValue } } }
     
-    dynamic public var inUse: Bool {
+    @objc dynamic public var inUse: Bool {
         get { return _inUse }
         set { _inUse = newValue } }
     
-    dynamic public var ip: String {
+    @objc dynamic public var ip: String {
         get { return _ip }
         set { if _ip != newValue { _ip = newValue } } }
     
-    dynamic public var port: Int {
+    @objc dynamic public var port: Int {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
 
-    dynamic public var radioAck: Bool {     // DL3LSM
+    @objc dynamic public var radioAck: Bool {     // DL3LSM
         get { return _radioAck }
         set { _radioAck = newValue } }
     
-    dynamic public var rxGain: Int {        // DL3LSM
+    @objc dynamic public var rxGain: Int {        // DL3LSM
         get { return _rxGain  }
         set {
             if _rxGain != newValue {
@@ -441,7 +441,7 @@ extension AudioStream {
             }
         }
     }
-    dynamic public var slice: xFlexAPI.Slice? {
+    @objc dynamic public var slice: xFlexAPI.Slice? {
         get { return _slice }
         set {
             if _slice != newValue {
@@ -456,7 +456,7 @@ extension AudioStream {
         }
     }
     
-    dynamic public var streamId: String {
+    @objc dynamic public var streamId: String {
         get { return _streamId }
         set { if _streamId != newValue { _streamId = newValue } } }
     

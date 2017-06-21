@@ -105,7 +105,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
         
         // set the length of the packet
         _vita!.payloadSize = _txPacketSize                                      // 8-Bit encoded samples
-        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size 	// payload size + header size
+        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size     // payload size + header size
         
         // set the sequence number
         _vita!.sequence = txSeq
@@ -336,11 +336,11 @@ extension Opus {
     // MARK: - Public properties - KVO compliant with Radio update
 
     // listed in alphabetical order
-    dynamic public var remoteRxOn: Bool {
+    @objc dynamic public var remoteRxOn: Bool {
         get { return _remoteRxOn }
         set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + "rx_on \(newValue.asNumber())") } } }
     
-    dynamic public var remoteTxOn: Bool {
+    @objc dynamic public var remoteTxOn: Bool {
         get { return _remoteTxOn }
         set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + "tx_on \(newValue.asNumber())") } } }
     
@@ -348,7 +348,7 @@ extension Opus {
 //        get { return _rxStreamId }
 //        set { if _rxStreamId != newValue { _rxStreamId = newValue } } }
     
-    dynamic public var rxStreamStopped: Bool {
+    @objc dynamic public var rxStreamStopped: Bool {
         get { return _rxStreamStopped }
         set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; _radio!.send(kRemoteAudioCmd + "opus_rx_stream_stopped \(newValue.asNumber())") } } }
     

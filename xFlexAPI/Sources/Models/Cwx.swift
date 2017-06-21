@@ -365,15 +365,15 @@ extension Cwx {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var delay: Int {
+    @objc dynamic public var delay: Int {
         get { return _delay }
         set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ; if _delay != value  { _delay = value ; radio!.send(kCwxCmd + "delay \(value)") } } } }
     
-    dynamic public var qskEnabled: Bool {
+    @objc dynamic public var qskEnabled: Bool {
         get { return _qskEnabled }
         set { if _qskEnabled != newValue { _qskEnabled = newValue ; radio!.send(kCwxCmd + "qsk_enabled \(newValue.asNumber())") } } }
     
-    dynamic public var speed: Int {
+    @objc dynamic public var speed: Int {
         get { return _speed }
         set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; radio!.send(kCwxCmd + "wpm \(value)") } } } }
     

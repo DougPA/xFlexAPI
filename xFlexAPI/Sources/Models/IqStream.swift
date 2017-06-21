@@ -226,39 +226,39 @@ extension IqStream {
     // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
-    dynamic public var available: Int {
+    @objc dynamic public var available: Int {
         get { return _available }
         set { if _available != newValue { _available = newValue } } }
     
-    dynamic public var capacity: Int {
+    @objc dynamic public var capacity: Int {
         get { return _capacity }
         set { if _capacity != newValue { _capacity = newValue } } }
     
-    dynamic public var daxIqChannel: Int {
+    @objc dynamic public var daxIqChannel: Int {
         get { return _daxIqChannel }
         set { if _daxIqChannel != newValue { _daxIqChannel = newValue } } }
     
-    dynamic public var ip: String {
+    @objc dynamic public var ip: String {
         get { return _ip }
         set { if _ip != newValue { _ip = newValue } } }
     
-    dynamic public var port: Int {
+    @objc dynamic public var port: Int {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
     
-    dynamic public var pan: Radio.PanadapterId? {
+    @objc dynamic public var pan: Radio.PanadapterId? {
         get { return _pan }
         set { if _pan != newValue { _pan = newValue } } }
     
-    dynamic public var rate: Int {
+    @objc dynamic public var rate: Int {
         get { return _rate  }
         set { if _rate != newValue { _rate = newValue } } }
     
-    dynamic public var streamId: String {
+    @objc dynamic public var streamId: String {
         get { return _streamId }
         set { if _streamId != newValue { _streamId = newValue } } }
     
-    dynamic public var streaming: Bool {
+    @objc dynamic public var streaming: Bool {
         get { return _streaming  }
         set { if _streaming != newValue { _streaming = newValue } } }
     
