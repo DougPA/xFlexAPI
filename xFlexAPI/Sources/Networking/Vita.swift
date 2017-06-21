@@ -71,7 +71,7 @@ public struct Vita {
     var fracTimeStampLsb: UInt32 = 0                                    // fractional portion -LSB 32 bits
     var oui: UInt32 = kFlexOui                                          // Flex Radio oui
     var informationClassCode: UInt32 = kFlexInformationClassCode        // Flex Radio classCode
-    var payload: UnsafeMutableRawPointer? = nil                         // Mutable Void Pointer to the payload
+    var payload: UnsafeRawPointer? = nil                                // Void Pointer to the payload
     var payloadSize: Int = 0                                            // Size of payload (bytes)
     var trailer: UInt32 = 0                                             // Trailer, 4 bytes (if used)
     var headerSize: Int = MemoryLayout<VitaHeader>.size                 // Header size (bytes)
@@ -141,7 +141,7 @@ public struct Vita {
             payloadArray[i] = UInt8(cString[i])
         }
         // give the Vita struct a pointer to the payload
-        vita.payload = UnsafeMutableRawPointer(mutating: payloadArray)
+        vita.payload = UnsafeRawPointer(payloadArray)
         
         // encode it to a Vita Data packet & return the Data packet
         return vita.encode()
@@ -253,7 +253,7 @@ public struct Vita {
         vita.payloadSize = data.count - vita.headerSize - (vita.trailerPresent ? kTrailerSize : 0)
         
         // get a <Void> pointer to the Payload
-        vita.payload = UnsafeMutableRawPointer(mutating: (data as NSData).bytes.advanced(by: vita.headerSize))
+        vita.payload = UnsafeRawPointer((data as NSData).bytes.advanced(by: vita.headerSize))
         
         // capture the Trailer (if any)
         if vita.trailerPresent {

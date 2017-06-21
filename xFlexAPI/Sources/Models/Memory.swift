@@ -288,7 +288,7 @@ public final class Memory : NSObject, KeyValueParser {
 // MARK: - Memory Class extensions
 //              - Synchronized internal properties
 //              - Dynamic public properties
-//              - Opus message enum
+//              - Memory message enum
 // --------------------------------------------------------------------------------
 
 extension Memory {

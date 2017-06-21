@@ -340,7 +340,7 @@ public final class Cwx : NSObject, KeyValueParser {
 // MARK: - Cwx Class extensions
 //              - Synchronized internal properties
 //              - Dynamic public properties
-//              - Opus message enum
+//              - Cwx message enum
 // --------------------------------------------------------------------------------
 
 extension Cwx {

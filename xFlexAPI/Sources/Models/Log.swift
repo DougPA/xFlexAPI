@@ -28,8 +28,8 @@ public enum MessageLevel: Int {
     
     /// Return the MessageLevel of a Flex Command response
     ///
-    /// - Parameter response: the response as a hex String
-    /// - Returns: the equivalent MessageLevel
+    /// - Parameter response:   the Flex response as a hex String
+    /// - Returns:              the equivalent xFlexAPI MessageLevel
     ///
     public static func from(_ response: String) -> MessageLevel {
         var value = MessageLevel.verbose            // "1" is converted to .verbose
@@ -78,11 +78,11 @@ public final class Log {
     /// Create an entry in a Log (if any). May be called from any thread
     ///
     /// - Parameters:
-    ///   - msg: a message String
-    ///   - level: the severity level
-    ///   - function: the function where the message originated
-    ///   - file: the file where the message originated
-    ///   - line: the line where the message originated
+    ///   - msg:        a message String
+    ///   - level:      the severity level
+    ///   - function:   the function where the message originated
+    ///   - file:       the file where the message originated
+    ///   - line:       the line where the message originated
     ///
     public func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) {
         

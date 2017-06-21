@@ -172,7 +172,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         
         // get a raw pointer to the start of the payload
         let payloadPtr = UnsafeMutableRawPointer(mutating: payload)
-        _vita!.payload = payloadPtr
+        _vita!.payload = UnsafeRawPointer(payload)
         
         // get a pointer to 32-bit chunks in the payload
         let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: kMaxSamplesToSend * kNumberOfChannels)
@@ -429,7 +429,7 @@ extension TXAudioStream {
         set { if _streamId != newValue { _streamId = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for MicAudioStream messages (only populate values that != case value)
+    // Mark: - Tokens for TxAudioStream messages (only populate values that != case value)
     
     enum Token: String {
         case daxTx = "dax_tx"
