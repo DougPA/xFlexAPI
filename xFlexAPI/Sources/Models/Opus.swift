@@ -26,7 +26,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate weak var radio: Radio?                  // The Radio that owns the Opus stream
+    fileprivate weak var _radio: Radio?                 // The Radio that owns the Opus stream
     fileprivate var _id: Radio.OpusId                   // The Opus stream id
 
     fileprivate var _initialized = false                // True if initialized by Radio hardware
@@ -39,9 +39,9 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     fileprivate var rxBytesPerSec = 0                   // Rx rate
     fileprivate var rxLostPacketCount = 0               // Rx lost packet count
     
-    fileprivate var txSeq: UInt16?                      // Tx sequence number
+    fileprivate var txSeq = 0                           // Tx sequence number
     fileprivate var txByteCount = 0                     // Tx byte count
-    fileprivate var txPacketCount = 0                   // Tx packet count
+    fileprivate var _txPacketSize = 240                  // Tx packet size (bytes)
     fileprivate var txBytesPerSec = 0                   // Tx rate
     
     // constants
@@ -54,9 +54,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     //                                                                                              //
     fileprivate var __remoteRxOn = false                // Opus for receive                         //
     fileprivate var __remoteTxOn = false                // Opus for transmit                        //
-    fileprivate var __rxStream = ""                     // Rx stream id                             //
     fileprivate var __rxStreamStopped = false           // Rx stream stopped                        //
-    fileprivate var __txStream = ""                     // Tx stream id                             //
                                                                                                     //
     fileprivate var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data            //
         didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }                     //
@@ -75,7 +73,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     ///
     init(radio: Radio, id: Radio.OpusId, queue: DispatchQueue) {
         
-        self.radio = radio
+        self._radio = radio
         self._opusQ = queue
         self._id = id
         
@@ -85,6 +83,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods
     
+    private var _vita: Vita?
     /// Send Opus encoded TX audio to the Radio (hardware)
     ///
     /// - Parameters:
@@ -92,11 +91,33 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     ///   - samples:    number of samples to be sent
     /// - Returns:      success / failure
     ///
-    public func sendOpusTxAudio(buffer: [UInt8], samples: Int) -> Bool {
-    
-        // TODO: add code
+    public func sendOpusTxAudio(buffer: [UInt8], samples: Int) {
         
-        return true
+        if _vita == nil {
+            // get a new Vita struct (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
+            _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: _id, tsi: .other)
+        }
+        // create new array for payload (interleaved L/R samples)
+        let payload = [UInt8](repeating: 0, count: _txPacketSize)
+
+        // get a raw pointer to the start of the payload
+        _vita!.payload = UnsafeRawPointer(payload)
+        
+        // set the length of the packet
+        _vita!.payloadSize = _txPacketSize                                      // 8-Bit encoded samples
+        _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size 	// payload size + header size
+        
+        // set the sequence number
+        _vita!.sequence = txSeq
+        
+        // encode vita packet to data and send to radio
+        if let packet = _vita!.encode() {
+            
+            // send packet to radio
+            _radio?.sendVitaData(packet)
+        }
+        // increment the sequence number (mod 16)
+        txSeq = (txSeq + 1) % 16
     }
 
     // ------------------------------------------------------------------------------
@@ -153,17 +174,17 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
                 _rxStreamStopped = bValue
                 didChangeValue(forKey: "rxStreamStopped")
                 
-            case .rxStream:
-                //get the streamId (remove the "0x" prefix)
-                willChangeValue(forKey: "rxStream")
-                _rxStream = String(kv.value.characters.dropFirst(2))
-                didChangeValue(forKey: "rxStream")
-
-            case .txStream:
-                //get the streamId (remove the "0x" prefix)
-                willChangeValue(forKey: "txStream")
-                _txStream = String(kv.value.characters.dropFirst(2))
-                didChangeValue(forKey: "txStream")
+//            case .rxStreamId:
+//                //get the streamId (remove the "0x" prefix)
+//                willChangeValue(forKey: "rxStream")
+//                _rxStreamId = String(kv.value.characters.dropFirst(2))
+//                didChangeValue(forKey: "rxStream")
+//
+//            case .txStreamId:
+//                //get the streamId (remove the "0x" prefix)
+//                willChangeValue(forKey: "txStream")
+//                _txStreamId = String(kv.value.characters.dropFirst(2))
+//                didChangeValue(forKey: "txStream")
             }
         }
         // the Radio (hardware) has acknowledged this Opus
@@ -299,17 +320,17 @@ extension Opus {
         get { return _opusQ.sync { __remoteTxOn } }
         set { _opusQ.sync(flags: .barrier) { __remoteTxOn = newValue } } }
     
-    fileprivate var _rxStream: String {
-        get { return _opusQ.sync { __rxStream } }
-        set { _opusQ.sync(flags: .barrier) { __rxStream = newValue } } }
+//    fileprivate var _rxStreamId: String {
+//        get { return _opusQ.sync { __rxStream } }
+//        set { _opusQ.sync(flags: .barrier) { __rxStream = newValue } } }
     
     fileprivate var _rxStreamStopped: Bool {
         get { return _opusQ.sync { __rxStreamStopped } }
         set { _opusQ.sync(flags: .barrier) { __rxStreamStopped = newValue } } }
     
-    fileprivate var _txStream: String {
-        get { return _opusQ.sync { __txStream } }
-        set { _opusQ.sync(flags: .barrier) { __txStream = newValue } } }
+//    fileprivate var _txStreamId: String {
+//        get { return _opusQ.sync { __txStream } }
+//        set { _opusQ.sync(flags: .barrier) { __txStream = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant with Radio update
@@ -317,23 +338,23 @@ extension Opus {
     // listed in alphabetical order
     dynamic public var remoteRxOn: Bool {
         get { return _remoteRxOn }
-        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; radio!.send(kRemoteAudioCmd + "rx_on \(newValue.asNumber())") } } }
+        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + "rx_on \(newValue.asNumber())") } } }
     
     dynamic public var remoteTxOn: Bool {
         get { return _remoteTxOn }
-        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; radio!.send(kRemoteAudioCmd + "tx_on \(newValue.asNumber())") } } }
+        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + "tx_on \(newValue.asNumber())") } } }
     
-    dynamic public var rxStream: String {
-        get { return _rxStream }
-        set { if _rxStream != newValue { _rxStream = newValue } } }
+//    dynamic public var rxStreamId: String {
+//        get { return _rxStreamId }
+//        set { if _rxStreamId != newValue { _rxStreamId = newValue } } }
     
     dynamic public var rxStreamStopped: Bool {
         get { return _rxStreamStopped }
-        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; radio!.send(kRemoteAudioCmd + "opus_rx_stream_stopped \(newValue.asNumber())") } } }
+        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; _radio!.send(kRemoteAudioCmd + "opus_rx_stream_stopped \(newValue.asNumber())") } } }
     
-    dynamic public var txStream: String {
-        get { return _txStream }
-        set { if _txStream != newValue { _txStream = newValue ; radio!.send(kRemoteAudioCmd + "tx_stream \(newValue)") } } }
+//    dynamic public var txStreamId: String {
+//        get { return _txStreamId }
+//        set { if _txStreamId != newValue { _txStreamId = newValue ; _radio!.send(kRemoteAudioCmd + "tx_stream \(newValue)") } } }
     
     
     // ----------------------------------------------------------------------------
@@ -351,9 +372,9 @@ extension Opus {
         case port
         case remoteRxOn = "rx_on"
         case remoteTxOn = "tx_on"
-        case rxStream = "rx_stream"
+//        case rxStreamId = "rx_stream"
         case rxStreamStopped = "opus_rx_stream_stopped"
-        case txStream = "tx_stream"
+//        case txStreamId = "tx_stream"
     }
     
 }
