@@ -145,7 +145,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
             _initialized = true
             
             // notify all observers
-            NC.post(.waterfallInitialized, object: self as Any?)
+            NC.post(.waterfallHasBeenAdded, object: self as Any?)
         }
     }
     

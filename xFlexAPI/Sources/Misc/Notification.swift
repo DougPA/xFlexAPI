@@ -39,24 +39,23 @@ public enum NotificationType : String {
     
     case logEntryWasAdded
     
-    case memoryAdded
-    case memoryInitialized
-    case memoryWillBeRemoved
+    case memoryHasBeenAdded
+//    case memoryInitialized
+    case memoryShouldBeRemoved
     
-    case meterAdded
-    case meterInitialized
+//    case meterAdded
+    case meterHasBeenAdded
+    case meterShouldBeRemoved
     case meterUpdated
-    case meterWillBeRemoved
     
     case micAudioStreamInitialized
     case micAudioStreamWillBeRemoved
 
-    case opusAdded
-    case opusInitialized
-    case opusWillBeRemoved
+    case opusHasBeenAdded
+    case opusShouldBeRemoved
     
-    case panadapterInitialized
-    case panadapterWillBeRemoved
+    case panadapterHasBeenAdded
+    case panadapterShouldBeRemoved
     
     case radioInitialized
     
@@ -64,7 +63,7 @@ public enum NotificationType : String {
     
     case replyHandlerWillBeRemoved
     
-    case sliceInitialized
+    case sliceHasBeenAdded
     case sliceShouldBeRemoved
     
     case tcpDidConnect
@@ -73,7 +72,7 @@ public enum NotificationType : String {
     case tcpPingTimeout
     case tcpWillDisconnect
     
-    case tnfInitialized
+    case tnfHasBeenAdded
     case tnfShouldBeRemoved
     
     case txAudioStreamInitialized
@@ -86,7 +85,7 @@ public enum NotificationType : String {
     
     case udpDidBind
     
-    case waterfallInitialized
-    case waterfallWillBeRemoved
+    case waterfallHasBeenAdded
+    case waterfallShouldBeRemoved
 }
 

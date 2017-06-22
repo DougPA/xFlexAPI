@@ -25,11 +25,11 @@ public protocol AudioStreamHandler {
 final public class AudioStream: NSObject {
     
     public private(set) var rxLostPacketCount = 0       // Rx lost packet count
-
+    public private(set) var id: Radio.DaxStreamId = ""  // The Audio stream id
+    
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _id: Radio.DaxStreamId = ""         // The Audio stream id
 //    fileprivate var _initialized = false                // True if initialized by Radio hardware
 
     fileprivate weak var _radio: Radio?                 // The Radio that owns this Audio stream

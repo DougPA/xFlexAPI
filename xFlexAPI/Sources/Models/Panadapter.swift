@@ -310,7 +310,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
             _initialized = true
             
             // notify all observers
-            NC.post(.panadapterInitialized, object: self as Any?)            
+            NC.post(.panadapterHasBeenAdded, object: self as Any?)            
         }
     }
     

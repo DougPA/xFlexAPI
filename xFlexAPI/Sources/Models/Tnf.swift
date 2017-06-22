@@ -144,7 +144,7 @@ public final class Tnf : NSObject, KeyValueParser {
             _initialized = true
             
             // notify all observers
-            NC.post(.tnfInitialized, object: self as Any?)
+            NC.post(.tnfHasBeenAdded, object: self as Any?)
 
         }
     }

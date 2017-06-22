@@ -166,7 +166,7 @@ public class Meter : KeyValueParser {
             _initialized = true
             
             // notify all observers
-            NC.post(.meterInitialized, object: self as Any?)
+            NC.post(.meterHasBeenAdded, object: self as Any?)
         }
     }
     

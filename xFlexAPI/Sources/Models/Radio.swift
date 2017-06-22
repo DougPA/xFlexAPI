@@ -358,6 +358,35 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - public methods
     
+    /// Remove an object from its collection
+    ///
+    /// - Parameter object:     an object
+    ///
+    public func removeObject<T>(_ object: T) {
+        
+        // cases are in alphabetical order
+        switch object {
+            
+        case is Memory:
+            memories[(object as! Memory).id] = nil
+            
+        case is Panadapter:
+            panadapters[(object as! Panadapter).id] = nil
+            
+        case is xFlexAPI.Slice:
+            slices[(object as! xFlexAPI.Slice).id] = nil
+            
+        case is Tnf:
+            tnfs[(object as! Tnf).id] = nil
+            
+        case is Waterfall:
+            waterfalls[(object as! Waterfall).id] = nil
+            
+        default:
+            _log.msg("Attempt to remove an unknown object type", level: .error, function: #function, file: #file, line: #line)
+        }
+        
+    }
     /// Establish a basic connection to Radio
     ///
     /// - Parameter selectedRadio:  the Radio to connect to
@@ -1182,7 +1211,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // should the object be removed?
         if isRemoved {
-        
+            
             
             // YES, Which Display Type?
             switch token {
@@ -1190,19 +1219,12 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             case .panadapter:
 
                 // notify all observers
-                NC.post(.panadapterWillBeRemoved, object: panadapters[streamId] as Any?)
+                NC.post(.panadapterShouldBeRemoved, object: panadapters[streamId] as Any?)
                 
             case .waterfall:
                 
                 // notify all observers
-                NC.post(.waterfallWillBeRemoved, object: waterfalls[streamId] as Any?)
-                
-//                DispatchQueue.main.async { [unowned self] in
-//                    // remove the Waterfall & Panadapter objects from their collections
-//                    let panadapterId = self.waterfalls[streamId]?.panadapterId
-//                    self.waterfalls[streamId] = nil
-//                    self.panadapters[panadapterId!] = nil
-//                }
+                NC.post(.waterfallShouldBeRemoved, object: waterfalls[streamId] as Any?)
             }
         
         } else {
@@ -1570,8 +1592,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
 //                        print("Meter - added to Slice \(slice.id), \(meter!)")
                     }
                 }
-                // notify all observers
-                NC.post(.meterAdded, object: meter as Any?)
+//                // notify all observers
+//                NC.post(.meterAdded, object: meter as Any?)
             }
             
             // pass the key values to the Meter for parsing
@@ -2438,57 +2460,57 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         return tnf
     }
     
-    // MARK: ----- Memory -----
-    
-    /// Given a Memory Id, return a reference to the Memory
-    ///
-    /// - parameter memoryId: the ID of a Meter
-    ///
-    /// - returns: a reference to a Memory
-    ///
-    public func findMemoryBy(memoryId: MemoryId) -> Memory? {
-        var memory: Memory?
-        
-        // use the objectQ to (sync, concurrent)
-        _objectQ.sync { [unowned self] in
-            
-            // get a reference to the Memory
-            memory = self.memories[memoryId]
-        }
-        return memory
-    }
-    /// Add a Memory to the Memories collection
-    ///
-    /// - parameter memory: a reference to a Memory
-    ///
-    public func addMemory(_ memory: Memory) {
-        
-        // use the objectQ to (sync, concurrent, barrier)
-        _objectQ.async(flags: .barrier) { [unowned self] in
-            
-            // add the Memory to the Radio class's Memories collection
-            self.memories[memory.id] = memory
-
-            // notify all observers
-            NC.post(.memoryAdded, object: memory as Any?)
-        }
-    }
-    /// Remove a Memory from the Memories collection
-    ///
-    /// - parameter memory: a reference to a Memory
-    ///
-    public func removeMemory(_ memory: Memory) {
-
-        // notify all observers
-        NC.post(.memoryWillBeRemoved, object: memory as Any?)
-
-        // use the objectQ to (sync, concurrent, barrier)
-        _objectQ.async(flags: .barrier) { [unowned self] in
-            
-            // remove the Memory from the Radio class's Memories collection
-            self.memories.removeValue(forKey: memory.id)
-        }
-    }
+//    // MARK: ----- Memory -----
+//
+//    /// Given a Memory Id, return a reference to the Memory
+//    ///
+//    /// - parameter memoryId: the ID of a Meter
+//    ///
+//    /// - returns: a reference to a Memory
+//    ///
+//    public func findMemoryBy(memoryId: MemoryId) -> Memory? {
+//        var memory: Memory?
+//
+//        // use the objectQ to (sync, concurrent)
+//        _objectQ.sync { [unowned self] in
+//
+//            // get a reference to the Memory
+//            memory = self.memories[memoryId]
+//        }
+//        return memory
+//    }
+//    /// Add a Memory to the Memories collection
+//    ///
+//    /// - parameter memory: a reference to a Memory
+//    ///
+//    public func addMemory(_ memory: Memory) {
+//
+//        // use the objectQ to (sync, concurrent, barrier)
+//        _objectQ.async(flags: .barrier) { [unowned self] in
+//
+//            // add the Memory to the Radio class's Memories collection
+//            self.memories[memory.id] = memory
+//
+//            // notify all observers
+//            NC.post(.memoryAdded, object: memory as Any?)
+//        }
+//    }
+//    /// Remove a Memory from the Memories collection
+//    ///
+//    /// - parameter memory: a reference to a Memory
+//    ///
+//    public func removeMemory(_ memory: Memory) {
+//
+//        // notify all observers
+//        NC.post(.memoryWillBeRemoved, object: memory as Any?)
+//
+//        // use the objectQ to (sync, concurrent, barrier)
+//        _objectQ.async(flags: .barrier) { [unowned self] in
+//
+//            // remove the Memory from the Radio class's Memories collection
+//            self.memories.removeValue(forKey: memory.id)
+//        }
+//    }
     
     // MARK: ----- Meter -----
     
@@ -2736,8 +2758,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // add it to the collection
             self.meters[id] = meter
             
-            // notify all observers
-            NC.post(.meterAdded, object: meter as Any?)
+//            // notify all observers
+//            NC.post(.meterAdded, object: meter as Any?)
             
             // pass the key values to the Meter for parsing
             meter.parseKeyValues( keyValues )

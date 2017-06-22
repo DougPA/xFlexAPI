@@ -172,19 +172,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
             case .rxStreamStopped:
                 willChangeValue(forKey: "rxStreamStopped")
                 _rxStreamStopped = bValue
-                didChangeValue(forKey: "rxStreamStopped")
-                
-//            case .rxStreamId:
-//                //get the streamId (remove the "0x" prefix)
-//                willChangeValue(forKey: "rxStream")
-//                _rxStreamId = String(kv.value.characters.dropFirst(2))
-//                didChangeValue(forKey: "rxStream")
-//
-//            case .txStreamId:
-//                //get the streamId (remove the "0x" prefix)
-//                willChangeValue(forKey: "txStream")
-//                _txStreamId = String(kv.value.characters.dropFirst(2))
-//                didChangeValue(forKey: "txStream")
+                didChangeValue(forKey: "rxStreamStopped")                
             }
         }
         // the Radio (hardware) has acknowledged this Opus
@@ -194,7 +182,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
             _initialized = true
             
             // notify all observers
-            NC.post(.opusInitialized, object: self as Any?)
+            NC.post(.opusHasBeenAdded, object: self as Any?)
         }
     }
     

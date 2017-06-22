@@ -279,8 +279,15 @@ public final class Memory : NSObject, KeyValueParser {
                 didChangeValue(forKey: "toneValue")
             }
         }
-        // the Radio (hardware) has acknowledged this Memory
-        _initialized = true
+        // is the Memory initialized?
+        if !_initialized  {
+            
+            // YES, the Radio (hardware) has acknowledged this Memory
+            _initialized = true
+            
+            // notify all observers
+            NC.post(.memoryHasBeenAdded, object: self as Any?)
+        }
     }
 }
 

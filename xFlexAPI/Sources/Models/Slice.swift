@@ -672,7 +672,7 @@ public class Slice : NSObject, KeyValueParser {
             _initialized = true
             
             // notify all observers
-            NC.post(.sliceInitialized, object: self)
+            NC.post(.sliceHasBeenAdded, object: self)
         }
     }
 }
