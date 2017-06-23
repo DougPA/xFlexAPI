@@ -28,6 +28,9 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
     
+    public var isConnected: Bool {
+        return _tcpSocket.isConnected
+    }
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
@@ -53,6 +56,13 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
         
         self._tcpQ = tcpQ
         self._delegate = delegate
+        
+        super.init()
+        
+        // get a socket & set it's parameters
+        _tcpSocket = GCDAsyncSocket(delegate: self, delegateQueue: _tcpQ)
+        _tcpSocket.isIPv4PreferredOverIPv6 = true
+        _tcpSocket.isIPv6Enabled = false
     }
     
     // ----------------------------------------------------------------------------
@@ -68,10 +78,10 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
         
         seqNum = 0
         
-        // get a socket & set it's parameters
-        _tcpSocket = GCDAsyncSocket(delegate: self, delegateQueue: _tcpQ)
-        _tcpSocket.isIPv4PreferredOverIPv6 = true
-        _tcpSocket.isIPv6Enabled = false
+//        // get a socket & set it's parameters
+//        _tcpSocket = GCDAsyncSocket(delegate: self, delegateQueue: _tcpQ)
+//        _tcpSocket.isIPv4PreferredOverIPv6 = true
+//        _tcpSocket.isIPv6Enabled = false
         
         do {
             // attempt to connect to the Radio (with timeout)
