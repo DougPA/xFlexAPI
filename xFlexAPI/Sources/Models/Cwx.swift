@@ -25,39 +25,39 @@ public final class Cwx : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate weak var  radio: Radio?                 // The Radio that owns this Cwx
-    fileprivate var _cwxQ: DispatchQueue                // GCD queue that guards this object
+    private var _radio: Radio?                      // The Radio that owns this Cwx
+    private var _cwxQ: DispatchQueue                // GCD queue that guards this object
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __delay = 0                         // Delay (ms)                               //
-    fileprivate var __qskEnabled = false                // QSK Enabled                              //
-    fileprivate var __speed = 0                         // Speed (wpm)                              //
+    private var __delay = 0                         // Delay (ms)                               //
+    private var __qskEnabled = false                // QSK Enabled                              //
+    private var __speed = 0                         // Speed (wpm)                              //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared log
-    fileprivate let kModule = "Cwx"                     // Module Name reported in log messages
-    fileprivate let kMinDelayMs = 0                     // Min delay (ms)
-    fileprivate let kMaxDelayMs = 2000                  // Max delay (ms)
-    fileprivate let kMinSpeed = 5                       // Min speed (wpm)
-    fileprivate let kMaxSpeed = 100                     // Max speed (wpm)
-    fileprivate let kMaxNumberOfMacros = 12             // Max number of macros
+    private let _log = Log.sharedInstance           // shared log
+    private let kModule = "Cwx"                     // Module Name reported in log messages
+    private let kMinDelayMs = 0                     // Min delay (ms)
+    private let kMaxDelayMs = 2000                  // Max delay (ms)
+    private let kMinSpeed = 5                       // Min speed (wpm)
+    private let kMaxSpeed = 100                     // Max speed (wpm)
+    private let kMaxNumberOfMacros = 12             // Max number of macros
 
-    fileprivate let kCwxCmd = "cwx "                    // Command prefixes
-    fileprivate let kCwxInsertCmd = "cwx insert "
-    fileprivate let kCwxMacroCmd = "cwx macro "
-    fileprivate let kCwxSendCmd = "cwx send "
+    private let kCwxCmd = "cwx "                    // Command prefixes
+    private let kCwxInsertCmd = "cwx insert "
+    private let kCwxMacroCmd = "cwx macro "
+    private let kCwxSendCmd = "cwx send "
     
-    fileprivate let kNoError = "0"                      // Response without error
+    private let kNoError = "0"                      // Response without error
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
     
     init(radio: Radio, queue: DispatchQueue) {
         
-        self.radio = radio
+        self._radio = radio
         self._cwxQ = queue
         macros = [String](repeating: "", count: kMaxNumberOfMacros)
         
@@ -67,8 +67,8 @@ public final class Cwx : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods that send commands to the Radio (hardware)
     
-    public func clearBuffer() { radio!.send(kCwxCmd + "clear") }
-    public func erase(numberOfChars: Int) { radio!.send(kCwxCmd + "erase \(numberOfChars)") }
+    public func clearBuffer() { _radio!.send(kCwxCmd + "clear") }
+    public func erase(numberOfChars: Int) { _radio!.send(kCwxCmd + "erase \(numberOfChars)") }
 
     /// Send a string of Cw, optionally with a block
     ///
@@ -83,11 +83,11 @@ public final class Cwx : NSObject, KeyValueParser {
         
         if let block = block {
             
-            radio!.send(kCwxSendCmd + "\"" + msg + "\" \(block)", replyTo: replyHandler)
+            _radio!.send(kCwxSendCmd + "\"" + msg + "\" \(block)", replyTo: replyHandler)
             
         } else {
             
-            radio!.send(kCwxSendCmd + "\"" + msg + "\"", replyTo: replyHandler)
+            _radio!.send(kCwxSendCmd + "\"" + msg + "\"", replyTo: replyHandler)
         }
     }
     /// Insert a string of Cw, optionally with a block
@@ -104,11 +104,11 @@ public final class Cwx : NSObject, KeyValueParser {
         
         if let block = block {
             
-            radio!.send(kCwxInsertCmd + "\(index) \"" + msg + "\" \(block)", replyTo: replyHandler)
+            _radio!.send(kCwxInsertCmd + "\(index) \"" + msg + "\" \(block)", replyTo: replyHandler)
             
         } else {
             
-            radio!.send(kCwxInsertCmd + "\(index) \"" + msg + "\"", replyTo: replyHandler)
+            _radio!.send(kCwxInsertCmd + "\(index) \"" + msg + "\"", replyTo: replyHandler)
         }
     }
     /// Send the specified Cwx Macro
@@ -123,11 +123,11 @@ public final class Cwx : NSObject, KeyValueParser {
         
         if let block = block {
             
-            radio!.send(kCwxMacroCmd + "send \(index) \(block)", replyTo: replyHandler)
+            _radio!.send(kCwxMacroCmd + "send \(index) \(block)", replyTo: replyHandler)
             
         } else {
             
-            radio!.send(kCwxMacroCmd + "send \(index)", replyTo: replyHandler)
+            _radio!.send(kCwxMacroCmd + "send \(index)", replyTo: replyHandler)
         }
     }
     /// Save the specified Cwx Macro and tell the Radio (hardware)
@@ -147,7 +147,7 @@ public final class Cwx : NSObject, KeyValueParser {
         
         macros[index] = msg
         
-        radio!.send(kCwxMacroCmd + "save \(index+1)" + " \"" + msg + "\"")
+        _radio!.send(kCwxMacroCmd + "save \(index+1)" + " \"" + msg + "\"")
         
         return true
     }
@@ -349,15 +349,15 @@ extension Cwx {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _delay: Int {
+    private var _delay: Int {
         get { return _cwxQ.sync { __delay } }
         set { _cwxQ.sync(flags: .barrier) { __delay = newValue } } }
     
-    fileprivate var _qskEnabled: Bool {
+    private var _qskEnabled: Bool {
         get { return _cwxQ.sync { __qskEnabled } }
         set { _cwxQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
     
-    fileprivate var _speed: Int {
+    private var _speed: Int {
         get { return _cwxQ.sync { __speed } }
         set { _cwxQ.sync(flags: .barrier) { __speed = newValue } } }
     
@@ -367,15 +367,15 @@ extension Cwx {
     // listed in alphabetical order
     @objc dynamic public var delay: Int {
         get { return _delay }
-        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ; if _delay != value  { _delay = value ; radio!.send(kCwxCmd + "delay \(value)") } } } }
+        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ; if _delay != value  { _delay = value ; _radio!.send(kCwxCmd + "delay \(value)") } } } }
     
     @objc dynamic public var qskEnabled: Bool {
         get { return _qskEnabled }
-        set { if _qskEnabled != newValue { _qskEnabled = newValue ; radio!.send(kCwxCmd + "qsk_enabled \(newValue.asNumber())") } } }
+        set { if _qskEnabled != newValue { _qskEnabled = newValue ; _radio!.send(kCwxCmd + "qsk_enabled \(newValue.asNumber())") } } }
     
     @objc dynamic public var speed: Int {
         get { return _speed }
-        set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; radio!.send(kCwxCmd + "wpm \(value)") } } } }
+        set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; _radio!.send(kCwxCmd + "wpm \(value)") } } } }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Cwx messages (only populate values that != case value)

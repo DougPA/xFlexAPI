@@ -22,103 +22,103 @@ public class Slice : NSObject, KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate weak var _radio: Radio?                 // The Radio that owns this Slice
-    fileprivate var _sliceQ: DispatchQueue              // GCD queue that guards this object
-    fileprivate var _initialized = false                // True if initialized by Radio (hardware)
-    fileprivate var _shouldBeRemoved = false            // True if being removed
-    fileprivate var _diversityIsAllowed: Bool
+    private weak var _radio: Radio?                 // The Radio that owns this Slice
+    private var _sliceQ: DispatchQueue              // GCD queue that guards this object
+    private var _initialized = false                // True if initialized by Radio (hardware)
+//    private var _shouldBeRemoved = false            // True if being removed
+    private var _diversityIsAllowed: Bool
         { return _radio?.selectedRadio?.model == "FLEX-6700" || _radio?.selectedRadio?.model == "FLEX-6700R" }
 
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    fileprivate let kModule = "Slice"                   // Module Name reported in log messages
-    fileprivate let kAudioClientCommand = "audio client " // command prefixes
-    fileprivate let kFilterCommand = "filt "
-    fileprivate let kSliceCommand = "slice "
-    fileprivate let kSliceSetCommand = "slice set "
-    fileprivate let kSliceTuneCommand = "slice tune "
-    fileprivate let kMinLevel = 0                       // control range
-    fileprivate let kMaxLevel = 100
-    fileprivate let kMinOffset = -99_999                // frequency offset range
-    fileprivate let kMaxOffset = 99_999
-    fileprivate let kNoError = "0"                      // response without error
-    fileprivate let kTuneStepList =                     // tuning steps
+    private let _log = Log.sharedInstance           // shared Log
+    private let kModule = "Slice"                   // Module Name reported in log messages
+    private let kAudioClientCommand = "audio client " // command prefixes
+    private let kFilterCommand = "filt "
+    private let kSliceCommand = "slice "
+    private let kSliceSetCommand = "slice set "
+    private let kSliceTuneCommand = "slice tune "
+    private let kMinLevel = 0                       // control range
+    private let kMaxLevel = 100
+    private let kMinOffset = -99_999                // frequency offset range
+    private let kMaxOffset = 99_999
+    private let kNoError = "0"                      // response without error
+    private let kTuneStepList =                     // tuning steps
         [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var _meters = [String: Meter]()         // Dictionary of Meters (on this Slice)     //
+    private var _meters = [String: Meter]()         // Dictionary of Meters (on this Slice)     //
                                                                                                     //
-    fileprivate var __daxClients = 0                    // DAX clients for this slice               //
+    private var __daxClients = 0                    // DAX clients for this slice               //
                                                                                                     //
-    fileprivate var __active = false                    //                                          //
-    fileprivate var __agcMode = AgcMode.off.rawValue    //                                          //
-    fileprivate var __agcOffLevel = 0                   // Slice AGC Off level                      //
-    fileprivate var __agcThreshold = 0                  //                                          //
-    fileprivate var __anfEnabled = false                //                                          //
-    fileprivate var __anfLevel = 0                      //                                          //
-    fileprivate var __apfEnabled = false                //                                          //
-    fileprivate var __apfLevel = 0                      // DSP APF Level (0 - 100)                  //
-    fileprivate var __audioGain = 0                     // Slice audio gain (0 - 100)               //
-    fileprivate var __audioMute = false                 // State of slice audio MUTE                //
-    fileprivate var __audioPan = 50                     // Slice audio pan (0 - 100)                //
-    fileprivate var __autoPanEnabled = false            //                                          //
-    fileprivate var __daxChannel = 0                    // DAX channel for this slice (1-8)         //
-    fileprivate var __daxTxEnabled = false              // DAX for transmit                         //
-    fileprivate var __dfmPreDeEmphasisEnabled = false   //                                          //
-    fileprivate var __digitalLowerOffset = 0            //                                          //
-    fileprivate var __digitalUpperOffset = 0            //                                          //
-    fileprivate var __diversityChild = false            // Slice is the child of the pair           //
-    fileprivate var __diversityEnabled = false          // Slice is part of a diversity pair        //
-    fileprivate var __diversityIndex = 0                // Slice number of the other slice          //
-    fileprivate var __diversityParent = false           // Slice is the parent of the pair          //
-    fileprivate var __filterHigh = 0                    // RX filter high frequency                 //
-    fileprivate var __filterLow = 0                     // RX filter low frequency                  //
-    fileprivate var __fmDeviation = 0                   // FM deviation                             //
-    fileprivate var __fmRepeaterOffset: Float = 0.0     // FM repeater offset                       //
-    fileprivate var __fmToneBurstEnabled = false        // FM tone burst                            //
-    fileprivate var __fmToneFreq: Float = 0.0           // FM CTCSS tone frequency                  //
-    fileprivate var __fmToneMode: String = ""           // FM CTCSS tone mode (ON | OFF)            //
-    fileprivate var __frequency = 0                     // Slice frequency in Hz                    //
-    fileprivate var __inUse = false                     // True = being used                        //
-    fileprivate var __locked = false                    // Slice frequency locked                   //
-    fileprivate var __loopAEnabled = false              // Loop A enable                            //
-    fileprivate var __loopBEnabled = false              // Loop B enable                            //
-    fileprivate var __mode = Mode.lsb.rawValue          // Slice mode                               //
-    fileprivate var __modeList = [String]()             // Array of Strings with available modes    //
-    fileprivate var __nbEnabled = false                 // State of DSP Noise Blanker               //
-    fileprivate var __nbLevel = 0                       // DSP Noise Blanker level (0 -100)         //
-    fileprivate var __nrEnabled = false                 // State of DSP Noise Reduction             //
-    fileprivate var __nrLevel = 0                       // DSP Noise Reduction level (0 - 100)      //
-    fileprivate var __owner = 0                         // Slice owner - RESERVED for FUTURE use    //
-    fileprivate var __panadapterId = ""                 // Panadaptor StreamID for this slice       //
-    fileprivate var __playbackEnabled = false           // Quick playback enable                    //
-    fileprivate var __postDemodBypassEnabled = false    //                                          //
-    fileprivate var __postDemodHigh = 0                 //                                          //
-    fileprivate var __postDemodLow = 0                  //                                          //
-    fileprivate var __qskEnabled = false                // QSK capable on slice                     //
-    fileprivate var __recordEnabled = false             // Quick record enable                      //
-    fileprivate var __recordLength: Float = 0.0         // Length of quick recording (seconds)      //
-    fileprivate var __repeaterOffsetDirection = RepeaterOffsetDirection.simplex.rawValue // Repeater offset direction (DOWN, UP, SIMPLEX)
-    fileprivate var __rfGain = 0                        // RF Gain                                  //
-    fileprivate var __ritEnabled = false                // RIT enabled                              //
-    fileprivate var __ritOffset = 0                     // RIT offset value                         //
-    fileprivate var __rttyMark = 0                      // Rtty Mark                                //
-    fileprivate var __rttyShift = 0                     // Rtty Shift                               //
-    fileprivate var __rxAnt = ""                        // RX Antenna port for this slice           //
-    fileprivate var __rxAntList = [String]()            // Array of available Antenna ports         //
-    fileprivate var __step = 0                          // Frequency step value                     //
-    fileprivate var __squelchEnabled = false            // Squelch enabled                          //
-    fileprivate var __squelchLevel = 0                  // Squelch level (0 - 100)                  //
-    fileprivate var __stepList = ""                     // Available Step values                    //
-    fileprivate var __txAnt: String = ""                // TX Antenna port for this slice           //
-    fileprivate var __txEnabled = false                 // TX on ths slice frequency/mode           //
-    fileprivate var __txOffsetFreq: Float = 0.0         // TX Offset Frequency                      //
-    fileprivate var __wide = false                      // State of slice bandpass filter           //
-    fileprivate var __wnbEnabled = false                // Wideband noise blanking enabled          //
-    fileprivate var __wnbLevel = 0                      // Wideband noise blanking level            //
-    fileprivate var __xitEnabled = false                // XIT enable                               //
-    fileprivate var __xitOffset = 0                     // XIT offset value                         //
+    private var __active = false                    //                                          //
+    private var __agcMode = AgcMode.off.rawValue    //                                          //
+    private var __agcOffLevel = 0                   // Slice AGC Off level                      //
+    private var __agcThreshold = 0                  //                                          //
+    private var __anfEnabled = false                //                                          //
+    private var __anfLevel = 0                      //                                          //
+    private var __apfEnabled = false                //                                          //
+    private var __apfLevel = 0                      // DSP APF Level (0 - 100)                  //
+    private var __audioGain = 0                     // Slice audio gain (0 - 100)               //
+    private var __audioMute = false                 // State of slice audio MUTE                //
+    private var __audioPan = 50                     // Slice audio pan (0 - 100)                //
+    private var __autoPanEnabled = false            //                                          //
+    private var __daxChannel = 0                    // DAX channel for this slice (1-8)         //
+    private var __daxTxEnabled = false              // DAX for transmit                         //
+    private var __dfmPreDeEmphasisEnabled = false   //                                          //
+    private var __digitalLowerOffset = 0            //                                          //
+    private var __digitalUpperOffset = 0            //                                          //
+    private var __diversityChild = false            // Slice is the child of the pair           //
+    private var __diversityEnabled = false          // Slice is part of a diversity pair        //
+    private var __diversityIndex = 0                // Slice number of the other slice          //
+    private var __diversityParent = false           // Slice is the parent of the pair          //
+    private var __filterHigh = 0                    // RX filter high frequency                 //
+    private var __filterLow = 0                     // RX filter low frequency                  //
+    private var __fmDeviation = 0                   // FM deviation                             //
+    private var __fmRepeaterOffset: Float = 0.0     // FM repeater offset                       //
+    private var __fmToneBurstEnabled = false        // FM tone burst                            //
+    private var __fmToneFreq: Float = 0.0           // FM CTCSS tone frequency                  //
+    private var __fmToneMode: String = ""           // FM CTCSS tone mode (ON | OFF)            //
+    private var __frequency = 0                     // Slice frequency in Hz                    //
+    private var __inUse = false                     // True = being used                        //
+    private var __locked = false                    // Slice frequency locked                   //
+    private var __loopAEnabled = false              // Loop A enable                            //
+    private var __loopBEnabled = false              // Loop B enable                            //
+    private var __mode = Mode.lsb.rawValue          // Slice mode                               //
+    private var __modeList = [String]()             // Array of Strings with available modes    //
+    private var __nbEnabled = false                 // State of DSP Noise Blanker               //
+    private var __nbLevel = 0                       // DSP Noise Blanker level (0 -100)         //
+    private var __nrEnabled = false                 // State of DSP Noise Reduction             //
+    private var __nrLevel = 0                       // DSP Noise Reduction level (0 - 100)      //
+    private var __owner = 0                         // Slice owner - RESERVED for FUTURE use    //
+    private var __panadapterId = ""                 // Panadaptor StreamID for this slice       //
+    private var __playbackEnabled = false           // Quick playback enable                    //
+    private var __postDemodBypassEnabled = false    //                                          //
+    private var __postDemodHigh = 0                 //                                          //
+    private var __postDemodLow = 0                  //                                          //
+    private var __qskEnabled = false                // QSK capable on slice                     //
+    private var __recordEnabled = false             // Quick record enable                      //
+    private var __recordLength: Float = 0.0         // Length of quick recording (seconds)      //
+    private var __repeaterOffsetDirection = RepeaterOffsetDirection.simplex.rawValue // Repeater offset direction (DOWN, UP, SIMPLEX)
+    private var __rfGain = 0                        // RF Gain                                  //
+    private var __ritEnabled = false                // RIT enabled                              //
+    private var __ritOffset = 0                     // RIT offset value                         //
+    private var __rttyMark = 0                      // Rtty Mark                                //
+    private var __rttyShift = 0                     // Rtty Shift                               //
+    private var __rxAnt = ""                        // RX Antenna port for this slice           //
+    private var __rxAntList = [String]()            // Array of available Antenna ports         //
+    private var __step = 0                          // Frequency step value                     //
+    private var __squelchEnabled = false            // Squelch enabled                          //
+    private var __squelchLevel = 0                  // Squelch level (0 - 100)                  //
+    private var __stepList = ""                     // Available Step values                    //
+    private var __txAnt: String = ""                // TX Antenna port for this slice           //
+    private var __txEnabled = false                 // TX on ths slice frequency/mode           //
+    private var __txOffsetFreq: Float = 0.0         // TX Offset Frequency                      //
+    private var __wide = false                      // State of slice bandpass filter           //
+    private var __wnbEnabled = false                // Wideband noise blanking enabled          //
+    private var __wnbLevel = 0                      // Wideband noise blanking level            //
+    private var __xitEnabled = false                // XIT enable                               //
+    private var __xitOffset = 0                     // XIT offset value                         //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
@@ -656,17 +656,8 @@ public class Slice : NSObject, KeyValueParser {
                 break
             }
         }
-        // if this is an initialized Slice and inUse becomes false
-        if _initialized && _shouldBeRemoved == false && inUse == false {
-            
-            // mark it for removal
-            _shouldBeRemoved = true
-
-            // notify all observers
-            NC.post(.sliceShouldBeRemoved, object: self)
-        }
         // if this is not yet initialized and inUse becomes true and panadapterId & frequency are set
-        else if _initialized == false && inUse == true && panadapterId != "" && frequency != 0 && mode != "" {
+        if _initialized == false && inUse == true && panadapterId != "" && frequency != 0 && mode != "" {
             
             // mark it as initialized
             _initialized = true
@@ -691,283 +682,283 @@ extension xFlexAPI.Slice {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _active: Bool {
+    private var _active: Bool {
         get { return _sliceQ.sync { __active } }
         set { _sliceQ.sync(flags: .barrier) {__active = newValue } } }
     
-    fileprivate var _agcMode: String {
+    private var _agcMode: String {
         get { return _sliceQ.sync { __agcMode } }
         set { _sliceQ.sync(flags: .barrier) { __agcMode = newValue } } }
     
-    fileprivate var _agcOffLevel: Int {
+    private var _agcOffLevel: Int {
         get { return _sliceQ.sync { __agcOffLevel } }
         set { _sliceQ.sync(flags: .barrier) { __agcOffLevel = newValue } } }
     
-    fileprivate var _agcThreshold: Int {
+    private var _agcThreshold: Int {
         get { return _sliceQ.sync { __agcThreshold } }
         set { _sliceQ.sync(flags: .barrier) { __agcThreshold = newValue } } }
     
-    fileprivate var _anfEnabled: Bool {
+    private var _anfEnabled: Bool {
         get { return _sliceQ.sync { __anfEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __anfEnabled = newValue } } }
     
-    fileprivate var _anfLevel: Int {
+    private var _anfLevel: Int {
         get { return _sliceQ.sync { __anfLevel } }
         set { _sliceQ.sync(flags: .barrier) { __anfLevel = newValue } } }
     
-    fileprivate var _apfEnabled: Bool {
+    private var _apfEnabled: Bool {
         get { return _sliceQ.sync { __apfEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __apfEnabled = newValue } } }
     
-    fileprivate var _apfLevel: Int {
+    private var _apfLevel: Int {
         get { return _sliceQ.sync { __apfLevel } }
         set { _sliceQ.sync(flags: .barrier) { __apfLevel = newValue } } }
     
-    fileprivate var _audioGain: Int {
+    private var _audioGain: Int {
         get { return _sliceQ.sync { __audioGain } }
         set { _sliceQ.sync(flags: .barrier) { __audioGain = newValue } } }
     
-    fileprivate var _audioMute: Bool {
+    private var _audioMute: Bool {
         get { return _sliceQ.sync { __audioMute } }
         set { _sliceQ.sync(flags: .barrier) { __audioMute = newValue } } }
     
-    fileprivate var _audioPan: Int {
+    private var _audioPan: Int {
         get { return _sliceQ.sync { __audioPan } }
         set { _sliceQ.sync(flags: .barrier) { __audioPan = newValue } } }
     
-    fileprivate var _autoPanEnabled: Bool {
+    private var _autoPanEnabled: Bool {
         get { return _sliceQ.sync { __autoPanEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __autoPanEnabled = newValue } } }
     
-    fileprivate var _daxChannel: Int {
+    private var _daxChannel: Int {
         get { return _sliceQ.sync { __daxChannel } }
         set { _sliceQ.sync(flags: .barrier) { __daxChannel = newValue } } }
     
-    fileprivate var _daxClients: Int {
+    private var _daxClients: Int {
         get { return _sliceQ.sync { __daxClients } }
         set { _sliceQ.sync(flags: .barrier) { __daxClients = newValue } } }
     
-    fileprivate var _dfmPreDeEmphasisEnabled: Bool {
+    private var _dfmPreDeEmphasisEnabled: Bool {
         get { return _sliceQ.sync { __dfmPreDeEmphasisEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __dfmPreDeEmphasisEnabled = newValue } } }
     
-    fileprivate var _daxTxEnabled: Bool {
+    private var _daxTxEnabled: Bool {
         get { return _sliceQ.sync { __daxTxEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __daxTxEnabled = newValue } } }
     
-    fileprivate var _digitalLowerOffset: Int {
+    private var _digitalLowerOffset: Int {
         get { return _sliceQ.sync { __digitalLowerOffset } }
         set { _sliceQ.sync(flags: .barrier) { __digitalLowerOffset = newValue } } }
     
-    fileprivate var _digitalUpperOffset: Int {
+    private var _digitalUpperOffset: Int {
         get { return _sliceQ.sync { __digitalUpperOffset } }
         set { _sliceQ.sync(flags: .barrier) { __digitalUpperOffset = newValue } } }
     
-    fileprivate var _diversityChild: Bool {
+    private var _diversityChild: Bool {
         get { return _sliceQ.sync { __diversityChild } }
         set { _sliceQ.sync(flags: .barrier) { __diversityChild = newValue } } }
     
-    fileprivate var _diversityEnabled: Bool {
+    private var _diversityEnabled: Bool {
         get { return _sliceQ.sync { __diversityEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __diversityEnabled = newValue } } }
     
-    fileprivate var _diversityIndex: Int {
+    private var _diversityIndex: Int {
         get { return _sliceQ.sync { __diversityIndex } }
         set { _sliceQ.sync(flags: .barrier) { __diversityIndex = newValue } } }
     
-    fileprivate var _diversityParent: Bool {
+    private var _diversityParent: Bool {
         get { return _sliceQ.sync { __diversityParent } }
         set { _sliceQ.sync(flags: .barrier) { __diversityParent = newValue } } }
     
-    fileprivate var _filterHigh: Int {
+    private var _filterHigh: Int {
         get { return _sliceQ.sync { __filterHigh } }
         set { _sliceQ.sync(flags: .barrier) { __filterHigh = newValue } } }
     
-    fileprivate var _filterLow: Int {
+    private var _filterLow: Int {
         get { return _sliceQ.sync { __filterLow } }
         set {_sliceQ.sync(flags: .barrier) { __filterLow = newValue } } }
     
-    fileprivate var _fmDeviation: Int {
+    private var _fmDeviation: Int {
         get { return _sliceQ.sync { __fmDeviation } }
         set { _sliceQ.sync(flags: .barrier) { __fmDeviation = newValue } } }
     
-    fileprivate var _fmRepeaterOffset: Float {
+    private var _fmRepeaterOffset: Float {
         get { return _sliceQ.sync { __fmRepeaterOffset } }
         set { _sliceQ.sync(flags: .barrier) { __fmRepeaterOffset = newValue } } }
     
-    fileprivate var _fmToneBurstEnabled: Bool {
+    private var _fmToneBurstEnabled: Bool {
         get { return _sliceQ.sync { __fmToneBurstEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __fmToneBurstEnabled = newValue } } }
     
-    fileprivate var _fmToneFreq: Float {
+    private var _fmToneFreq: Float {
         get { return _sliceQ.sync { __fmToneFreq } }
         set { _sliceQ.sync(flags: .barrier) { __fmToneFreq = newValue } } }
     
-    fileprivate var _fmToneMode: String {
+    private var _fmToneMode: String {
         get { return _sliceQ.sync { __fmToneMode } }
         set { _sliceQ.sync(flags: .barrier) { __fmToneMode = newValue } } }
     
-    fileprivate var _frequency: Int {
+    private var _frequency: Int {
         get { return _sliceQ.sync { __frequency } }
         set { _sliceQ.sync(flags: .barrier) { __frequency = newValue } } }
     
-    fileprivate var _inUse: Bool {
+    private var _inUse: Bool {
         get { return _sliceQ.sync { __inUse } }
         set { _sliceQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    fileprivate var _locked: Bool {
+    private var _locked: Bool {
         get { return _sliceQ.sync { __locked } }
         set { _sliceQ.sync(flags: .barrier) { __locked = newValue } } }
     
-    fileprivate var _loopAEnabled: Bool {
+    private var _loopAEnabled: Bool {
         get { return _sliceQ.sync { __loopAEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __loopAEnabled = newValue } } }
     
-    fileprivate var _loopBEnabled: Bool {
+    private var _loopBEnabled: Bool {
         get { return _sliceQ.sync { __loopBEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __loopBEnabled = newValue } } }
     
-    fileprivate var _mode: String {
+    private var _mode: String {
         get { return _sliceQ.sync { __mode } }
         set { _sliceQ.sync(flags: .barrier) { __mode = newValue } } }
     
-    fileprivate var _modeList: [String] {
+    private var _modeList: [String] {
         get { return _sliceQ.sync { __modeList } }
         set { _sliceQ.sync(flags: .barrier) { __modeList = newValue } } }
     
-    fileprivate var _nbEnabled: Bool {
+    private var _nbEnabled: Bool {
         get { return _sliceQ.sync { __nbEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __nbEnabled = newValue } } }
     
-    fileprivate var _nbLevel: Int {
+    private var _nbLevel: Int {
         get { return _sliceQ.sync { __nbLevel } }
         set { _sliceQ.sync(flags: .barrier) { __nbLevel = newValue } } }
     
-    fileprivate var _nrEnabled: Bool {
+    private var _nrEnabled: Bool {
         get { return _sliceQ.sync { __nrEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __nrEnabled = newValue } } }
     
-    fileprivate var _nrLevel: Int {
+    private var _nrLevel: Int {
         get { return _sliceQ.sync { __nrLevel } }
         set { _sliceQ.sync(flags: .barrier) { __nrLevel = newValue } } }
     
-    fileprivate var _owner: Int {
+    private var _owner: Int {
         get { return _sliceQ.sync { __owner } }
         set { _sliceQ.sync(flags: .barrier) { __owner = newValue } } }
     
-    fileprivate var _panadapterId: String {
+    private var _panadapterId: String {
         get { return _sliceQ.sync { __panadapterId } }
         set { _sliceQ.sync(flags: .barrier) { __panadapterId = newValue } } }
     
-    fileprivate var _panControl: Int {
+    private var _panControl: Int {
         get { return _sliceQ.sync { __audioPan } }
         set { _sliceQ.sync(flags: .barrier) { __audioPan = newValue } } }
     
-    fileprivate var _playbackEnabled: Bool {
+    private var _playbackEnabled: Bool {
         get { return _sliceQ.sync { __playbackEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __playbackEnabled = newValue } } }
     
-    fileprivate var _postDemodBypassEnabled: Bool {
+    private var _postDemodBypassEnabled: Bool {
         get { return _sliceQ.sync { __postDemodBypassEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __postDemodBypassEnabled = newValue } } }
     
-    fileprivate var _postDemodHigh: Int {
+    private var _postDemodHigh: Int {
         get { return _sliceQ.sync { __postDemodHigh } }
         set { _sliceQ.sync(flags: .barrier) { __postDemodHigh = newValue } } }
     
-    fileprivate var _postDemodLow: Int {
+    private var _postDemodLow: Int {
         get { return _sliceQ.sync { __postDemodLow } }
         set { _sliceQ.sync(flags: .barrier) { __postDemodLow = newValue } } }
     
-    fileprivate var _qskEnabled: Bool {
+    private var _qskEnabled: Bool {
         get { return _sliceQ.sync { __qskEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
     
-    fileprivate var _recordEnabled: Bool {
+    private var _recordEnabled: Bool {
         get { return _sliceQ.sync { __recordEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __recordEnabled = newValue } } }
     
-    fileprivate var _recordLength: Float {
+    private var _recordLength: Float {
         get { return _sliceQ.sync { __recordLength } }
         set { _sliceQ.sync(flags: .barrier) { __recordLength = newValue } } }
     
-    fileprivate var _repeaterOffsetDirection: String {
+    private var _repeaterOffsetDirection: String {
         get { return _sliceQ.sync { __repeaterOffsetDirection } }
         set { _sliceQ.sync(flags: .barrier) { __repeaterOffsetDirection = newValue } } }
     
-    fileprivate var _rfGain: Int {
+    private var _rfGain: Int {
         get { return _sliceQ.sync { __rfGain } }
         set { _sliceQ.sync(flags: .barrier) { __rfGain = newValue } } }
     
-    fileprivate var _ritEnabled: Bool {
+    private var _ritEnabled: Bool {
         get { return _sliceQ.sync { __ritEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __ritEnabled = newValue } } }
     
-    fileprivate var _ritOffset: Int {
+    private var _ritOffset: Int {
         get { return _sliceQ.sync { __ritOffset } }
         set { _sliceQ.sync(flags: .barrier) { __ritOffset = newValue } } }
     
-    fileprivate var _rttyMark: Int {
+    private var _rttyMark: Int {
         get { return _sliceQ.sync { __rttyMark } }
         set { _sliceQ.sync(flags: .barrier) { __rttyMark = newValue } } }
     
-    fileprivate var _rttyShift: Int {
+    private var _rttyShift: Int {
         get { return _sliceQ.sync { __rttyShift } }
         set { _sliceQ.sync(flags: .barrier) { __rttyShift = newValue } } }
     
-    fileprivate var _rxAnt: Radio.AntennaPort {
+    private var _rxAnt: Radio.AntennaPort {
         get { return _sliceQ.sync { __rxAnt } }
         set { _sliceQ.sync(flags: .barrier) { __rxAnt = newValue } } }
     
-    fileprivate var _rxAntList: [Radio.AntennaPort] {
+    private var _rxAntList: [Radio.AntennaPort] {
         get { return _sliceQ.sync { __rxAntList } }
         set { _sliceQ.sync(flags: .barrier) { __rxAntList = newValue } } }
     
-    fileprivate var _step: Int {
+    private var _step: Int {
         get { return _sliceQ.sync { __step } }
         set { _sliceQ.sync(flags: .barrier) { __step = newValue } } }
     
-    fileprivate var _stepList: String {
+    private var _stepList: String {
         get { return _sliceQ.sync { __stepList } }
         set { _sliceQ.sync(flags: .barrier) { __stepList = newValue } } }
     
-    fileprivate var _squelchEnabled: Bool {
+    private var _squelchEnabled: Bool {
         get { return _sliceQ.sync { __squelchEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __squelchEnabled = newValue } } }
     
-    fileprivate var _squelchLevel: Int {
+    private var _squelchLevel: Int {
         get { return _sliceQ.sync { __squelchLevel } }
         set { _sliceQ.sync(flags: .barrier) { __squelchLevel = newValue } } }
     
-    fileprivate var _txAnt: String {
+    private var _txAnt: String {
         get { return _sliceQ.sync { __txAnt } }
         set { _sliceQ.sync(flags: .barrier) { __txAnt = newValue } } }
     
-    fileprivate var _txEnabled: Bool {
+    private var _txEnabled: Bool {
         get { return _sliceQ.sync { __txEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __txEnabled = newValue } } }
     
-    fileprivate var _txOffsetFreq: Float {
+    private var _txOffsetFreq: Float {
         get { return _sliceQ.sync { __txOffsetFreq } }
         set { _sliceQ.sync(flags: .barrier) { __txOffsetFreq = newValue } } }
     
-    fileprivate var _wide: Bool {
+    private var _wide: Bool {
         get { return _sliceQ.sync { __wide } }
         set { _sliceQ.sync(flags: .barrier) { __wide = newValue } } }
     
-    fileprivate var _wnbEnabled: Bool {
+    private var _wnbEnabled: Bool {
         get { return _sliceQ.sync { __wnbEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __wnbEnabled = newValue } } }
     
-    fileprivate var _wnbLevel: Int {
+    private var _wnbLevel: Int {
         get { return _sliceQ.sync { __wnbLevel } }
         set { _sliceQ.sync(flags: .barrier) { __wnbLevel = newValue } } }
     
-    fileprivate var _xitEnabled: Bool {
+    private var _xitEnabled: Bool {
         get { return _sliceQ.sync { __xitEnabled } }
         set { _sliceQ.sync(flags: .barrier) { __xitEnabled = newValue } } }
     
-    fileprivate var _xitOffset: Int {
+    private var _xitOffset: Int {
         get { return _sliceQ.sync { __xitOffset } }
         set { _sliceQ.sync(flags: .barrier) { __xitOffset = newValue } } }
     

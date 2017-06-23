@@ -24,27 +24,27 @@ public final class Equalizer : NSObject, KeyValueParser {
     public private(set) var eqType: Radio.EqualizerType!    // Type that uniquely identifies this Equalizer
     
     // ------------------------------------------------------------------------------
-    // MARK: - Internal properties
+    // MARK: - Private properties
     
-    fileprivate weak var  radio:  Radio?                    // The Radio that owns this Equalizer
-    fileprivate var _eqQ: DispatchQueue                     // GCD queue that guards this object
+    private var  _radio:  Radio?                        // The Radio that owns this Equalizer
+    private var _eqQ: DispatchQueue                     // GCD queue that guards this object
     
     // constants
-    fileprivate let _log = Log.sharedInstance               // shared log
-    fileprivate let kModule = "Equalizer"                   // Module Name reported in log messages
-    fileprivate let kEqCommand = "eq "                      // Equalizer command prefix
+    private let _log = Log.sharedInstance               // shared log
+    private let kModule = "Equalizer"                   // Module Name reported in log messages
+    private let kEqCommand = "eq "                      // Equalizer command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __eqEnabled = false                                                             //
-    fileprivate var __level63Hz = 0                                                                 //
-    fileprivate var __level125Hz = 0                                                                //
-    fileprivate var __level250Hz = 0                                                                //
-    fileprivate var __level500Hz = 0                                                                //
-    fileprivate var __level1000Hz = 0                                                               //
-    fileprivate var __level2000Hz = 0                                                               //
-    fileprivate var __level4000Hz = 0                                                               //
-    fileprivate var __level8000Hz = 0                                                               //
+    private var __eqEnabled = false                                                             //
+    private var __level63Hz = 0                                                                 //
+    private var __level125Hz = 0                                                                //
+    private var __level250Hz = 0                                                                //
+    private var __level500Hz = 0                                                                //
+    private var __level1000Hz = 0                                                               //
+    private var __level2000Hz = 0                                                               //
+    private var __level4000Hz = 0                                                               //
+    private var __level8000Hz = 0                                                               //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
@@ -60,7 +60,7 @@ public final class Equalizer : NSObject, KeyValueParser {
     ///
     init( radio: Radio,  eqType: Radio.EqualizerType, queue: DispatchQueue) {
         
-        self.radio = radio
+        self._radio = radio
         self.eqType = eqType
         
         self._eqQ = queue
@@ -156,39 +156,39 @@ extension Equalizer {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties - with synchronization
     
-    fileprivate var _eqEnabled: Bool {
+    private var _eqEnabled: Bool {
         get { return _eqQ.sync { __eqEnabled } }
         set { _eqQ.sync(flags: .barrier) { __eqEnabled = newValue } } }
     
-    fileprivate var _level63Hz: Int {
+    private var _level63Hz: Int {
         get { return _eqQ.sync { __level63Hz } }
         set { _eqQ.sync(flags: .barrier) { __level63Hz = newValue } } }
     
-    fileprivate var _level125Hz: Int {
+    private var _level125Hz: Int {
         get { return _eqQ.sync { __level125Hz } }
         set { _eqQ.sync(flags: .barrier) { __level125Hz = newValue } } }
     
-    fileprivate var _level250Hz: Int {
+    private var _level250Hz: Int {
         get { return _eqQ.sync { __level250Hz } }
         set { _eqQ.sync(flags: .barrier) { __level250Hz = newValue } } }
     
-    fileprivate var _level500Hz: Int {
+    private var _level500Hz: Int {
         get { return _eqQ.sync { __level500Hz } }
         set { _eqQ.sync(flags: .barrier) { __level500Hz = newValue } } }
     
-    fileprivate var _level1000Hz: Int {
+    private var _level1000Hz: Int {
         get { return _eqQ.sync { __level1000Hz } }
         set { _eqQ.sync(flags: .barrier) { __level1000Hz = newValue } } }
     
-    fileprivate var _level2000Hz: Int {
+    private var _level2000Hz: Int {
         get { return _eqQ.sync { __level2000Hz } }
         set { _eqQ.sync(flags: .barrier) { __level2000Hz = newValue } } }
     
-    fileprivate var _level4000Hz: Int {
+    private var _level4000Hz: Int {
         get { return _eqQ.sync { __level4000Hz } }
         set { _eqQ.sync(flags: .barrier) { __level4000Hz = newValue } } }
     
-    fileprivate var _level8000Hz: Int {
+    private var _level8000Hz: Int {
         get { return _eqQ.sync { __level8000Hz } }
         set { _eqQ.sync(flags: .barrier) { __level8000Hz = newValue } } }
     
@@ -198,39 +198,39 @@ extension Equalizer {
     // listed in alphabetical order
     @objc dynamic public var eqEnabled: Bool {
         get { return  _eqEnabled }
-        set { if _eqEnabled != newValue { _eqEnabled = newValue ; radio!.send( kEqCommand + eqType.rawValue + " mode=\(newValue.asNumber())" ) } } }
+        set { if _eqEnabled != newValue { _eqEnabled = newValue ; _radio!.send( kEqCommand + eqType.rawValue + " mode=\(newValue.asNumber())" ) } } }
     
     @objc dynamic public var level63Hz: Int {
         get { return _level63Hz }
-        set { if _level63Hz != newValue { _level63Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level63Hz.rawValue)=\(newValue)") } } }
+        set { if _level63Hz != newValue { _level63Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level63Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level125Hz: Int {
         get { return _level125Hz }
-        set { if _level125Hz != newValue { _level125Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level125Hz.rawValue)=\(newValue)") } } }
+        set { if _level125Hz != newValue { _level125Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level125Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level250Hz: Int {
         get { return _level250Hz }
-        set { if _level250Hz != newValue { _level250Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level250Hz.rawValue)=\(newValue)") } } }
+        set { if _level250Hz != newValue { _level250Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level250Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level500Hz: Int {
         get { return _level500Hz }
-        set { if _level500Hz != newValue { _level500Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level500Hz.rawValue)=\(newValue)") } } }
+        set { if _level500Hz != newValue { _level500Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level500Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level1000Hz: Int {
         get { return _level1000Hz }
-        set { if _level1000Hz != newValue { _level1000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level1000Hz.rawValue)=\(newValue)") } } }
+        set { if _level1000Hz != newValue { _level1000Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level1000Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level2000Hz: Int {
         get { return _level2000Hz }
-        set { if _level2000Hz != newValue { _level2000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level2000Hz.rawValue)=\(newValue)") } } }
+        set { if _level2000Hz != newValue { _level2000Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level2000Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level4000Hz: Int {
         get { return _level4000Hz }
-        set { if _level4000Hz != newValue { _level4000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level4000Hz.rawValue)=\(newValue)") } } }
+        set { if _level4000Hz != newValue { _level4000Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level4000Hz.rawValue)=\(newValue)") } } }
     
     @objc dynamic public var level8000Hz: Int {
         get { return _level8000Hz }
-        set { if _level8000Hz != newValue { _level8000Hz = newValue ; radio!.send(kEqCommand + eqType.rawValue + " \(Token.level8000Hz.rawValue)=\(newValue)") } } }
+        set { if _level8000Hz != newValue { _level8000Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level8000Hz.rawValue)=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Equalizer messages (only populate values that != case value)

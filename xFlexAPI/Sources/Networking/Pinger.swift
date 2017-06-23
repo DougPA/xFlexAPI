@@ -17,10 +17,10 @@ public final class Pinger {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _tcpManager: TcpManager                 // a TcpManager instance
-    fileprivate var _pingTimer: DispatchSourceTimer!        // periodic timer for ping
-    fileprivate var _pingQ: DispatchQueue!                  // Queue for Pinger synchronization
-    fileprivate var _lastPingRxTime: Date!                  // Time of the last ping response
+    private var _tcpManager: TcpManager                 // a TcpManager instance
+    private var _pingTimer: DispatchSourceTimer!        // periodic timer for ping
+    private var _pingQ: DispatchQueue!                  // Queue for Pinger synchronization
+    private var _lastPingRxTime: Date!                  // Time of the last ping response
     
     // ----------------------------------------------------------------------------
     // MARK: - Initialization

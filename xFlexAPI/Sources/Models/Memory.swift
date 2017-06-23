@@ -22,40 +22,40 @@ public final class Memory : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
 
-    fileprivate var _memoryQ: DispatchQueue             // GCD queue that guards this object
+    private var _memoryQ: DispatchQueue             // GCD queue that guards this object
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __digitalLowerOffset = 0            // Digital Lower Offset                     //
-    fileprivate var __digitalUpperOffset = 0            // Digital Upper Offset                     //
-    fileprivate var __filterHigh = 0                    // Filter high                              //
-    fileprivate var __filterLow = 0                     // Filter low                               //
-    fileprivate var __frequency = 0                     // Frequency (Hz)                           //
-    fileprivate var __group = ""                        // Group                                    //
-    fileprivate var __mode = ""                         // Mode                                     //
-    fileprivate var __name = ""                         // Name                                     //
-    fileprivate var __offset = 0                        // Offset (Hz)                              //
-    fileprivate var __offsetDirection = ""              // Offset direction                         //
-    fileprivate var __owner = ""                        // Owner                                    //
-    fileprivate var __rfPower = 0                       // Rf Power                                 //
-    fileprivate var __rttyMark = 0                      // RTTY Mark                                //
-    fileprivate var __rttyShift = 0                     // RTTY Shift                               //
-    fileprivate var __squelchEnabled = false            // Squelch enabled                          //
-    fileprivate var __squelchLevel = 0                  // Squelch level                            //
-    fileprivate var __step = 0                          // Step (Hz)                                //
-    fileprivate var __toneMode = ""                     // Tone Mode                                //
-    fileprivate var __toneValue = 0                     // Tone values (Hz)                         //
+    private var __digitalLowerOffset = 0            // Digital Lower Offset                     //
+    private var __digitalUpperOffset = 0            // Digital Upper Offset                     //
+    private var __filterHigh = 0                    // Filter high                              //
+    private var __filterLow = 0                     // Filter low                               //
+    private var __frequency = 0                     // Frequency (Hz)                           //
+    private var __group = ""                        // Group                                    //
+    private var __mode = ""                         // Mode                                     //
+    private var __name = ""                         // Name                                     //
+    private var __offset = 0                        // Offset (Hz)                              //
+    private var __offsetDirection = ""              // Offset direction                         //
+    private var __owner = ""                        // Owner                                    //
+    private var __rfPower = 0                       // Rf Power                                 //
+    private var __rttyMark = 0                      // RTTY Mark                                //
+    private var __rttyShift = 0                     // RTTY Shift                               //
+    private var __squelchEnabled = false            // Squelch enabled                          //
+    private var __squelchLevel = 0                  // Squelch level                            //
+    private var __step = 0                          // Step (Hz)                                //
+    private var __toneMode = ""                     // Tone Mode                                //
+    private var __toneValue = 0                     // Tone values (Hz)                         //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
-    fileprivate weak var _radio: Radio!                 // The Radio that owns this Memory
-    fileprivate var _initialized = false                // True if initialized by Radio hardware
+    private weak var _radio: Radio!                 // The Radio that owns this Memory
+    private var _initialized = false                // True if initialized by Radio hardware
     
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared log
-    fileprivate let kModule = "Memory"                  // Module Name reported in log messages
-    fileprivate let kMinLevel = 0                       // control range
-    fileprivate let kMaxLevel = 100
+    private let _log = Log.sharedInstance           // shared log
+    private let kModule = "Memory"                  // Module Name reported in log messages
+    private let kMinLevel = 0                       // control range
+    private let kMaxLevel = 100
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -304,79 +304,79 @@ extension Memory {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _digitalLowerOffset: Int {
+    private var _digitalLowerOffset: Int {
         get { return _memoryQ.sync { __digitalLowerOffset } }
         set { _memoryQ.sync(flags: .barrier) { __digitalLowerOffset = newValue } } }
     
-    fileprivate var _digitalUpperOffset: Int {
+    private var _digitalUpperOffset: Int {
         get { return _memoryQ.sync { __digitalUpperOffset } }
         set { _memoryQ.sync(flags: .barrier) { __digitalUpperOffset = newValue } } }
     
-    fileprivate var _filterHigh: Int {
+    private var _filterHigh: Int {
         get { return _memoryQ.sync { __filterHigh } }
         set { _memoryQ.sync(flags: .barrier) { __filterHigh = newValue } } }
     
-    fileprivate var _filterLow: Int {
+    private var _filterLow: Int {
         get { return _memoryQ.sync { __filterLow } }
         set { _memoryQ.sync(flags: .barrier) { __filterLow = newValue } } }
     
-    fileprivate var _frequency: Int {
+    private var _frequency: Int {
         get { return _memoryQ.sync { __frequency } }
         set { _memoryQ.sync(flags: .barrier) { __frequency = newValue } } }
     
-    fileprivate var _group: String {
+    private var _group: String {
         get { return _memoryQ.sync { __group } }
         set { _memoryQ.sync(flags: .barrier) { __group = newValue } } }
     
-    fileprivate var _mode: String {
+    private var _mode: String {
         get { return _memoryQ.sync { __mode } }
         set { _memoryQ.sync(flags: .barrier) { __mode = newValue } } }
     
-    fileprivate var _name: String {
+    private var _name: String {
         get { return _memoryQ.sync { __name } }
         set { _memoryQ.sync(flags: .barrier) { __name = newValue } } }
     
-    fileprivate var _offset: Int {
+    private var _offset: Int {
         get { return _memoryQ.sync { __offset } }
         set { _memoryQ.sync(flags: .barrier) { __offset = newValue } } }
     
-    fileprivate var _offsetDirection: String {
+    private var _offsetDirection: String {
         get { return _memoryQ.sync { __offsetDirection } }
         set { _memoryQ.sync(flags: .barrier) { __offsetDirection = newValue } } }
     
-    fileprivate var _owner: String {
+    private var _owner: String {
         get { return _memoryQ.sync { __owner } }
         set { _memoryQ.sync(flags: .barrier) { __owner = newValue } } }
     
-    fileprivate var _rfPower: Int {
+    private var _rfPower: Int {
         get { return _memoryQ.sync { __rfPower } }
         set { _memoryQ.sync(flags: .barrier) { __rfPower = newValue } } }
     
-    fileprivate var _rttyMark: Int {
+    private var _rttyMark: Int {
         get { return _memoryQ.sync { __rttyMark } }
         set { _memoryQ.sync(flags: .barrier) { __rttyMark = newValue } } }
     
-    fileprivate var _rttyShift: Int {
+    private var _rttyShift: Int {
         get { return _memoryQ.sync { __rttyShift } }
         set { _memoryQ.sync(flags: .barrier) { __rttyShift = newValue } } }
     
-    fileprivate var _squelchEnabled: Bool {
+    private var _squelchEnabled: Bool {
         get { return _memoryQ.sync { __squelchEnabled } }
         set { _memoryQ.sync(flags: .barrier) { __squelchEnabled = newValue } } }
     
-    fileprivate var _squelchLevel: Int {
+    private var _squelchLevel: Int {
         get { return _memoryQ.sync { __squelchLevel } }
         set { _memoryQ.sync(flags: .barrier) { __squelchLevel = newValue } } }
     
-    fileprivate var _step: Int {
+    private var _step: Int {
         get { return _memoryQ.sync { __step } }
         set { _memoryQ.sync(flags: .barrier) { __step = newValue } } }
     
-    fileprivate var _toneMode: String {
+    private var _toneMode: String {
         get { return _memoryQ.sync { __toneMode } }
         set { _memoryQ.sync(flags: .barrier) { __toneMode = newValue } } }
     
-    fileprivate var _toneValue: Int {
+    private var _toneValue: Int {
         get { return _memoryQ.sync { __toneValue } }
         set { _memoryQ.sync(flags: .barrier) { __toneValue = newValue } } }
     

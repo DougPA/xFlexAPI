@@ -19,13 +19,11 @@ public typealias NC = NotificationCenter
 //
 public enum NotificationType : String {
     
-    case audioStreamInitialized
+    case audioStreamHasBeenAdded
     case audioStreamWillBeRemoved
     
     case clientDidConnect
     case clientDidDisconnect
-    
-    case commandEntryWasAdded
     
     case globalProfileChanged
     case globalProfileCreated
@@ -35,36 +33,30 @@ public enum NotificationType : String {
     case guiConnectionEstablished
     
     case iqStreamInitialized
-    case iqStreamShouldBeRemoved
-    
-    case logEntryWasAdded
+    case iqStreamWillBeRemoved
     
     case memoryHasBeenAdded
-//    case memoryInitialized
-    case memoryShouldBeRemoved
+    case memoryWillBeRemoved
     
-//    case meterAdded
     case meterHasBeenAdded
-    case meterShouldBeRemoved
+    case meterWillBeRemoved
     case meterUpdated
     
-    case micAudioStreamInitialized
+    case micAudioStreamHasBeenAdded
     case micAudioStreamWillBeRemoved
 
     case opusHasBeenAdded
-    case opusShouldBeRemoved
+    case opusWillBeRemoved
     
     case panadapterHasBeenAdded
-    case panadapterShouldBeRemoved
+    case panadapterWillBeRemoved
     
     case radioInitialized
     
     case radiosAvailable
     
-    case replyHandlerWillBeRemoved
-    
     case sliceHasBeenAdded
-    case sliceShouldBeRemoved
+    case sliceWillBeRemoved
     
     case tcpDidConnect
     case tcpDidDisconnect
@@ -73,9 +65,9 @@ public enum NotificationType : String {
     case tcpWillDisconnect
     
     case tnfHasBeenAdded
-    case tnfShouldBeRemoved
+    case tnfWillBeRemoved
     
-    case txAudioStreamInitialized
+    case txAudioStreamHasBeenAdded
     case txAudioStreamWillBeRemoved
 
     case txProfileChanged
@@ -86,6 +78,6 @@ public enum NotificationType : String {
     case udpDidBind
     
     case waterfallHasBeenAdded
-    case waterfallShouldBeRemoved
+    case waterfallWillBeRemoved
 }
 

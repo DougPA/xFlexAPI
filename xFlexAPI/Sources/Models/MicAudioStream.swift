@@ -18,43 +18,41 @@ public protocol MicAudioStreamHandler {
 final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 
     
+    public var rxLostPacketCount = 0                    // Rx lost packet count
     
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _id: Radio.DaxStreamId = ""         // The Mic Audio stream id
-//    fileprivate var _initialized = false                // True if initialized by Radio hardware
+    private var _id: Radio.DaxStreamId = ""         // The Mic Audio stream id
     
-    fileprivate weak var _radio: Radio?                 // The Radio that owns this MicAudioStream
-    fileprivate var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
-    fileprivate var _shouldBeRemoved = false            // True if being removed
+    private weak var _radio: Radio?                 // The Radio that owns this MicAudioStream
+    private var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
+    private var _initialized = false                // True if initialized by Radio hardware
     
-    fileprivate var rxSeq: Int?                         // Rx sequence number
-    public var rxLostPacketCount = 0                    // Rx lost packet count
+    private var rxSeq: Int?                         // Rx sequence number
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __inUse = false                     // true = in use                            //
-    fileprivate var __ip = ""                           // Ip Address                               //
-    fileprivate var __port = 0                          // Port number                              //
-    fileprivate var __radioAck = false                  // has the radio acknowledged this stream   //
-    fileprivate var __micGain = 50                      // rx gain of stream                        //
-    fileprivate var __micGainScalar: Float = 1.0        // scalar gain value for multiplying        //
-    fileprivate var __streamId: Radio.DaxStreamId = ""  // Stream Id                                //
+    private var __inUse = false                     // true = in use                            //
+    private var __ip = ""                           // Ip Address                               //
+    private var __port = 0                          // Port number                              //
+    private var __micGain = 50                      // rx gain of stream                        //
+    private var __micGainScalar: Float = 1.0        // scalar gain value for multiplying        //
+    private var __streamId: Radio.DaxStreamId = ""  // Stream Id                                //
     //
-    fileprivate var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                //
+    private var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ----//
     
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    fileprivate let kModule = "MicAudioStream"          // Module Name reported in log messages
-    fileprivate let kNoError = "0"                      // response without error
+    private let _log = Log.sharedInstance           // shared Log
+    private let kModule = "MicAudioStream"          // Module Name reported in log messages
+    private let kNoError = "0"                      // response without error
     
-    fileprivate let kMicStreamCreateCmd = "stream create daxmic"
+    private let kMicStreamCreateCmd = "stream create daxmic"
     
     // see FlexLib
-    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
     /// Initialize an Mic Audio Stream
     ///
@@ -76,7 +74,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     public func requestMicAudioStream() -> Bool {
         
         // check to see if this object has already been activated
-        if _radioAck { return false }
+        if !_initialized { return false }
         
         // check to ensure this object is tied to a radio object
         if _radio == nil { return false }
@@ -141,8 +139,6 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
-        var setRadioAck = false
-        
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
@@ -169,10 +165,6 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
                 _ip = kv.value
                 didChangeValue(forKey: "ip")
                 
-                if !_radioAck {
-                    setRadioAck = true
-                }
-                
             case .port:
                 willChangeValue(forKey: "port")
                 _port = iValue
@@ -180,23 +172,14 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
                 
             }
         }
-        // if this is an initialized AudioStream and inUse becomes false
-        if _radioAck && _shouldBeRemoved == false && _inUse == false {
-            
-            // mark it for removal
-            _shouldBeRemoved = true
-            
-            _radio?.removeMicAudioStream(self.streamId)
-        }
-        
         // is the AudioStream acknowledged by the radio?
-        if setRadioAck {
+        if !_initialized && _ip != "" {
             
             // YES, the Radio (hardware) has acknowledged this Audio Stream
-            radioAck = true
+            _initialized = true
             
             // notify all observers
-            NC.post(.micAudioStreamInitialized, object: self as Any?)
+            NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
         }
     }
     
@@ -336,31 +319,27 @@ extension MicAudioStream {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _inUse: Bool {
+    private var _inUse: Bool {
         get { return _micAudioStreamsQ.sync { __inUse } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    fileprivate var _ip: String {
+    private var _ip: String {
         get { return _micAudioStreamsQ.sync { __ip } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    fileprivate var _port: Int {
+    private var _port: Int {
         get { return _micAudioStreamsQ.sync { __port } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    fileprivate var _radioAck: Bool {
-        get { return _micAudioStreamsQ.sync { __radioAck } }
-        set { _micAudioStreamsQ.sync(flags: .barrier) { __radioAck = newValue } } }
-    
-    fileprivate var _micGain: Int {
+    private var _micGain: Int {
         get { return _micAudioStreamsQ.sync { __micGain } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGain = newValue } } }
     
-    fileprivate var _micGainScalar: Float {
+    private var _micGainScalar: Float {
         get { return _micAudioStreamsQ.sync { __micGainScalar } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     
-    fileprivate var _streamId: String {
+    private var _streamId: String {
         get { return _micAudioStreamsQ.sync { __streamId } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
     
@@ -379,10 +358,6 @@ extension MicAudioStream {
     @objc dynamic public var port: Int {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
-    
-    @objc dynamic public var radioAck: Bool {
-        get { return _radioAck }
-        set { _radioAck = newValue } }
     
     @objc dynamic public var micGain: Int {
         get { return _micGain  }

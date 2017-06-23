@@ -15,36 +15,34 @@ import Cocoa
 final public class TXAudioStream: NSObject, KeyValueParser {
 
     // ------------------------------------------------------------------------------
-    // MARK: - Internal properties
+    // MARK: - Private properties
     
-    fileprivate weak var _radio: Radio?                 // The Radio that owns this TXAudioStream
-    fileprivate var _txAudioStreamsQ: DispatchQueue       // GCD queue that guards TXAudioStreams
-    fileprivate var _shouldBeRemoved = false            // True if being removed
+    private var _radio: Radio?                      // The Radio that owns this TXAudioStream
+    private var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TXAudioStreams
+    private var _initialized = false                // True if initialized by Radio hardware
     
-    fileprivate var txSeq = 0                         // Tx sequence number (modulo 16)
+    private var txSeq = 0                           // Tx sequence number (modulo 16)
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __inUse = false                     // true = in use                            //
-    fileprivate var __ip = ""                           // Ip Address                               //
-    fileprivate var __port = 0                          // Port number                              //
-    fileprivate var __radioAck = false                  // has the radio acknowledged this stream   //
-    fileprivate var __transmit = false                  // dax transmitting                         //
-    fileprivate var __txGain = 50                       // tx gain of stream                        //
-    fileprivate var __txGainScalar: Float = 1.0         // scalar gain value for multiplying        //
-    fileprivate var __streamId: Radio.DaxStreamId = ""  // Stream Id                                //
+    private var __inUse = false                     // true = in use                                //
+    private var __ip = ""                           // Ip Address                                   //
+    private var __port = 0                          // Port number                                  //
+    private var __transmit = false                  // dax transmitting                             //
+    private var __txGain = 50                       // tx gain of stream                            //
+    private var __txGainScalar: Float = 1.0         // scalar gain value for multiplying            //
+    private var __streamId: Radio.DaxStreamId = ""  // Stream Id                                    //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    fileprivate let kModule = "TXAudioStream"             // Module Name reported in log messages
-    fileprivate let kNoError = "0"                      // response without error
+    private let _log = Log.sharedInstance           // shared Log
+    private let kNoError = "0"                      // response without error
     
-    fileprivate let kTXStreamCreateCmd = "stream create daxtx"
+    private let kTXStreamCreateCmd = "stream create daxtx"
     
     // see FlexLib
-    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
     /// Initialize an TX Audio Stream
     ///
@@ -66,7 +64,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     public func requestTXAudioStream() -> Bool {
         
         // check to see if this object has already been activated
-        if _radioAck { return false }
+        if !_initialized { return false }
         
         // check to ensure this object is tied to a radio object
         if _radio == nil { return false }
@@ -263,8 +261,6 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
-        var setRadioAck = false
-        
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
@@ -296,10 +292,6 @@ final public class TXAudioStream: NSObject, KeyValueParser {
                 _ip = kv.value
                 didChangeValue(forKey: "ip")
                 
-                if !_radioAck {
-                    setRadioAck = true
-                }
-                
             case .port:
                 willChangeValue(forKey: "port")
                 _port = iValue
@@ -307,23 +299,14 @@ final public class TXAudioStream: NSObject, KeyValueParser {
                 
             }
         }
-        // if this is an initialized AudioStream and inUse becomes false
-        if _radioAck && _shouldBeRemoved == false && _inUse == false {
-            
-            // mark it for removal
-            _shouldBeRemoved = true
-            
-            _radio?.removeTXAudioStream(self.streamId)
-        }
-        
         // is the AudioStream acknowledged by the radio?
-        if setRadioAck {
+        if !_initialized && _ip != "" {
             
             // YES, the Radio (hardware) has acknowledged this Audio Stream
-            radioAck = true
+            _initialized = true
             
             // notify all observers
-            NC.post(.txAudioStreamInitialized, object: self as Any?)
+            NC.post(.txAudioStreamHasBeenAdded, object: self as Any?)
         }
     }
 
@@ -342,35 +325,31 @@ extension TXAudioStream {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _inUse: Bool {
+    private var _inUse: Bool {
         get { return _txAudioStreamsQ.sync { __inUse } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    fileprivate var _ip: String {
+    private var _ip: String {
         get { return _txAudioStreamsQ.sync { __ip } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    fileprivate var _port: Int {
+    private var _port: Int {
         get { return _txAudioStreamsQ.sync { __port } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    fileprivate var _radioAck: Bool {
-        get { return _txAudioStreamsQ.sync { __radioAck } }
-        set { _txAudioStreamsQ.sync(flags: .barrier) { __radioAck = newValue } } }
-    
-    fileprivate var _transmit: Bool {
+    private var _transmit: Bool {
         get { return _txAudioStreamsQ.sync { __transmit } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __transmit = newValue } } }
     
-    fileprivate var _txGain: Int {
+    private var _txGain: Int {
         get { return _txAudioStreamsQ.sync { __txGain } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGain = newValue } } }
     
-    fileprivate var _txGainScalar: Float {
+    private var _txGainScalar: Float {
         get { return _txAudioStreamsQ.sync { __txGainScalar } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
     
-    fileprivate var _streamId: String {
+    private var _streamId: String {
         get { return _txAudioStreamsQ.sync { __streamId } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
     
@@ -389,10 +368,6 @@ extension TXAudioStream {
     @objc dynamic public var port: Int {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
-    
-    @objc dynamic public var radioAck: Bool {
-        get { return _radioAck }
-        set { _radioAck = newValue } }
     
     @objc dynamic public var transmit: Bool {
         get { return _transmit  }
