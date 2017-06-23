@@ -18,12 +18,12 @@ public protocol MicAudioStreamHandler {
 final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 
     
+    public private(set) var id: Radio.DaxStreamId = ""  // The Mic Audio stream id
     public var rxLostPacketCount = 0                    // Rx lost packet count
     
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _id: Radio.DaxStreamId = ""         // The Mic Audio stream id
     
     private weak var _radio: Radio?                 // The Radio that owns this MicAudioStream
     private var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
@@ -38,7 +38,6 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     private var __port = 0                          // Port number                              //
     private var __micGain = 50                      // rx gain of stream                        //
     private var __micGainScalar: Float = 1.0        // scalar gain value for multiplying        //
-    private var __streamId: Radio.DaxStreamId = ""  // Stream Id                                //
     //
     private var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                //
     //                                                                                              //
@@ -60,9 +59,10 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     ///   - radio:              the Radio instance
     ///   - queue:              MicAudioStreams concurrent Queue
     ///
-    init(radio: Radio, queue: DispatchQueue) {
+    init(radio: Radio, id: Radio.DaxStreamId, queue: DispatchQueue) {
         
         self._radio = radio
+        self.id = id
         self._micAudioStreamsQ = queue
         
         super.init()
@@ -71,28 +71,28 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods that send commands to the Radio (hardware)
     
-    public func requestMicAudioStream() -> Bool {
-        
-        // check to see if this object has already been activated
-        if !_initialized { return false }
-        
-        // check to ensure this object is tied to a radio object
-        if _radio == nil { return false }
-        
-        // check to make sure the radio is connected
-        switch _radio!.connectionState {
-        case .clientConnected:
-            _radio!.send(kMicStreamCreateCmd, replyTo: updateStreamId)
-            return true
-        default:
-            return false
-        }
-    }
-    public func removeMicAudioStream() {      
-        
-        _radio?.send("stream remove 0x\(streamId)")
-        _radio?.removeAudioStream(streamId)
-    }
+//    public func requestMicAudioStream() -> Bool {
+//
+//        // check to see if this object has already been activated
+//        if !_initialized { return false }
+//
+//        // check to ensure this object is tied to a radio object
+//        if _radio == nil { return false }
+//
+//        // check to make sure the radio is connected
+//        switch _radio!.connectionState {
+//        case .clientConnected:
+//            _radio!.send(kMicStreamCreateCmd, replyTo: updateStreamId)
+//            return true
+//        default:
+//            return false
+//        }
+//    }
+//    public func removeMicAudioStream() {
+//
+//        _radio?.send("stream remove 0x\(streamId)")
+//        _radio?.removeAudioStream(streamId)
+//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - Private methods
@@ -104,30 +104,30 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     ///   - responseValue:  the response value
     ///   - reply:          the reply
     ///
-    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
-        
-        guard responseValue == kNoError else {
-            // Anything other than 0 is an error, log it and ignore the Reply
-            _log.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
-            return
-        }
-        
-        //get the streamId (remove the "0x" prefix)
-        //_streamId = String(reply.characters.dropFirst(2))
-        // DL3LSM: there is no 0x prefix -> don't drop anything
-        // but make the string 8 characters long -> add "0" at the beginning
-        let fillCnt = 8 - reply.characters.count
-        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
-        _streamId = fills + reply
-        
-        // add the Audio Stream to the collection if not existing
-        if let _ = _radio?.micAudioStreams[_streamId] {
-            _log.msg(command + ", attempted to add MicAudioStream already in Radio micAudioStreams List", level: .warning, function: #function, file: #file, line: #line)
-            return // already in the list
-        }
-        
-        _radio?.micAudioStreams[_streamId] = self
-    }
+//    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
+//
+//        guard responseValue == kNoError else {
+//            // Anything other than 0 is an error, log it and ignore the Reply
+//            _log.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
+//            return
+//        }
+//
+//        //get the streamId (remove the "0x" prefix)
+//        //_streamId = String(reply.characters.dropFirst(2))
+//        // DL3LSM: there is no 0x prefix -> don't drop anything
+//        // but make the string 8 characters long -> add "0" at the beginning
+//        let fillCnt = 8 - reply.characters.count
+//        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
+//        _streamId = fills + reply
+//
+//        // add the Audio Stream to the collection if not existing
+//        if let _ = _radio?.micAudioStreams[_streamId] {
+//            _log.msg(command + ", attempted to add MicAudioStream already in Radio micAudioStreams List", level: .warning, function: #function, file: #file, line: #line)
+//            return // already in the list
+//        }
+//
+//        _radio?.micAudioStreams[_streamId] = self
+//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
@@ -173,7 +173,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
             }
         }
         // is the AudioStream acknowledged by the radio?
-        if !_initialized && _ip != "" {
+        if !_initialized && _inUse && _ip != "" {
             
             // YES, the Radio (hardware) has acknowledged this Audio Stream
             _initialized = true
@@ -182,7 +182,6 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
             NC.post(.micAudioStreamHasBeenAdded, object: self as Any?)
         }
     }
-    
     
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler protocol methods
@@ -339,10 +338,6 @@ extension MicAudioStream {
         get { return _micAudioStreamsQ.sync { __micGainScalar } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     
-    private var _streamId: String {
-        get { return _micAudioStreamsQ.sync { __streamId } }
-        set { _micAudioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
-    
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant with Radio update
     
@@ -378,10 +373,6 @@ extension MicAudioStream {
             }
         }
     }
-    
-    @objc dynamic public var streamId: String {
-        get { return _streamId }
-        set { if _streamId != newValue { _streamId = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization

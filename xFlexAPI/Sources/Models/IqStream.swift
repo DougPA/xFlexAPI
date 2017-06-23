@@ -10,10 +10,12 @@ import Foundation
 
 final public class IqStream: NSObject {
     
+    public var id = ""                              // Stream Id
+    
     // ------------------------------------------------------------------------------
     // MARK: - Internal properties
     
-    private weak var _radio: Radio!                 // The Radio that owns this Tnf
+    private var _radio: Radio!                      // The Radio that owns this Tnf
     private var _iqStreamsQ: DispatchQueue          // GCD queue that guards IqStreams
     private var _initialized = false                // True if initialized by Radio hardware
     private var _shouldBeRemoved = false            // True if being removed
@@ -27,14 +29,12 @@ final public class IqStream: NSObject {
     private var __pan: Radio.PanadapterId?          // Source Panadapter
     private var __port = 0                          // Port number
     private var __rate = 0                          // Stream rate
-    private var __streamId = ""                     // Stream Id
     private var __streaming = false                 // Stream state
     //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
     
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kModule = "IqStream"                // Module Name reported in log messages
     private let kNoError = "0"                      // response without error
 
     private let kStreamCmd = "stream "              // Command string prefixes
@@ -47,14 +47,15 @@ final public class IqStream: NSObject {
     ///   - radio:              the Radio instance
     ///   - queue:              IqStreams concurrent Queue
     ///
-    init(channel: Radio.DaxIqChannel, radio: Radio, queue: DispatchQueue) {
+    init(radio: Radio, id: String, queue: DispatchQueue) {
         
         self._radio = radio
+        self.id = id
         self._iqStreamsQ = queue
         
         super.init()
         
-        self._daxIqChannel = channel
+//        self._daxIqChannel = channel
 //        _pan = radio.findPanadapterBy(daxIqChannel: daxIqChannel)
     }
     
@@ -152,17 +153,8 @@ final public class IqStream: NSObject {
                 didChangeValue(forKey: "streaming")
             }
         }
-        // if this is an initialized AudioStream and inUse becomes false
-        if _initialized && _shouldBeRemoved == false {
-            
-            // mark it for removal
-            _shouldBeRemoved = true
-            
-            // notify all observers
-            NC.post(.iqStreamWillBeRemoved, object: self)
-        }
-        // is the Tnf initialized?
-        if !_initialized {
+        // is the Stream initialized?
+        if !_initialized && _ip != "" {
             
             // YES, the Radio (hardware) has acknowledged this Tnf
             _initialized = true
@@ -214,10 +206,10 @@ extension IqStream {
         get { return _iqStreamsQ.sync { __rate } }
         set { _iqStreamsQ.sync(flags: .barrier) { __rate = newValue } } }
     
-    private var _streamId: String {
-        get { return _iqStreamsQ.sync { __streamId } }
-        set { _iqStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
-    
+//    private var _streamId: String {
+//        get { return _iqStreamsQ.sync { __streamId } }
+//        set { _iqStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
+//
     private var _streaming: Bool {
         get { return _iqStreamsQ.sync { __streaming } }
         set { _iqStreamsQ.sync(flags: .barrier) { __streaming = newValue } } }
@@ -254,10 +246,10 @@ extension IqStream {
         get { return _rate  }
         set { if _rate != newValue { _rate = newValue } } }
     
-    @objc dynamic public var streamId: String {
-        get { return _streamId }
-        set { if _streamId != newValue { _streamId = newValue } } }
-    
+//    @objc dynamic public var streamId: String {
+//        get { return _streamId }
+//        set { if _streamId != newValue { _streamId = newValue } } }
+//
     @objc dynamic public var streaming: Bool {
         get { return _streaming  }
         set { if _streaming != newValue { _streaming = newValue } } }

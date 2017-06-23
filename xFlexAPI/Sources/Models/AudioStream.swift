@@ -33,7 +33,6 @@ final public class AudioStream: NSObject {
     private var _initialized = false                // True if initialized by Radio hardware
     
     private var _radio: Radio?                      // The Radio that owns this Audio stream
-    private var _id: Radio.DaxStreamId = ""         // Stream Id
     private var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
     
     private var rxSeq: Int?                         // Rx sequence number
@@ -70,10 +69,10 @@ final public class AudioStream: NSObject {
     ///   - id:                 the Stream Id
     ///   - queue:              AudioStreams concurrent Queue
     ///
-    init(radio: Radio, id: String, queue: DispatchQueue) {
+    init(radio: Radio, id: Radio.DaxStreamId, queue: DispatchQueue) {
         
         self._radio = radio
-        self._id = id
+        self.id = id
         self._audioStreamsQ = queue
         
         super.init()
@@ -402,7 +401,7 @@ extension AudioStream {
                 let value = newValue.bound(0, 100)
                 if _rxGain != value {
                     _rxGain = value
-                    _radio?.send("audio stream 0x" + _id + " slice " + _slice!.id + " gain \(value)")
+                    _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
                 }
             }
         }

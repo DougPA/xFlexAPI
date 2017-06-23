@@ -76,19 +76,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let _pingQ =            DispatchQueue(label: kApiId + ".pingQ")
 
     // GCD Concurrent Queues
-    private let _audioStreamsQ =    DispatchQueue(label: kApiId + ".audioStreamsQ", attributes: [.concurrent])
+    private let _audioStreamQ =     DispatchQueue(label: kApiId + ".audioStreamQ", attributes: [.concurrent])
     private let _cwxQ =             DispatchQueue(label: kApiId + ".cwxQ", attributes: [.concurrent])
     private let _equalizerQ =       DispatchQueue(label: kApiId + ".equalizerQ", attributes: [.concurrent])
-    private let _iqStreamQ =        DispatchQueue(label: kApiId + ".iqStreamyQ", attributes: [.concurrent])
+    private let _iqStreamQ =        DispatchQueue(label: kApiId + ".iqStreamQ", attributes: [.concurrent])
     private let _memoryQ =          DispatchQueue(label: kApiId + ".memoryQ", attributes: [.concurrent])
     private let _meterQ =           DispatchQueue(label: kApiId + ".meterQ", attributes: [.concurrent])
-    private let _micAudioStreamsQ = DispatchQueue(label: kApiId + ".micAudioStreamsQ", attributes: [.concurrent])
+    private let _micAudioStreamQ =  DispatchQueue(label: kApiId + ".micAudioStreamQ", attributes: [.concurrent])
     private let _objectQ =          DispatchQueue(label: kApiId + ".objectQ", attributes: [.concurrent])
     private let _panadapterQ =      DispatchQueue(label: kApiId + ".panadapterQ", attributes: [.concurrent])
     private let _radioQ =           DispatchQueue(label: kApiId + ".radioQ", attributes: [.concurrent])
     private let _sliceQ =           DispatchQueue(label: kApiId + ".sliceQ", attributes: [.concurrent])
     private let _tnfQ =             DispatchQueue(label: kApiId + ".tnfQ", attributes: [.concurrent])
-    private let _txAudioStreamsQ =  DispatchQueue(label: kApiId + ".txAudioStreamsQ", attributes: [.concurrent])
+    private let _txAudioStreamQ =   DispatchQueue(label: kApiId + ".txAudioStreamQ", attributes: [.concurrent])
     private let _waterfallQ =       DispatchQueue(label: kApiId + ".waterfallQ", attributes: [.concurrent])
 
     private var _connectionHandle: String?                           // API conversation ID
@@ -431,6 +431,23 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         return _tcp.connect(radioParameters: selectedRadio)
     }
+    
+    
+    /// Send a command to the Radio (hardware)
+    ///
+    /// - Parameters:
+    ///   - command:        a Command String
+    ///   - callback:       a callback function (if any)
+    ///
+    public func sendWithCheck(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) -> Bool {
+        
+        guard _tcp.isConnected else { return false }
+        
+        // tell the TcpManager to send the command (and optionally setup a callback)
+        send(command, diagnostic: flag, replyTo: callback)
+        
+        return true
+    }
     /// Send a command to the Radio (hardware)
     ///
     /// - Parameters:
@@ -533,14 +550,18 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func requestAntennaList() { send(kAntListCmd, replyTo: replyHandler) }       // Antenna List
     public func atuStart() { send(kAtuCmd + "start") }
     public func atuBypass() { send(kAtuCmd + "bypass") }
-    public func createAudioStream(_ channel: String, callback: ReplyHandler? = nil) { send(kStreamCreateCmd + "dax=\(channel)", replyTo: callback) }
+    public func createAudioStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
+        return sendWithCheck(kStreamCreateCmd + "dax=\(channel)", replyTo: callback)
+    }
 //    //     DL3LSM
 //    public func createAudioStream(_ channel: Radio.DaxChannel) -> AudioStream {
 //
 //        let audioStream = AudioStream(channel: channel, radio: self, queue: _audioStreamsQ)
 //        return audioStream
 //    }
-    public func removeAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
+    public func removeAudioStream(_ channel: String) -> Bool {
+        return sendWithCheck(kStreamRemoveCmd + "0x\(channel)")
+    }
 //    //     DL3LSM
 //    public func removeAudioStream(_ streamId: Radio.DaxStreamId) {
 //        
@@ -555,25 +576,27 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // M
     public func createMemory() { send("memory create") }
     public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
-//    public func createMicAudioStream() { send(kMicStreamCreateCmd) }
-//    public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
-    //     DL3LSM
-    public func createMicAudioStream() -> MicAudioStream {
-        
-        let micAudioStream = MicAudioStream(radio: self, queue: _micAudioStreamsQ)
-        return micAudioStream
+    public func createMicAudioStream(callback: ReplyHandler? = nil) -> Bool {
+        return sendWithCheck(kMicStreamCreateCmd)
     }
-    // DL3LSM
-    public func removeMicAudioStream(_ streamId: Radio.DaxStreamId) {
-        
-        if let micAudioStream = micAudioStreams[streamId] {
-            
-            // notify all observers
-            NC.post(.micAudioStreamWillBeRemoved, object: micAudioStream as Any?)
-            
-            micAudioStreams[streamId] = nil
-        }
-    }
+    public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
+//    //     DL3LSM
+//    public func createMicAudioStream() -> MicAudioStream {
+//
+//        let micAudioStream = MicAudioStream(radio: self, queue: _micAudioStreamsQ)
+//        return micAudioStream
+//    }
+//    // DL3LSM
+//    public func removeMicAudioStream(_ streamId: Radio.DaxStreamId) {
+//
+//        if let micAudioStream = micAudioStreams[streamId] {
+//
+//            // notify all observers
+//            NC.post(.micAudioStreamWillBeRemoved, object: micAudioStream as Any?)
+//
+//            micAudioStreams[streamId] = nil
+//        }
+//    }
     public func requestMicList() { send(kMicListCmd, replyTo: replyHandler) }
     // O
     public func startOffset(_ value: Bool) { startOffset = value ; if value == false { send("radio pll_start") } }
@@ -622,7 +645,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // DL3LSM
     public func createTXAudioStream() -> TXAudioStream {
         
-        let txAudioStream = TXAudioStream(radio: self, queue: _txAudioStreamsQ)
+        let txAudioStream = TXAudioStream(radio: self, queue: _txAudioStreamQ)
         return txAudioStream
     }
     // DL3LSM
@@ -977,8 +1000,10 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .daxiq:
             //      format: <daxChannel> <key=value> <key=value> ...<key=value>
-            parseDaxiq(keyValuesArray(remainder, delimiter: " "))
-        
+//            parseDaxiq(keyValuesArray(remainder, delimiter: " "))
+            
+            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
+            
         case .display:
             //     format: <displayType> <streamId> <key=value> <key=value> ...<key=value>
             parseDisplay(keyValuesArray(remainder, delimiter: " "), notInUse: remainder.contains("removed"))
@@ -1011,7 +1036,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .meter:
             //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
-            parseMeter(remainder , keyValues: keyValuesArray(remainder, delimiter: "#"), notInUse: remainder.contains("removed"))
+            parseMeter(keyValuesArray(remainder, delimiter: "#"), notInUse: remainder.contains("removed"))
         
         case .micAudioStream:
             //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
@@ -1041,9 +1066,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             parseSlice(keyValuesArray(remainder, delimiter: " "), notInUse: remainder.contains("in_use=0"))
             
         case .stream:
+            parseStream(keyValuesArray(remainder, delimiter: " "))
             
-            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-        
         case .tnf:
             //     format: <tnfId> <key=value> <key=value> ...<key=value>
             parseTnf(keyValuesArray(remainder, delimiter: " "))
@@ -1107,7 +1131,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             if audioStreams[streamId] == nil {
                 
                 // NO, create a new AudioStream & add it to the AudioStreams collection
-                audioStreams[streamId] = AudioStream(radio: self, id: streamId, queue: _audioStreamsQ)
+                audioStreams[streamId] = AudioStream(radio: self, id: streamId, queue: _audioStreamQ)
             }
             // pass the remaining key values to the AudioStream for parsing
             audioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
@@ -1119,6 +1143,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseAtu(_ keyValues: KeyValuesArray) {
+        // Format: <"status", value> <"memories_enabled", 1|0> <"using_mem", 1|0>
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -1171,26 +1196,29 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         cwx.parseKeyValues(keyValues)
     }
     
-    /// Prepare to parse a DaxIq status message
-    ///
-    /// - Parameters:
-    ///   - keyValues:      a KeyValuesArray
-    ///
-    private func parseDaxiq(_ keyValues: KeyValuesArray) {
-        
-        // get the Dax Channel
-        let channel = Int(keyValues[0].key) ?? 0
-        
-        // does the DaxIQ stream exist?
-        var iqStream = findIqStreamBy(daxIqChannel: channel)
-        if iqStream == nil {
-            
-            // NO, create a new Stream
-            iqStream = IqStream(channel: channel, radio: self, queue: _iqStreamQ)
-        }
-        // pass the key values to the IqStream for parsing
-        iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
-    }
+    // FIXME: How to integrate this with the Stream Status?
+    
+//    /// Prepare to parse a DaxIq status message
+//    ///
+//    /// - Parameters:
+//    ///   - keyValues:      a KeyValuesArray
+//    ///
+//    private func parseDaxiq(_ keyValues: KeyValuesArray) {
+//        // Format: <channel, ""> <"pan", streamId> <"rate", value> <"capacity", value> <"available", value>
+//
+//        // get the Dax Channel
+//        let channel = Int(keyValues[0].key) ?? 0
+//
+//        // does the DaxIQ stream exist?
+//        var iqStream = findIqStreamBy(daxIqChannel: channel)
+//        if iqStream == nil {
+//
+//            // NO, create a new Stream
+//            iqStream = IqStream(radio: self, id: queue: _iqStreamQ)
+//        }
+//        // pass the key values to the IqStream for parsing
+//        iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+//    }
     /// Prepare to parse a Display status message
     ///
     /// - Parameters:
@@ -1198,7 +1226,37 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - notInUse:       true = "in_use=0", otherwise false
     ///
     private func parseDisplay(_ keyValues: KeyValuesArray, notInUse: Bool) {
-
+        // ***** Panadapter Formats *****
+        //
+        // Format: <"pan", ""> <id, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0> <"x_pixels", value> <"y_pixels", value>
+        //          <"center", value>, <"bandwidth", value> <"min_dbm", value> <"max_dbm", value> <"fps", value> <"average", value>
+        //          <"weighted_average", 1|0> <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0>
+        //          <"band", value> <"daxiq", 1|0> <"daxiq_rate", value> <"capacity", value> <"available", value> <"waterfall", streamId>
+        //          <"min_bw", value> <"max_bw", value> <"xvtr", value> <"pre", value> <"ant_list", value>
+        //      OR
+        // Format: <"pan", ""> <id, ""> <"center", value> <"xvtr", value>
+        //      OR
+        // Format: <"pan", ""> <id, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0> <"ant_list", value>
+        //      OR
+        // Format: <"pan", ""> <id, ""> <"rfgain", value> <"pre", value>
+        //
+        // Format: <"pan", ""> <id, ""> <"wnb", 1|0> <"wnb_level", value> <"wnb_updating", 1|0>
+        //      OR
+        // Format: <"pan", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
+        
+        // ***** Waterfall Formats *****
+        //
+        // Format: <"waterfall", ""> <id, ""> <"x_pixels", value> <"center", value> <"bandwidth", value> <"line_duration", value>
+        //          <"rfgain", value> <"rxant", value> <"wide", 1|0> <"loopa", 1|0> <"loopb", 1|0> <"band", value> <"daxiq", value>
+        //          <"daxiq_rate", value> <"capacity", value> <"available", value> <"panadapter", streamId>=40000000 <"color_gain", value>
+        //          <"auto_black", 1|0> <"black_level", value> <"gradient_index", value> <"xvtr", value>
+        //      OR
+        // Format: <"waterfall", ""> <id, ""> <"rxant", value> <"loopa", 1|0> <"loopb", 1|0>
+        //      OR
+        // Format: <"waterfall", ""> <id, ""> <"rfgain", value>
+        //      OR
+        // Format: <"waterfall", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
+        
         // get the Type & remove it
         let displayType = keyValues[0].key
         
@@ -1269,6 +1327,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseEqualizer(_ keyValues: KeyValuesArray) {
+        // Format: <type, ""> <"mode", 1|0>, <"63Hz", value> <"125Hz", value> <"250Hz", value> <"500Hz", value>
+        //          <"1000Hz", value> <"2000Hz", value> <"4000Hz", value> <"8000Hz", value>
+        
         var equalizer: Equalizer?
         
         // get the Type
@@ -1306,7 +1367,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseGps(_ keyValues: KeyValuesArray) {
-
+        // Format: <"lat", value> <"lon", value> <"grid", value> <"altitude", value> <"tracked", value> <"visible", value> <"speed", value>
+        //          <"freq_error", value> <"status", "Not Present" | "Present"> <"time", value> <"track", value>
+        
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
@@ -1389,6 +1452,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseInterlock(_ keyValues: KeyValuesArray) {
+        // Format: <"timeout", value> <"acc_txreq_enable", 1|0> <"rca_txreq_enable", 1|0> <"acc_txreq_polarity", 1|0> <"rca_txreq_polarity", 1|0>
+        //              <"tx1_enabled", 1|0> <"tx1_delay", value> <"tx2_enabled", 1|0> <"tx2_delay", value> <"tx3_enabled", 1|0> <"tx3_delay", value>
+        //              <"acc_tx_enabled", 1|0> <"acc_tx_delay", value> <"tx_delay", value>
+        //      OR
+        // Format: <"state", value> <"tx_allowed", 1|0>
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -1542,16 +1610,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///   - notInUse:       true = "in_use=0", otherwise false
     ///
-    private func parseMeter(_ remainder: String, keyValues: KeyValuesArray, notInUse: Bool) {
+    private func parseMeter(_ keyValues: KeyValuesArray, notInUse: Bool) {
+        // Format: <number."src", src> <number."nam", name> <number."hi", highValue> <number."desc", description> <number."unit", unit> ,number."fps", fps>
+        //      OR
+        // Format: <number "removed", "">
         
         // is it marked for removal?
         if notInUse {
             
-            // YES, extract the Meter Number from the remainder
-            let components = remainder.components(separatedBy: " ")
+            // YES, extract the Meter Number
+            let meterId = keyValues[0].key.components(separatedBy: " ")[0]
             
             // does it exist?
-            if let meter = meters[components[0]] {
+            if let meter = meters[meterId] {
                 
                 // is it a Slice meter?
                 if meter.source == Meter.MeterSource.slice.rawValue {
@@ -1560,14 +1631,14 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                     if let slice = slices[meter.number] {
                         
                         // remove the Meter from the Slice
-                        slice.removeMeter(meter.id)
+                        slice.removeMeter(meterId)
                     }
                 }
                 // notify all observers
-                NC.post(.meterWillBeRemoved, object: meters[meter.id] as Any?)
+                NC.post(.meterWillBeRemoved, object: meters[meterId] as Any?)
                 
                 // remove it from the its collection
-                removeObject(meters[meter.id])
+                removeObject(meters[meterId])
             }
             
         } else {
@@ -1580,27 +1651,23 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             let meterId = components[0]
             
             // does the meter exist?
-            var meter = meters[meterId]
-            if meter == nil {
+            if meters[meterId] == nil {
                 
-                // NO, create a new Meter
-                meter = Meter(radio: self, id: meterId, queue: _meterQ)
+                // NO, create a new Meter & add it to the Meters collection
+                meters[meterId] = Meter(radio: self, id: meterId, queue: _meterQ)
                 
-                // add the Meter to the Radio class's Meters collection
-                meters[meterId] = meter
-                
-                if meter!.source == Meter.MeterSource.slice.rawValue {
+                if meters[meterId]!.source == Meter.MeterSource.slice.rawValue {
                     
                     // YES, get the Slice
-                    if let slice = slices[meter!.number] {
+                    if let slice = slices[meters[meterId]!.number] {
                         
                         // add the Meter to the Slice
-                        slice.addMeter(meter!)
+                        slice.addMeter(meters[meterId]!)
                     }
                 }
             }
             // pass the key values to the Meter for parsing
-            meter!.parseKeyValues( keyValues )
+            meters[meterId]!.parseKeyValues( keyValues )
         }
     }
     /// Prepare to parse a MicAudioStream status message
@@ -1610,8 +1677,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - notInUse:       true = "in_use=0", otherwise false
     ///
     private func parseMicAudioStream(_ keyValues: KeyValuesArray, notInUse: Bool) {
+        // Format:  <streamId, > <"in_use", 1|0> <"ip", ip> <"port", port>
         
-        //get the AudioStreamId (remove the "0x" prefix)
+        //get the MicAudioStreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
         
         // is it marked for removal?
@@ -1625,13 +1693,13 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         } else {
             
-            // NO, does the AudioStream exist?
+            // NO, does the MicAudioStream exist?
             if micAudioStreams[streamId] == nil {
                 
-                // NO, create a new AudioStream & add it to the AudioStreams collection
-                micAudioStreams[streamId] = MicAudioStream(radio: self, queue: _micAudioStreamsQ)
+                // NO, create a new MicAudioStream & add it to the MicAudioStreams collection
+                micAudioStreams[streamId] = MicAudioStream(radio: self, id: streamId, queue: _micAudioStreamQ)
             }
-            // pass the remaining key values to the AudioStream for parsing
+            // pass the remaining key values to the MicAudioStream for parsing
             micAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
@@ -1641,23 +1709,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseOpus(_ keyValues: KeyValuesArray) {
+        // Format:  <streamId, > <"ip", ip> <"port", port> <"opus_rx_stream_stopped", 1|0>  <"rx_on", 1|0> <"tx_on", 1|0>
         
         // get the Opus Id (without the "0x" prefix)
         let opusId = String(keyValues[0].key.characters.dropFirst(2))
         
         // does the Opus exist?
-        var opus = opusStreams[opusId]
-        if  opus == nil {
+        if  opusStreams[opusId] == nil {
             
-            // NO, create a new Opus
-            opus = Opus(radio: self, id: opusId, queue: _opusQ)
-            
-            // add the Opus to the Radio class's OpusStreams collection
-            opusStreams[opusId] = opus
+            // NO, create a new Opus & add it to the OpusStreams collection
+            opusStreams[opusId] = Opus(radio: self, id: opusId, queue: _opusQ)
         }
-        
         // pass the key values to Opus for parsing
-        opus!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+        opusStreams[opusId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
     /// Parse a Profile status message
     ///
@@ -1971,6 +2035,26 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             slices[sliceId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
+    /// Parse a Stream status message
+    ///
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
+    ///
+    private func parseStream(_ keyValues: KeyValuesArray) {
+        // Format: <StreamId, ""> <"daxiq", value> <"pan", StreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
+        
+        //get the StreamId (remove the "0x" prefix)
+        let streamId = String(keyValues[0].key.characters.dropFirst(2))
+        
+        // does the Stream exist?
+        if iqStreams[streamId] == nil {
+            
+            // NO, create a new Stream & add it to the Streams collection
+            iqStreams[streamId] = IqStream(radio: self, id: streamId, queue: _iqStreamQ)
+        }
+        // pass the remaining key values to the IqStream for parsing
+        iqStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+    }
     /// Prepare to parse a Tnf status message
     ///
     /// - Parameters:
@@ -2263,7 +2347,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             if txAudioStreams[streamId] == nil {
                 
                 // NO, create a new AudioStream & add it to the AudioStreams collection
-                txAudioStreams[streamId] = TXAudioStream(radio: self, queue: _txAudioStreamsQ)
+                txAudioStreams[streamId] = TXAudioStream(radio: self, queue: _txAudioStreamQ)
             }
             // pass the remaining key values to the AudioStream for parsing
             txAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
@@ -4738,35 +4822,6 @@ extension Radio {
     // ----------------------------------------------------------------------------
     // Mark: - Other Radio related enums
     
-//    public enum RadioMode: String {
-//        
-//        case tcp                // Tcp only
-//        case tcpGui             // Tcp & Gui
-//        case udp                // Udp only
-//        case tcpUdp             // Tcp & Udp
-//        case tcpUdpGui          // Tcp, Udp & Gui
-//        
-//        func includes(_ mode: RadioMode) -> Bool {
-//            
-//            switch mode {
-//            case .tcp:
-//                return self == .tcp || self == .tcpUdp || self == .tcpUdpGui
-//                
-//            case .tcpGui:
-//                return self == .tcpGui || self == .tcpUdpGui
-//                
-//            case .udp:
-//                return self == .udp || self == .tcpUdp || self == .tcpUdpGui
-//                
-//            case .tcpUdp:
-//                return self == .tcpUdp
-//                
-//            case .tcpUdpGui:
-//                return self == .tcpUdpGui
-//            }
-//        }
-//    }
-
     public enum DisconnectReason: String {
         case closed = "Closed"
         case connectionFailed = "Connection failed"
@@ -4774,12 +4829,16 @@ extension Radio {
         case tooManyGuiClients = "Too many Gui clients"
     }
     
-    public enum ConnectionState {
+    public enum ConnectionState: Equatable {
         case clientConnected
         case disconnected(reason: DisconnectReason)
         case tcpConnected(host: String, port: UInt16)
         case udpBound(port: UInt16)
         case update(host: String, port: UInt16)
+        
+        public static func ==(lhs: ConnectionState, rhs: ConnectionState) -> Bool {
+            return lhs == rhs
+        }
     }
     
     public enum ProfileType: String {
