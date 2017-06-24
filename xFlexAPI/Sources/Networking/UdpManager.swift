@@ -37,14 +37,15 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public private(set) var port: UInt16 = 0                // actual Vita port number
-    public private(set) var canBroadcast = true             // True if Broadcast permitted
+    public private(set) var port: UInt16 = 0            // actual Vita port number
+    public private(set) var canBroadcast = true         // True if Broadcast permitted
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
     private var _parameters: RadioParameters            // Struct of Radio parameters
-    private var _udpQ: DispatchQueue!                   // serial GCD Queue for UDP traffic
+    private var _udpReceiveQ: DispatchQueue!            // serial GCD Queue for inbound UDP traffic
+    private var _udpSendQ: DispatchQueue!               // serial GCD Queue for outbound UDP traffic
     private var _delegate: UdpManagerDelegate           // class to receive UDP data
 
     private var _udpSocket: GCDAsyncUdpSocket!          // socket for Vita UDP data
@@ -63,20 +64,21 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     /// - parameter radioParameters: a RadioParameters tuple
     /// - parameter udpQ:  a serial Q for GCDAsyncUdpSocket activity
     ///
-    public init(radioParameters: RadioParameters, udpQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
+    public init(radioParameters: RadioParameters, udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
         
         _parameters = radioParameters
-        _udpQ = udpQ
+        _udpReceiveQ = udpReceiveQ
+        _udpSendQ = udpSendQ
         _delegate = delegate
         port = udpPort
         
         super.init()
         
         // create the timer's dispatch source
-        _streamTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: _udpQ)
+        _streamTimer = DispatchSource.makeTimerSource(flags: [.strict], queue: _udpReceiveQ)
         
         // get a socket
-        _udpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: udpQ)
+        _udpSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpReceiveQ)
         _udpSocket.setIPv4Enabled(true)
         _udpSocket.setIPv6Enabled(false)
         
@@ -89,8 +91,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
         }
         
         // get a socket for sending Vita Data
-        // TODO: use a seperate queue??
-        _udpSendSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpQ)
+        _udpSendSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpSendQ)
         _udpSendSocket?.setIPv4Enabled(true)
         _udpSendSocket?.setIPv6Enabled(false)
     }
@@ -152,8 +153,6 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
             _udpSendSocket?.close()
             _udpSendSocket = nil
         }
-
-        
         // change the state
         _delegate.udpState(bound: success, port: port, error: success ? "" : "Unable to bind")
         _delegate.udpStream(active: success)
@@ -186,7 +185,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     
     // ----------------------------------------------------------------------------
     // MARK: - GCDAsyncUdpSocket Protocol methods methods
-    //     Note: called on the udpQ Queue
+    //     Note: called on the udpReceiveQ Queue
     
     /// Called when data has been read from the UDP connection
     ///

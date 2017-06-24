@@ -77,7 +77,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let _opusQ =            DispatchQueue(label: kApiId + ".opusQ")
     private let _parseQ =           DispatchQueue(label: kApiId + ".parseQ")
     private let _tcpQ =             DispatchQueue(label: kApiId + ".tcpQ")
-    private let _udpQ =             DispatchQueue(label: kApiId + ".udpQ")
+    private let _udpReceiveQ =      DispatchQueue(label: kApiId + ".udpReceiveQ")
+    private let _udpSendQ =         DispatchQueue(label: kApiId + ".udpSendQ")
     private let _pingQ =            DispatchQueue(label: kApiId + ".pingQ")
 
     // GCD Concurrent Queues
@@ -353,7 +354,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         _tcp = TcpManager(tcpQ: _tcpQ, delegate: self)
 
         // initialize a Manager for the UDP Data Streams
-        _udp = UdpManager(radioParameters: radioParameters, udpQ: _udpQ, delegate: self)
+        _udp = UdpManager(radioParameters: radioParameters, udpReceiveQ: _udpReceiveQ, udpSendQ: _udpSendQ, delegate: self)
         
         // subscribe to Pinger notifications
         addNotifications()
@@ -2353,7 +2354,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             if txAudioStreams[streamId] == nil {
                 
                 // NO, create a new AudioStream & add it to the AudioStreams collection
-                txAudioStreams[streamId] = TXAudioStream(radio: self, queue: _txAudioStreamQ)
+                txAudioStreams[streamId] = TXAudioStream(radio: self, id: streamId, queue: _txAudioStreamQ)
             }
             // pass the remaining key values to the AudioStream for parsing
             txAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
