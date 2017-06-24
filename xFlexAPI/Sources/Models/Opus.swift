@@ -19,6 +19,11 @@ public protocol OpusStreamHandler {
 
 // --------------------------------------------------------------------------------
 // MARK: - Opus Class implementation
+//
+//      creates an Opus instance to be used by a Client to support the
+//      processing of Opus encoded Rx (from the Radio) and Tx (to the Radio)
+//      streams
+//
 // --------------------------------------------------------------------------------
 
 public final class Opus : NSObject, KeyValueParser, VitaHandler {

@@ -10,6 +10,10 @@ import Foundation
 
 // ------------------------------------------------------------------------------
 // MARK: - TNF Class implementation
+//
+//      creates a Tnf instance to be used by a Client to support the
+//      rendering of a Tnf
+//
 // ------------------------------------------------------------------------------
 
 public final class Tnf : NSObject, KeyValueParser {

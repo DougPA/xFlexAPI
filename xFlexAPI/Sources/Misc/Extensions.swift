@@ -8,6 +8,9 @@
 
 import Foundation
 
+// ----------------------------------------------------------------------------
+// MARK: - Date
+
 public extension Date {
     
     /// Create a Date/Time in the local time zone
@@ -22,6 +25,7 @@ public extension Date {
         return dtf.string(from: self)
     }
 }
+
 // ----------------------------------------------------------------------------
 // MARK: - NotificationCenter
 
@@ -47,11 +51,6 @@ public extension NotificationCenter {
         NotificationCenter.default.post(name: Notification.Name(rawValue: notification.rawValue), object: object)
         
     }
-
-    //
-    //  Non-block style
-    //
-    
     /// setup a Notification Observer by Name
     ///
     /// - Parameters:
@@ -105,38 +104,44 @@ public extension String {
 
     /// Convert a Mhz string to an Hz Int
     ///
-    /// - Returns: the Int equivalent
+    /// - Returns:      the Int equivalent
     ///
     func mhzToHz() -> Int {
         return Int( (Double(self) ?? 0) * 1_000_000 )
     }
     /// Return the Integer value (or 0 if invalid)
     ///
-    /// - returns: an Integer
+    /// - Returns:      the Int equivalent
     ///
     func iValue() -> Int {
         return Int(self) ?? 0
     }
     /// Return the Bool value (or false if invalid)
     ///
-    /// - Returns: a Bool
+    /// - Returns:      a Bool equivalent
     ///
     func bValue() -> Bool {
         return (Int(self) ?? 0) == 1 ? true : false
     }
     /// Return the Float value (or 0 if invalid)
     ///
-    /// - returns: a Float value
+    /// - Returns:      a Float equivalent
+    ///
     func fValue() -> Float {
         return Float(self) ?? 0
     }
     /// Return the Double value (or 0 if invalid)
     ///
-    /// - returns: a Double value
+    /// - Returns:      a Double equivalent
+    ///
     func dValue() -> Double {
         return Double(self) ?? 0
     }
-
+    /// Replace spaces with a specified value
+    ///
+    /// - Parameter value:  the String to replace spaces
+    /// - Returns:          the adjusted String
+    ///
     func replacingSpacesWith(_ value: String) -> String {
         return self.replacingOccurrences(of: " ", with: value)
     }
@@ -149,21 +154,21 @@ public extension Bool {
 
     /// Return "1" / "0" for true / fals
     ///
-    /// - returns: a String
+    /// - Returns:      a String
     ///
     func asNumber() -> String {
         return (self ? "1" : "0")
     }
     /// Return "True" / "False" Strings for true / false Booleans
     ///
-    /// - returns: a String
+    /// - Returns:      a String
     ///
     func asString() -> String {
         return (self ? "True" : "False")
     }
     /// Return "T" / "F" Strings for true / false Booleans
     ///
-    /// - returns: a String
+    /// - Returns:      a String
     ///
     func asLetter() -> String {
         return (self ? "T" : "F")
@@ -208,6 +213,7 @@ public extension Int {
         return newValue > value2 ? value2 : newValue
     }
 }
+
 // ----------------------------------------------------------------------------
 // MARK: - CGFloat
 
@@ -215,10 +221,10 @@ public extension CGFloat {
 
     /// Force a CGFloat to be within a min / max value range
     ///
-    /// - parameter min: min CGFloat value
-    /// - parameter max: max CGFloat value
-    ///
-    /// - returns: adjusted value
+    /// - Parameters:
+    ///   - min:        min CGFloat value
+    ///   - max:        max CGFloat value
+    /// - Returns:      adjusted value
     ///
     func bracket(_ min: CGFloat, _ max: CGFloat) -> CGFloat {
         
@@ -229,29 +235,22 @@ public extension CGFloat {
     }
     /// Create a CGFloat from a String
     ///
-    /// - parameter string: a String
+    /// - Parameters:
+    ///   - string:     a String
     ///
-    /// - returns: CGFloat value of String or 0
+    /// - Returns:      CGFloat value of String or 0
     ///
     init(_ string: String) {
         
         self = CGFloat(Float(string) ?? 0)
     }
-    /// Convert a CGFloat representing Hz to a String in MHz
-    ///
-    /// - returns: String representing MHz
-    ///
-//    func hzToMhz() -> String {
-//        
-//        return floatToString(width: 0, precision: 6, divisor: 1_000_000)
-//    }
     /// Format a String with the value of a CGFloat
     ///
-    /// - parameter width:     number of digits before the decimal point
-    /// - parameter precision: number of digits after the decimal point
-    /// - parameter divisor:   divisor
-    ///
-    /// - returns: a String representation of the CGFloat
+    /// - Parameters:
+    ///   - width:      number of digits before the decimal point
+    ///   - precision:  number of digits after the decimal point
+    ///   - divisor:    divisor
+    /// - Returns:      a String representation of the CGFloat
     ///
     private func floatToString(width: Int, precision: Int, divisor: CGFloat) -> String {
         

@@ -8,7 +8,19 @@
 
 import Foundation
 
+// ------------------------------------------------------------------------------
+// MARK: - IqStream Class implementation
+//
+//      creates a udp stream of I / Q data, from a Panadapter in the Radio (hardware) to
+//      to the Client, to be used by the client for various purposes (e.g. CW Skimmer,
+//      digital modes, etc.)
+//
+// ------------------------------------------------------------------------------
+
 final public class IqStream: NSObject {
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Public properties
     
     public var id = ""                              // Stream Id
     
@@ -36,7 +48,6 @@ final public class IqStream: NSObject {
     // constants
     private let _log = Log.sharedInstance           // shared Log
     private let kNoError = "0"                      // response without error
-
     private let kStreamCmd = "stream "              // Command string prefixes
     private let kStreamCreateCmd = "stream create "
     

@@ -10,6 +10,10 @@ import Cocoa
 
 // ------------------------------------------------------------------------------
 // MARK: - TXAudioStream Class implementation
+//
+//      creates a udp stream of audio, from the Client to the Radio (hardware),
+//      to be used by the Radio as transmit audio
+//
 // ------------------------------------------------------------------------------
 
 final public class TXAudioStream: NSObject, KeyValueParser {
@@ -300,7 +304,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
             }
         }
         // is the AudioStream acknowledged by the radio?
-        if !_initialized && _ip != "" {
+        if !_initialized && _inUse && _ip != "" {
             
             // YES, the Radio (hardware) has acknowledged this Audio Stream
             _initialized = true

@@ -10,11 +10,13 @@ import Foundation
 
 // ----------------------------------------------------------------------------
 // MARK: - FlexErrors enum
+//
+//      Flex 6000 error codes
+//      see http://wiki.flexradio.com/index.php?title=Known_API_Responses
+//
 // ----------------------------------------------------------------------------
 
 public enum FlexErrors: UInt32 {
-    
-    // Error codes from http://wiki.flexradio.com/index.php?title=Known_API_Responses
     
     // SL_ERROR_BASE = 0x50000000
     // SL_INFO = 0x10000000

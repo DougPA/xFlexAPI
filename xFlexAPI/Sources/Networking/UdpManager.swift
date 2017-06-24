@@ -10,6 +10,9 @@ import Foundation
 
 // ------------------------------------------------------------------------------
 // MARK: - UDP Manager Class implementation
+//
+//      manages all Udp communication between the API and the Radio (hardware)
+//
 // ------------------------------------------------------------------------------
 
 public protocol UdpManagerDelegate {

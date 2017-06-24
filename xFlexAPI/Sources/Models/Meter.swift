@@ -10,6 +10,10 @@ import Foundation
 
 // ----------------------------------------------------------------------------------
 // MARK: - Meter Class implementation
+//
+//      creates a Meter instance to be used by a Client to support the
+//      rendering of a Meter
+//
 // ----------------------------------------------------------------------------------
 
 public class Meter : KeyValueParser {

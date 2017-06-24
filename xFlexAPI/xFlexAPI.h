@@ -14,7 +14,9 @@ FOUNDATION_EXPORT double xFlexAPIVersionNumber;
 //! Project version string for xFlexAPI.
 FOUNDATION_EXPORT const unsigned char xFlexAPIVersionString[];
 
-// In this header, you should import all the public headers of your framework using statements like #import <xFlexAPI/PublicHeader.h>
+// CocoaAsyncSocket is embedded in this project as source code
+//      version 7.6.1 as of 2017-06-24
+//      see https://github.com/robbiehanson/CocoaAsyncSocket
 
 #import <xFlexAPI/GCDAsyncSocket.h>
 #import <xFlexAPI/GCDAsyncUDPSocket.h>

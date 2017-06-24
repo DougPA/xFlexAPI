@@ -20,6 +20,10 @@ public protocol PanadapterStreamHandler {
 
 // --------------------------------------------------------------------------------
 // MARK: - Panadapter implementation
+//
+//      creates a Panadapter instance to be used by a Client to support the
+//      rendering of a Panadapter
+//
 // --------------------------------------------------------------------------------
 
 public final class Panadapter : NSObject, KeyValueParser, VitaHandler {

@@ -10,6 +10,9 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - RadioParameters implementation
+//
+//      structure used internally to represent a Radio (hardware) instance
+//
 // --------------------------------------------------------------------------------
 
 public final class RadioParameters : Equatable {

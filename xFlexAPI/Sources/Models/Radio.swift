@@ -22,6 +22,11 @@ public protocol KeyValueParser {
 
 // --------------------------------------------------------------------------------
 // MARK: - Radio Class implementation
+//
+//      as the object analog to the Radio (hardware) manages the connections (Tcp
+//      and Udp) to the radio hardware and coordinates the use of all of the other
+//      model objects
+//
 // --------------------------------------------------------------------------------
 
 public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
@@ -642,25 +647,27 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         removeObject(tnf)
     }
     public func setTransmit(_ value: Bool) { send(kXmitCmd + " \(value.asNumber())") }
-    // DL3LSM
-    public func createTXAudioStream() -> TXAudioStream {
-        
-        let txAudioStream = TXAudioStream(radio: self, queue: _txAudioStreamQ)
-        return txAudioStream
+//    // DL3LSM
+//    public func createTXAudioStream() -> TXAudioStream {
+//
+//        let txAudioStream = TXAudioStream(radio: self, queue: _txAudioStreamQ)
+//        return txAudioStream
+//    }
+//    // DL3LSM
+//    public func removeTXAudioStream(_ streamId: Radio.DaxStreamId) {
+//
+//        if let txAudioStream = txAudioStreams[streamId] {
+//
+//            // notify all observers
+//            NC.post(.txAudioStreamWillBeRemoved, object: txAudioStream as Any?)
+//
+//            txAudioStreams[streamId] = nil
+//        }
+//    }
+    public func createTxAudioStream() -> Bool {
+        return sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: replyHandler)
     }
-    // DL3LSM
-    public func removeTXAudioStream(_ streamId: Radio.DaxStreamId) {
-        
-        if let txAudioStream = txAudioStreams[streamId] {
-            
-            // notify all observers
-            NC.post(.txAudioStreamWillBeRemoved, object: txAudioStream as Any?)
-            
-            txAudioStreams[streamId] = nil
-        }
-    }
-    //public func createTxAudioStream() { send(kStreamCreateCmd + "daxtx", replyTo: replyHandler) }
-    //public func removeTxAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
+    public func removeTxAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
     // U
     public func requestUptime() { send(kRadioUptimeCmd, replyTo: replyHandler) }
 

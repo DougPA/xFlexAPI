@@ -10,6 +10,10 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Cwx Class implementation
+//
+//      creates a Cwx instance to be used by a Client to support the
+//      rendering of a Cwx
+//
 // --------------------------------------------------------------------------------
 
 public final class Cwx : NSObject, KeyValueParser {

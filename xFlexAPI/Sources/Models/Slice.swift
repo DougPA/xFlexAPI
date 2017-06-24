@@ -10,6 +10,10 @@ import Foundation
 
 // ------------------------------------------------------------------------------
 // MARK: - Slice Class implementation
+//
+//      creates a Slice instance to be used by a Client to support the
+//      rendering of a Slice
+//
 // ------------------------------------------------------------------------------
 
 public class Slice : NSObject, KeyValueParser {

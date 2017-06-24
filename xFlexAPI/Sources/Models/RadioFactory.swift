@@ -10,6 +10,10 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - RadioFactory implementation
+//
+//      listens for the udp broadcasts announcing the presence of a Flex-6000
+//      Radio, reports changes to the list of available radios
+//
 // --------------------------------------------------------------------------------
 
 public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {

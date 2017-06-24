@@ -18,6 +18,10 @@ protocol VitaHandler {
 
 // ------------------------------------------------------------------------------
 // MARK: - VITA header struct implementation
+//
+//      provides decoding and encoding services for Vita encoding
+//      see http://www.vita.com
+//
 // ------------------------------------------------------------------------------
 
 public struct VitaHeader {

@@ -19,6 +19,10 @@ public protocol WaterfallStreamHandler
 
 // --------------------------------------------------------------------------------
 // MARK: - Waterfall Class implementation
+//
+//      creates a Waterfall instance to be used by a Client to support the
+//      rendering of a Waterfall
+//
 // --------------------------------------------------------------------------------
 
 public final class Waterfall : NSObject, KeyValueParser, VitaHandler {

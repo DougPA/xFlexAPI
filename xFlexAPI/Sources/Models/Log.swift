@@ -52,6 +52,11 @@ public enum MessageLevel: Int {
 
 // ----------------------------------------------------------------------------
 // MARK: - Log implementation
+//
+//      provides a singleton Log instance which optionally, given a delegate,
+//      forwards log messages to the Client for processing by the Client's
+//      choice (if any) of logging software
+//
 // ----------------------------------------------------------------------------
 
 public final class Log {

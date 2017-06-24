@@ -10,6 +10,10 @@ import Foundation
 
 // ------------------------------------------------------------------------------
 // MARK: - Pinger Class implementation
+//
+//      generates "ping" messages once a second, if no reply is received
+//      sends a .tcpPingTimeout Notification
+//
 // ------------------------------------------------------------------------------
 
 public final class Pinger {

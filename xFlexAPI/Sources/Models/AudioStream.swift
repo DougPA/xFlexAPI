@@ -20,6 +20,11 @@ public protocol AudioStreamHandler {
 
 // ------------------------------------------------------------------------------
 // MARK: - AudioStream Class implementation
+//
+//      creates a udp stream of audio, from a Slice in the Radio (hardware) to
+//      the Client, to be used by the client for various purposes (e.g. CW Skimmer,
+//      digital modes, etc.)
+//
 // ------------------------------------------------------------------------------
 
 final public class AudioStream: NSObject {
@@ -195,7 +200,7 @@ final public class AudioStream: NSObject {
             }
         }
         // if this is not yet initialized and inUse becomes true
-        if !_initialized && _inUse == true && _ip != "" {
+        if !_initialized && _inUse && _ip != "" {
             
             // YES, the Radio (hardware) has acknowledged this Audio Stream
             _initialized = true

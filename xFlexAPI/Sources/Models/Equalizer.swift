@@ -11,6 +11,9 @@ import Foundation
 // ------------------------------------------------------------------------------
 // MARK: - Equalizer Class implementation
 //
+//      creates an Equalizer instance to be used by a Client to support the
+//      rendering of an Equalizer
+//
 //      Note: ignores the non-"sc" version of Equalizer messages
 //            The "sc" version is the standard for API Version 1.4 and greater
 //

@@ -10,6 +10,10 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Memory Class implementation
+//
+//      creates a Memory instance to be used by a Client to support the
+//      processing of a Memory
+//
 // --------------------------------------------------------------------------------
 
 public final class Memory : NSObject, KeyValueParser {

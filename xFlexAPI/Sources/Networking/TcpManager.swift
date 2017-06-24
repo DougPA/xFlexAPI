@@ -21,6 +21,9 @@ public protocol TcpManagerDelegate {
 
 // ------------------------------------------------------------------------------
 // MARK: - TcpManager Class implementation
+//
+//      manages all Tcp communication between the API and the Radio (hardware)
+//
 // ------------------------------------------------------------------------------
 
 public final class TcpManager: NSObject, GCDAsyncSocketDelegate {

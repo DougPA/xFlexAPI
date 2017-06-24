@@ -15,6 +15,14 @@ public protocol MicAudioStreamHandler {
     
 }
 
+// ------------------------------------------------------------------------------
+// MARK: - MicAudioStream Class implementation
+//
+//      creates a udp stream of audio, from the Radio (hardware) to the Client,
+//      containing the Radio's transmit audio
+//
+// ------------------------------------------------------------------------------
+
 final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 
     
