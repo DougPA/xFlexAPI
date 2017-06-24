@@ -30,34 +30,33 @@ public final class Memory : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __digitalLowerOffset = 0            // Digital Lower Offset                     //
-    private var __digitalUpperOffset = 0            // Digital Upper Offset                     //
-    private var __filterHigh = 0                    // Filter high                              //
-    private var __filterLow = 0                     // Filter low                               //
-    private var __frequency = 0                     // Frequency (Hz)                           //
-    private var __group = ""                        // Group                                    //
-    private var __mode = ""                         // Mode                                     //
-    private var __name = ""                         // Name                                     //
-    private var __offset = 0                        // Offset (Hz)                              //
-    private var __offsetDirection = ""              // Offset direction                         //
-    private var __owner = ""                        // Owner                                    //
-    private var __rfPower = 0                       // Rf Power                                 //
-    private var __rttyMark = 0                      // RTTY Mark                                //
-    private var __rttyShift = 0                     // RTTY Shift                               //
-    private var __squelchEnabled = false            // Squelch enabled                          //
-    private var __squelchLevel = 0                  // Squelch level                            //
-    private var __step = 0                          // Step (Hz)                                //
-    private var __toneMode = ""                     // Tone Mode                                //
-    private var __toneValue = 0                     // Tone values (Hz)                         //
+    private var __digitalLowerOffset = 0            // Digital Lower Offset                         //
+    private var __digitalUpperOffset = 0            // Digital Upper Offset                         //
+    private var __filterHigh = 0                    // Filter high                                  //
+    private var __filterLow = 0                     // Filter low                                   //
+    private var __frequency = 0                     // Frequency (Hz)                               //
+    private var __group = ""                        // Group                                        //
+    private var __mode = ""                         // Mode                                         //
+    private var __name = ""                         // Name                                         //
+    private var __offset = 0                        // Offset (Hz)                                  //
+    private var __offsetDirection = ""              // Offset direction                             //
+    private var __owner = ""                        // Owner                                        //
+    private var __rfPower = 0                       // Rf Power                                     //
+    private var __rttyMark = 0                      // RTTY Mark                                    //
+    private var __rttyShift = 0                     // RTTY Shift                                   //
+    private var __squelchEnabled = false            // Squelch enabled                              //
+    private var __squelchLevel = 0                  // Squelch level                                //
+    private var __step = 0                          // Step (Hz)                                    //
+    private var __toneMode = ""                     // Tone Mode                                    //
+    private var __toneValue = 0                     // Tone values (Hz)                             //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
-    private weak var _radio: Radio!                 // The Radio that owns this Memory
+    private var _radio: Radio!                      // The Radio that owns this Memory
     private var _initialized = false                // True if initialized by Radio hardware
     
     // constants
     private let _log = Log.sharedInstance           // shared log
-    private let kModule = "Memory"                  // Module Name reported in log messages
     private let kMinLevel = 0                       // control range
     private let kMaxLevel = 100
     

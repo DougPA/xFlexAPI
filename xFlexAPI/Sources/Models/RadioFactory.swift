@@ -40,7 +40,6 @@ public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {
     
     // constants
     private let _log =      Log.sharedInstance          // shared log
-    private let kModule =   "RadioFactory"              // Module Name reported in log messages
 
     // ----------------------------------------------------------------------------
     // MARK: - Private Getter / Setter with synchronization

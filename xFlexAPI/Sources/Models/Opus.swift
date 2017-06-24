@@ -52,16 +52,15 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // constants
     private let _opusQ: DispatchQueue               // Opus synchronization
     private let _log = Log.sharedInstance           // Shared Log
-    private let kModule = "Opus"                    // Module Name reported in log messages
     private let kRemoteAudioCmd = "remote_audio "   // Remote Audio command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __remoteRxOn = false                // Opus for receive                         //
-    private var __remoteTxOn = false                // Opus for transmit                        //
-    private var __rxStreamStopped = false           // Rx stream stopped                        //
+    private var __remoteRxOn = false                // Opus for receive                             //
+    private var __remoteTxOn = false                // Opus for transmit                            //
+    private var __rxStreamStopped = false           // Rx stream stopped                            //
                                                                                                     //
-    private var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data            //
+    private var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data                //
         didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }                     //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------

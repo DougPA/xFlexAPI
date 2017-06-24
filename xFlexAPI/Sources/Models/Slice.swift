@@ -26,103 +26,101 @@ public class Slice : NSObject, KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private weak var _radio: Radio?                 // The Radio that owns this Slice
-    private var _sliceQ: DispatchQueue              // GCD queue that guards this object
-    private var _initialized = false                // True if initialized by Radio (hardware)
-//    private var _shouldBeRemoved = false            // True if being removed
+    private var _radio: Radio?                          // The Radio that owns this Slice
+    private var _sliceQ: DispatchQueue                  // GCD queue that guards this object
+    private var _initialized = false                    // True if initialized by Radio (hardware)
     private var _diversityIsAllowed: Bool
         { return _radio?.selectedRadio?.model == "FLEX-6700" || _radio?.selectedRadio?.model == "FLEX-6700R" }
 
     // constants
-    private let _log = Log.sharedInstance           // shared Log
-    private let kModule = "Slice"                   // Module Name reported in log messages
-    private let kAudioClientCommand = "audio client " // command prefixes
+    private let _log = Log.sharedInstance               // shared Log
+    private let kAudioClientCommand = "audio client "   // command prefixes
     private let kFilterCommand = "filt "
     private let kSliceCommand = "slice "
     private let kSliceSetCommand = "slice set "
     private let kSliceTuneCommand = "slice tune "
-    private let kMinLevel = 0                       // control range
+    private let kMinLevel = 0                           // control range
     private let kMaxLevel = 100
-    private let kMinOffset = -99_999                // frequency offset range
+    private let kMinOffset = -99_999                    // frequency offset range
     private let kMaxOffset = 99_999
-    private let kNoError = "0"                      // response without error
-    private let kTuneStepList =                     // tuning steps
+    private let kNoError = "0"                          // response without error
+    private let kTuneStepList =                         // tuning steps
         [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var _meters = [String: Meter]()         // Dictionary of Meters (on this Slice)     //
+    private var _meters = [String: Meter]()         // Dictionary of Meters (on this Slice)         //
                                                                                                     //
-    private var __daxClients = 0                    // DAX clients for this slice               //
+    private var __daxClients = 0                    // DAX clients for this slice                   //
                                                                                                     //
-    private var __active = false                    //                                          //
-    private var __agcMode = AgcMode.off.rawValue    //                                          //
-    private var __agcOffLevel = 0                   // Slice AGC Off level                      //
-    private var __agcThreshold = 0                  //                                          //
-    private var __anfEnabled = false                //                                          //
-    private var __anfLevel = 0                      //                                          //
-    private var __apfEnabled = false                //                                          //
-    private var __apfLevel = 0                      // DSP APF Level (0 - 100)                  //
-    private var __audioGain = 0                     // Slice audio gain (0 - 100)               //
-    private var __audioMute = false                 // State of slice audio MUTE                //
-    private var __audioPan = 50                     // Slice audio pan (0 - 100)                //
-    private var __autoPanEnabled = false            //                                          //
-    private var __daxChannel = 0                    // DAX channel for this slice (1-8)         //
-    private var __daxTxEnabled = false              // DAX for transmit                         //
-    private var __dfmPreDeEmphasisEnabled = false   //                                          //
-    private var __digitalLowerOffset = 0            //                                          //
-    private var __digitalUpperOffset = 0            //                                          //
-    private var __diversityChild = false            // Slice is the child of the pair           //
-    private var __diversityEnabled = false          // Slice is part of a diversity pair        //
-    private var __diversityIndex = 0                // Slice number of the other slice          //
-    private var __diversityParent = false           // Slice is the parent of the pair          //
-    private var __filterHigh = 0                    // RX filter high frequency                 //
-    private var __filterLow = 0                     // RX filter low frequency                  //
-    private var __fmDeviation = 0                   // FM deviation                             //
-    private var __fmRepeaterOffset: Float = 0.0     // FM repeater offset                       //
-    private var __fmToneBurstEnabled = false        // FM tone burst                            //
-    private var __fmToneFreq: Float = 0.0           // FM CTCSS tone frequency                  //
-    private var __fmToneMode: String = ""           // FM CTCSS tone mode (ON | OFF)            //
-    private var __frequency = 0                     // Slice frequency in Hz                    //
-    private var __inUse = false                     // True = being used                        //
-    private var __locked = false                    // Slice frequency locked                   //
-    private var __loopAEnabled = false              // Loop A enable                            //
-    private var __loopBEnabled = false              // Loop B enable                            //
-    private var __mode = Mode.lsb.rawValue          // Slice mode                               //
-    private var __modeList = [String]()             // Array of Strings with available modes    //
-    private var __nbEnabled = false                 // State of DSP Noise Blanker               //
-    private var __nbLevel = 0                       // DSP Noise Blanker level (0 -100)         //
-    private var __nrEnabled = false                 // State of DSP Noise Reduction             //
-    private var __nrLevel = 0                       // DSP Noise Reduction level (0 - 100)      //
-    private var __owner = 0                         // Slice owner - RESERVED for FUTURE use    //
-    private var __panadapterId = ""                 // Panadaptor StreamID for this slice       //
-    private var __playbackEnabled = false           // Quick playback enable                    //
-    private var __postDemodBypassEnabled = false    //                                          //
-    private var __postDemodHigh = 0                 //                                          //
-    private var __postDemodLow = 0                  //                                          //
-    private var __qskEnabled = false                // QSK capable on slice                     //
-    private var __recordEnabled = false             // Quick record enable                      //
-    private var __recordLength: Float = 0.0         // Length of quick recording (seconds)      //
+    private var __active = false                    //                                              //
+    private var __agcMode = AgcMode.off.rawValue    //                                              //
+    private var __agcOffLevel = 0                   // Slice AGC Off level                          //
+    private var __agcThreshold = 0                  //                                              //
+    private var __anfEnabled = false                //                                              //
+    private var __anfLevel = 0                      //                                              //
+    private var __apfEnabled = false                //                                              //
+    private var __apfLevel = 0                      // DSP APF Level (0 - 100)                      //
+    private var __audioGain = 0                     // Slice audio gain (0 - 100)                   //
+    private var __audioMute = false                 // State of slice audio MUTE                    //
+    private var __audioPan = 50                     // Slice audio pan (0 - 100)                    //
+    private var __autoPanEnabled = false            //                                              //
+    private var __daxChannel = 0                    // DAX channel for this slice (1-8)             //
+    private var __daxTxEnabled = false              // DAX for transmit                             //
+    private var __dfmPreDeEmphasisEnabled = false   //                                              //
+    private var __digitalLowerOffset = 0            //                                              //
+    private var __digitalUpperOffset = 0            //                                              //
+    private var __diversityChild = false            // Slice is the child of the pair               //
+    private var __diversityEnabled = false          // Slice is part of a diversity pair            //
+    private var __diversityIndex = 0                // Slice number of the other slice              //
+    private var __diversityParent = false           // Slice is the parent of the pair              //
+    private var __filterHigh = 0                    // RX filter high frequency                     //
+    private var __filterLow = 0                     // RX filter low frequency                      //
+    private var __fmDeviation = 0                   // FM deviation                                 //
+    private var __fmRepeaterOffset: Float = 0.0     // FM repeater offset                           //
+    private var __fmToneBurstEnabled = false        // FM tone burst                                //
+    private var __fmToneFreq: Float = 0.0           // FM CTCSS tone frequency                      //
+    private var __fmToneMode: String = ""           // FM CTCSS tone mode (ON | OFF)                //
+    private var __frequency = 0                     // Slice frequency in Hz                        //
+    private var __inUse = false                     // True = being used                            //
+    private var __locked = false                    // Slice frequency locked                       //
+    private var __loopAEnabled = false              // Loop A enable                                //
+    private var __loopBEnabled = false              // Loop B enable                                //
+    private var __mode = Mode.lsb.rawValue          // Slice mode                                   //
+    private var __modeList = [String]()             // Array of Strings with available modes        //
+    private var __nbEnabled = false                 // State of DSP Noise Blanker                   //
+    private var __nbLevel = 0                       // DSP Noise Blanker level (0 -100)             //
+    private var __nrEnabled = false                 // State of DSP Noise Reduction                 //
+    private var __nrLevel = 0                       // DSP Noise Reduction level (0 - 100)          //
+    private var __owner = 0                         // Slice owner - RESERVED for FUTURE use        //
+    private var __panadapterId = ""                 // Panadaptor StreamID for this slice           //
+    private var __playbackEnabled = false           // Quick playback enable                        //
+    private var __postDemodBypassEnabled = false    //                                              //
+    private var __postDemodHigh = 0                 //                                              //
+    private var __postDemodLow = 0                  //                                              //
+    private var __qskEnabled = false                // QSK capable on slice                         //
+    private var __recordEnabled = false             // Quick record enable                          //
+    private var __recordLength: Float = 0.0         // Length of quick recording (seconds)          //
     private var __repeaterOffsetDirection = RepeaterOffsetDirection.simplex.rawValue // Repeater offset direction (DOWN, UP, SIMPLEX)
-    private var __rfGain = 0                        // RF Gain                                  //
-    private var __ritEnabled = false                // RIT enabled                              //
-    private var __ritOffset = 0                     // RIT offset value                         //
-    private var __rttyMark = 0                      // Rtty Mark                                //
-    private var __rttyShift = 0                     // Rtty Shift                               //
-    private var __rxAnt = ""                        // RX Antenna port for this slice           //
-    private var __rxAntList = [String]()            // Array of available Antenna ports         //
-    private var __step = 0                          // Frequency step value                     //
-    private var __squelchEnabled = false            // Squelch enabled                          //
-    private var __squelchLevel = 0                  // Squelch level (0 - 100)                  //
-    private var __stepList = ""                     // Available Step values                    //
-    private var __txAnt: String = ""                // TX Antenna port for this slice           //
-    private var __txEnabled = false                 // TX on ths slice frequency/mode           //
-    private var __txOffsetFreq: Float = 0.0         // TX Offset Frequency                      //
-    private var __wide = false                      // State of slice bandpass filter           //
-    private var __wnbEnabled = false                // Wideband noise blanking enabled          //
-    private var __wnbLevel = 0                      // Wideband noise blanking level            //
-    private var __xitEnabled = false                // XIT enable                               //
-    private var __xitOffset = 0                     // XIT offset value                         //
+    private var __rfGain = 0                        // RF Gain                                      //
+    private var __ritEnabled = false                // RIT enabled                                  //
+    private var __ritOffset = 0                     // RIT offset value                             //
+    private var __rttyMark = 0                      // Rtty Mark                                    //
+    private var __rttyShift = 0                     // Rtty Shift                                   //
+    private var __rxAnt = ""                        // RX Antenna port for this slice               //
+    private var __rxAntList = [String]()            // Array of available Antenna ports             //
+    private var __step = 0                          // Frequency step value                         //
+    private var __squelchEnabled = false            // Squelch enabled                              //
+    private var __squelchLevel = 0                  // Squelch level (0 - 100)                      //
+    private var __stepList = ""                     // Available Step values                        //
+    private var __txAnt: String = ""                // TX Antenna port for this slice               //
+    private var __txEnabled = false                 // TX on ths slice frequency/mode               //
+    private var __txOffsetFreq: Float = 0.0         // TX Offset Frequency                          //
+    private var __wide = false                      // State of slice bandpass filter               //
+    private var __wnbEnabled = false                // Wideband noise blanking enabled              //
+    private var __wnbLevel = 0                      // Wideband noise blanking level                //
+    private var __xitEnabled = false                // XIT enable                                   //
+    private var __xitOffset = 0                     // XIT offset value                             //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     

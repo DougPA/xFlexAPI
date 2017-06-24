@@ -41,19 +41,18 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __inUse = false                     // true = in use                            //
-    private var __ip = ""                           // Ip Address                               //
-    private var __port = 0                          // Port number                              //
-    private var __micGain = 50                      // rx gain of stream                        //
-    private var __micGainScalar: Float = 1.0        // scalar gain value for multiplying        //
-    //
-    private var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                //
+    private var __inUse = false                     // true = in use                                //
+    private var __ip = ""                           // Ip Address                                   //
+    private var __port = 0                          // Port number                                  //
+    private var __micGain = 50                      // rx gain of stream                            //
+    private var __micGainScalar: Float = 1.0        // scalar gain value for multiplying            //
+                                                                                                    //
+    private var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                    //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ----//
     
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kModule = "MicAudioStream"          // Module Name reported in log messages
     private let kNoError = "0"                      // response without error
     
     private let kMicStreamCreateCmd = "stream create daxmic"

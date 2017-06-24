@@ -46,18 +46,17 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
 
     // constants
     private let _log = Log.sharedInstance               // shared log
-    private let kModule = "Waterfall"                   // Module Name reported in log messages
     private let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __autoBlackEnabled = false              // State of auto black                  //
-    private var __autoBlackLevel: UInt32 = 0            //                                      //
-    private var __blackLevel = 0                        // Setting of black level (1 -> 100)    //
-    private var __colorGain = 0                         // Setting of color gain (1 -> 100)     //
-    private var __gradientIndex = 0                     // Index of selected color gradient     //
-    private var __lineDuration = 0                      // Line duration (milliseconds)         //
-    private var __panadapterId = ""                     // Panadaptor above this waterfall      //
+    private var __autoBlackEnabled = false              // State of auto black                      //
+    private var __autoBlackLevel: UInt32 = 0            //                                          //
+    private var __blackLevel = 0                        // Setting of black level (1 -> 100)        //
+    private var __colorGain = 0                         // Setting of color gain (1 -> 100)         //
+    private var __gradientIndex = 0                     // Index of selected color gradient         //
+    private var __lineDuration = 0                      // Line duration (milliseconds)             //
+    private var __panadapterId = ""                     // Panadaptor above this waterfall          //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     

@@ -34,15 +34,14 @@ public final class Cwx : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __delay = 0                         // Delay (ms)                               //
-    private var __qskEnabled = false                // QSK Enabled                              //
-    private var __speed = 0                         // Speed (wpm)                              //
+    private var __delay = 0                         // Delay (ms)                                   //
+    private var __qskEnabled = false                // QSK Enabled                                  //
+    private var __speed = 0                         // Speed (wpm)                                  //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
     // constants
     private let _log = Log.sharedInstance           // shared log
-    private let kModule = "Cwx"                     // Module Name reported in log messages
     private let kMinDelayMs = 0                     // Min delay (ms)
     private let kMaxDelayMs = 2000                  // Max delay (ms)
     private let kMinSpeed = 5                       // Min speed (wpm)

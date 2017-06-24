@@ -34,15 +34,14 @@ public final class Tnf : NSObject, KeyValueParser {
 
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kModule = "Tnf"                     // Module Name reported in log messages
     private let kSetCommand = "tnf set "            // Tnf Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __depth = Tnf.Depth.normal.rawValue // Depth (Normal, Deep, Very Deep)          //
-    private var __frequency = 0                     // Frequency (Hz)                           //
-    private var __permanent = false                 // True =                                   //
-    private var __width = 0                         // Width (Hz)                               //
+    private var __depth = Tnf.Depth.normal.rawValue // Depth (Normal, Deep, Very Deep)              //
+    private var __frequency = 0                     // Frequency (Hz)                               //
+    private var __permanent = false                 // True =                                       //
+    private var __width = 0                         // Width (Hz)                                   //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     

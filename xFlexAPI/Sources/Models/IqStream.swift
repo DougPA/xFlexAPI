@@ -22,7 +22,7 @@ final public class IqStream: NSObject {
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public var id = ""                              // Stream Id
+    public private(set) var id = ""                 // Stream Id
     
     // ------------------------------------------------------------------------------
     // MARK: - Internal properties
@@ -32,17 +32,17 @@ final public class IqStream: NSObject {
     private var _initialized = false                // True if initialized by Radio hardware
     private var _shouldBeRemoved = false            // True if being removed
     
-    // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
-    //
-    private var __available = 0                     // Number of available IQ Streams
-    private var __capacity = 0                      // Total Number of  IQ Streams
-    private var __daxIqChannel = 0                  // Channel in use (1 - 8)
-    private var __ip = ""                           // Ip Address
-    private var __pan: Radio.PanadapterId?          // Source Panadapter
-    private var __port = 0                          // Port number
-    private var __rate = 0                          // Stream rate
-    private var __streaming = false                 // Stream state
-    //
+    // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+    //                                                                                              //
+    private var __available = 0                     // Number of available IQ Streams               //
+    private var __capacity = 0                      // Total Number of  IQ Streams                  //
+    private var __daxIqChannel = 0                  // Channel in use (1 - 8)                       //
+    private var __ip = ""                           // Ip Address                                   //
+    private var __pan: Radio.PanadapterId?          // Source Panadapter                            //
+    private var __port = 0                          // Port number                                  //
+    private var __rate = 0                          // Stream rate                                  //
+    private var __streaming = false                 // Stream state                                 //
+    //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
     
     // constants

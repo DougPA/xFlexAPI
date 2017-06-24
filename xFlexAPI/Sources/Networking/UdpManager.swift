@@ -47,13 +47,11 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     private var _udpQ: DispatchQueue!                   // serial GCD Queue for UDP traffic
     private var _delegate: UdpManagerDelegate           // class to receive UDP data
 
-//    private var _vita = Vita()                          // a Vita-49 packet
     private var _udpSocket: GCDAsyncUdpSocket!          // socket for Vita UDP data
     private var _udpSendSocket: GCDAsyncUdpSocket?      // socket for sending Vita UDP data
     private var _streamTimer: DispatchSourceTimer!      // periodic timer for stream activity
     
     // constants
-    private let kModule = "UdpManager"                  // Module Name reported in log messages
     private let kBroadcastAddress = "255.255.255.255"
     private let kUdpSendPort: UInt16 = 4991
     

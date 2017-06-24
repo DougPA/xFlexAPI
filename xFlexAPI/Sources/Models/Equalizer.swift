@@ -29,25 +29,24 @@ public final class Equalizer : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var  _radio:  Radio?                        // The Radio that owns this Equalizer
+    private var _radio:  Radio?                         // The Radio that owns this Equalizer
     private var _eqQ: DispatchQueue                     // GCD queue that guards this object
     
     // constants
     private let _log = Log.sharedInstance               // shared log
-    private let kModule = "Equalizer"                   // Module Name reported in log messages
     private let kEqCommand = "eq "                      // Equalizer command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __eqEnabled = false                                                             //
-    private var __level63Hz = 0                                                                 //
-    private var __level125Hz = 0                                                                //
-    private var __level250Hz = 0                                                                //
-    private var __level500Hz = 0                                                                //
-    private var __level1000Hz = 0                                                               //
-    private var __level2000Hz = 0                                                               //
-    private var __level4000Hz = 0                                                               //
-    private var __level8000Hz = 0                                                               //
+    private var __eqEnabled = false                                                                 //
+    private var __level63Hz = 0                                                                     //
+    private var __level125Hz = 0                                                                    //
+    private var __level250Hz = 0                                                                    //
+    private var __level500Hz = 0                                                                    //
+    private var __level1000Hz = 0                                                                   //
+    private var __level2000Hz = 0                                                                   //
+    private var __level4000Hz = 0                                                                   //
+    private var __level8000Hz = 0                                                                   //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     

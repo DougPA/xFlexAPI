@@ -101,7 +101,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // constants
     private let _log = Log.sharedInstance                            // shared log
-    private let kModule = "Radio"                                    // Module Name reported in log messages
     private let kBundleIdentifier = kDomainId + "." + kApiId
     private let kTnfClickBandwidth: CGFloat = 0.01                   // * bandwidth = minimum Tnf click width
     private let kSliceClickBandwidth: CGFloat = 0.01                 // * bandwidth = minimum Slice click width
@@ -664,8 +663,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
 //            txAudioStreams[streamId] = nil
 //        }
 //    }
-    public func createTxAudioStream() -> Bool {
-        return sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: replyHandler)
+    public func createTxAudioStream(callback: ReplyHandler? = nil) -> Bool {
+        return sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: callback)
     }
     public func removeTxAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
     // U

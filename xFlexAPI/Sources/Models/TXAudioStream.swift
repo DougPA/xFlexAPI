@@ -17,7 +17,12 @@ import Cocoa
 // ------------------------------------------------------------------------------
 
 final public class TXAudioStream: NSObject, KeyValueParser {
-
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Public properties
+    
+    public private(set) var id: Radio.DaxStreamId = ""  // Stream Id
+    
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
@@ -35,15 +40,14 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     private var __transmit = false                  // dax transmitting                             //
     private var __txGain = 50                       // tx gain of stream                            //
     private var __txGainScalar: Float = 1.0         // scalar gain value for multiplying            //
-    private var __streamId: Radio.DaxStreamId = ""  // Stream Id                                    //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kNoError = "0"                      // response without error
-    
-    private let kTXStreamCreateCmd = "stream create daxtx"
+//    private let kNoError = "0"                      // response without error
+//
+//    private let kTXStreamCreateCmd = "stream create daxtx"
     
     // see FlexLib
     private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
@@ -54,39 +58,40 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     ///   - radio:              the Radio instance
     ///   - queue:              MicAudioStreams concurrent Queue
     ///
-    init(radio: Radio, queue: DispatchQueue) {
+    init(radio: Radio, id: Radio.DaxStreamId, queue: DispatchQueue) {
         
         self._radio = radio
+        self.id = id
         self._txAudioStreamsQ = queue
         
         super.init()        
     }
     
-    // ------------------------------------------------------------------------------
-    // MARK: - Public methods that send commands to the Radio (hardware)
-    
-    public func requestTXAudioStream() -> Bool {
-        
-        // check to see if this object has already been activated
-        if !_initialized { return false }
-        
-        // check to ensure this object is tied to a radio object
-        if _radio == nil { return false }
-        
-        // check to make sure the radio is connected
-        switch _radio!.connectionState {
-        case .clientConnected:
-            _radio!.send(kTXStreamCreateCmd, replyTo: updateStreamId)
-            return true
-        default:
-            return false
-        }
-    }
-    public func removeTXAudioStream() {
-        
-        _radio?.send("stream remove 0x\(streamId)")
-        _radio?.removeTXAudioStream(streamId)
-    }
+//    // ------------------------------------------------------------------------------
+//    // MARK: - Public methods that send commands to the Radio (hardware)
+//
+//    public func requestTXAudioStream() -> Bool {
+//
+//        // check to see if this object has already been activated
+//        if !_initialized { return false }
+//
+//        // check to ensure this object is tied to a radio object
+//        if _radio == nil { return false }
+//
+//        // check to make sure the radio is connected
+//        switch _radio!.connectionState {
+//        case .clientConnected:
+//            _radio!.send(kTXStreamCreateCmd, replyTo: updateStreamId)
+//            return true
+//        default:
+//            return false
+//        }
+//    }
+//    public func removeTXAudioStream() {
+//
+//        _radio?.send("stream remove 0x\(streamId)")
+//        _radio?.removeTXAudioStream(streamId)
+//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - Public methods for sending tx audio to the Radio (hardware)
@@ -220,40 +225,40 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         return true
     }
     
-    // ------------------------------------------------------------------------------
-    // MARK: - Private methods
-    
-    /// Process the Reply to a Stream Create command, reply format: <value>,<value>,...<value>
-    ///
-    /// - Parameters:
-    ///   - seqNum:         the Sequence Number of the original command
-    ///   - responseValue:  the response value
-    ///   - reply:          the reply
-    ///
-    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
-        
-        guard responseValue == kNoError else {
-            // Anything other than 0 is an error, log it and ignore the Reply
-            _log.msg(command + ", un-handled non-zero reply - \(responseValue)", level: .warning, function: #function, file: #file, line: #line)
-            return
-        }
-        
-        //get the streamId (remove the "0x" prefix)
-        //_streamId = String(reply.characters.dropFirst(2))
-        // DL3LSM: there is no 0x prefix -> don't drop anything
-        // but make the string 8 characters long -> add "0" at the beginning
-        let fillCnt = 8 - reply.characters.count
-        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
-        _streamId = fills + reply
-        
-        // add the Audio Stream to the collection if not existing
-        if let _ = _radio?.txAudioStreams[_streamId] {
-            _log.msg(command + ", attempted to add TXAudioStream already in Radio txAudioStreams List", level: .warning, function: #function, file: #file, line: #line)
-            return // already in the list
-        }
-        
-        _radio?.txAudioStreams[_streamId] = self
-    }
+//    // ------------------------------------------------------------------------------
+//    // MARK: - Private methods
+//
+//    /// Process the Reply to a Stream Create command, reply format: <value>,<value>,...<value>
+//    ///
+//    /// - Parameters:
+//    ///   - seqNum:         the Sequence Number of the original command
+//    ///   - responseValue:  the response value
+//    ///   - reply:          the reply
+//    ///
+//    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
+//
+//        guard responseValue == kNoError else {
+//            // Anything other than 0 is an error, log it and ignore the Reply
+//            _log.msg(command + ", un-handled non-zero reply - \(responseValue)", level: .warning, function: #function, file: #file, line: #line)
+//            return
+//        }
+//
+//        //get the streamId (remove the "0x" prefix)
+//        //_streamId = String(reply.characters.dropFirst(2))
+//        // DL3LSM: there is no 0x prefix -> don't drop anything
+//        // but make the string 8 characters long -> add "0" at the beginning
+//        let fillCnt = 8 - reply.characters.count
+//        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
+//        _streamId = fills + reply
+//
+//        // add the Audio Stream to the collection if not existing
+//        if let _ = _radio?.txAudioStreams[_streamId] {
+//            _log.msg(command + ", attempted to add TXAudioStream already in Radio txAudioStreams List", level: .warning, function: #function, file: #file, line: #line)
+//            return // already in the list
+//        }
+//
+//        _radio?.txAudioStreams[_streamId] = self
+//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
@@ -353,10 +358,10 @@ extension TXAudioStream {
         get { return _txAudioStreamsQ.sync { __txGainScalar } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
     
-    private var _streamId: String {
-        get { return _txAudioStreamsQ.sync { __streamId } }
-        set { _txAudioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
-    
+//    private var _streamId: String {
+//        get { return _txAudioStreamsQ.sync { __streamId } }
+//        set { _txAudioStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
+//
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant with Radio update
     
@@ -403,10 +408,10 @@ extension TXAudioStream {
         }
     }
     
-    @objc dynamic public var streamId: String {
-        get { return _streamId }
-        set { if _streamId != newValue { _streamId = newValue } } }
-    
+//    @objc dynamic public var streamId: String {
+//        get { return _streamId }
+//        set { if _streamId != newValue { _streamId = newValue } } }
+//
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for TxAudioStream messages (only populate values that != case value)
     

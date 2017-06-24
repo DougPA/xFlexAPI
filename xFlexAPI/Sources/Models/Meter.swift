@@ -32,20 +32,19 @@ public class Meter : KeyValueParser {
 
     // constants
     private let _log = Log.sharedInstance                        // shared log
-    private let kModule = "Meter"                                // Module Name reported in log messages
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var _description = ""                                // long description            //
-    private var _fps = 0                                         // frames per second           //
-    private var _high: Float = 0.0                               // high limit                  //
-    private var _low: Float = 0.0                                // low limit                   //
-    private var _number = ""                                     // Id of the source            //
-    private var _name = ""                                       // abbreviated description     //
-    private var _peak: Float = 0.0                               // peak value                  //
-    private var _source = ""                                     // source                      //
-    private var _units = ""                                      // value units                 //
-    private var _value: Float = 0.0                              // value                       //
+    private var _description = ""                                // long description                //
+    private var _fps = 0                                         // frames per second               //
+    private var _high: Float = 0.0                               // high limit                      //
+    private var _low: Float = 0.0                                // low limit                       //
+    private var _number = ""                                     // Id of the source                //
+    private var _name = ""                                       // abbreviated description         //
+    private var _peak: Float = 0.0                               // peak value                      //
+    private var _source = ""                                     // source                          //
+    private var _units = ""                                      // value units                     //
+    private var _value: Float = 0.0                              // value                           //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 

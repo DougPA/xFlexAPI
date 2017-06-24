@@ -36,10 +36,8 @@ final public class AudioStream: NSObject {
     // MARK: - Private properties
     
     private var _initialized = false                // True if initialized by Radio hardware
-    
     private var _radio: Radio?                      // The Radio that owns this Audio stream
     private var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
-    
     private var rxSeq: Int?                         // Rx sequence number
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -58,7 +56,6 @@ final public class AudioStream: NSObject {
 
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kModule = "AudioStream"             // Module Name reported in log messages
     private let kNoError = "0"                      // response without error
 
     private let kStreamCreateCmd = "stream create "
