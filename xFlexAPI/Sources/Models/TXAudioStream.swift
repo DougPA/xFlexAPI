@@ -168,7 +168,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
         
         if _vita == nil {
             // get a new Vita struct (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
-            _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: _streamId, tsi: .other)
+            _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: id, tsi: .other)
         }
         
         let kMaxSamplesToSend = 128     // maximum packet samples (per channel)
