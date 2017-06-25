@@ -1042,7 +1042,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             parseTXAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
             
         case .usbCable:
-            
+            //      format:
+            parseUsbCable( keyValuesArray(remainder))
             _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
 
         case .waveform:
@@ -1050,7 +1051,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             parseWaveform( keyValuesArray(remainder))
 
         case .xvtr:
-            
+            //      format:
+            parseXvtr( keyValuesArray(remainder))
             _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
         }
     }
@@ -2320,6 +2322,33 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             txAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
+    /// Parse a USB Cable status message
+    ///
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
+    ///
+    private func parseUsbCable(_ keyValues: KeyValuesArray) {
+        
+        // process each key/value pair, <key=value>
+        for kv in keyValues {
+            
+            // Check for Unknown token
+            guard let token = UsbCableToken(rawValue: kv.key.lowercased())  else {
+                
+                // unknown Token, log it and ignore this token
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                continue
+            }
+            
+//            // Known tokens, in alphabetical order
+//            switch token {
+//
+//            case .waveformList:
+//                _waveformList = kv.value
+//
+//            }
+        }
+    }
     /// Parse a Waveform status message
     ///
     /// - Parameters:
@@ -2347,7 +2376,34 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-
+    /// Parse an Xvtr status message
+    ///
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
+    ///
+    private func parseXvtr(_ keyValues: KeyValuesArray) {
+        
+        // process each key/value pair, <key=value>
+        for kv in keyValues {
+            
+            // Check for Unknown token
+            guard let token = XvtrToken(rawValue: kv.key.lowercased())  else {
+                
+                // unknown Token, log it and ignore this token
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                continue
+            }
+            
+            //            // Known tokens, in alphabetical order
+            //            switch token {
+            //
+            //            case .waveformList:
+            //                _waveformList = kv.value
+            //
+            //            }
+        }
+    }
+    
     // --------------------------------------------------------------------------------
     // MARK: - Internal Supporting methods
     // --------------------------------------------------------------------------------
@@ -4699,10 +4755,24 @@ extension Radio {
     }
     
     // ----------------------------------------------------------------------------
+    // Mark: - Tokens for UsbCable messages (only populate values that != case value)
+    
+    enum UsbCableToken: String {
+        case none
+    }
+    
+    // ----------------------------------------------------------------------------
     // Mark: - Tokens for Waveform messages (only populate values that != case value)
     
     enum WaveformToken: String {
         case waveformList = "installed_list"
+    }
+    
+    // ----------------------------------------------------------------------------
+    // Mark: - Tokens for Xvtr messages (only populate values that != case value)
+    
+    enum XvtrToken: String {
+        case none
     }
     
     // ----------------------------------------------------------------------------

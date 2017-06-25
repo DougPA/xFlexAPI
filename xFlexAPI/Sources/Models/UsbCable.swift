@@ -1,22 +1,22 @@
 //
-//  Xvtr.swift
+//  UsbCable.swift
 //  xFlexAPI
 //
-//  Created by Douglas Adams on 6/24/17.
+//  Created by Douglas Adams on 6/25/17.
 //  Copyright © 2017 Douglas Adams. All rights reserved.
 //
 
 import Foundation
 
 // --------------------------------------------------------------------------------
-// MARK: - Xvtr Class implementation
+// MARK: - USB Cable Class implementation
 //
-//      creates an Xvtr instance to be used by a Client to support the
-//      processing of an Xvtr
+//      creates a USB Cable instance to be used by a Client to support the
+//      processing of USB connections to the Radio (hardware)
 //
 // --------------------------------------------------------------------------------
 
-public final class Xvtr : NSObject, KeyValueParser {
+public final class UsbCable : NSObject, KeyValueParser {
     
     
     // TODO: add code
@@ -26,7 +26,7 @@ public final class Xvtr : NSObject, KeyValueParser {
     // MARK: - KeyValueParser Protocol methods
     //     called by Radio, executes on the parseQ
     
-    /// Parse Xvtr key/value pairs
+    /// Parse USB Cable key/value pairs
     ///
     /// - parameter keyValues: a KeyValuesArray
     ///
