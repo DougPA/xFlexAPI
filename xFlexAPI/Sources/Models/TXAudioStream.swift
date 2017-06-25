@@ -29,8 +29,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     private var _radio: Radio?                      // The Radio that owns this TXAudioStream
     private var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TXAudioStreams
     private var _initialized = false                // True if initialized by Radio hardware
-    
-    private var txSeq = 0                           // Tx sequence number (modulo 16)
+    private var _txSeq = 0                          // Tx sequence number (modulo 16)
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
@@ -45,10 +44,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    
-    // see FlexLib
-    private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
-    
+        
     /// Initialize an TX Audio Stream
     ///
     /// - Parameters:
@@ -112,7 +108,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
 //            _vita?.payloadSize = payloadSize
 //            _vita?.packetSize = payloadSize + MemoryLayout<VitaHeader>.size // payload size + header size
 //            
-//            _vita?.sequence = txSeq
+//            _vita?.sequence = _txSeq
 //            
 //            // encode vita packet to data and send to radio
 //            if let packet = _vita!.encode() {
@@ -121,7 +117,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
 //                _radio?.sendVitaData(packet)
 //            }
 //
-//            txSeq = (txSeq + 1) % 16
+//            _txSeq = (_txSeq + 1) % 16
 //            
 //            // adjust the samples sent
 //            samplesSent += numSamplesToSend
@@ -177,7 +173,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
             _vita!.packetSize = _vita!.payloadSize + MemoryLayout<VitaHeader>.size     // payload size + header size
             
             // set the sequence number
-            _vita!.sequence = txSeq
+            _vita!.sequence = _txSeq
             
             // encode vita packet to data and send to radio
             if let packet = _vita!.encode() {
@@ -186,7 +182,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
                 _radio?.sendVitaData(packet)
             }
             // increment the sequence number (mod 16)
-            txSeq = (txSeq + 1) % 16
+            _txSeq = (_txSeq + 1) % 16
             
             // adjust the samples sent
             samplesSent += numSamplesToSend
