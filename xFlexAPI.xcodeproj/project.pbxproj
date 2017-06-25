@@ -37,6 +37,7 @@
 		91B9F8101ED9203300F7799D /* GCDAsyncUdpSocket.m in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F80C1ED9203300F7799D /* GCDAsyncUdpSocket.m */; };
 		91B9F8111ED9212200F7799D /* GCDAsyncSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F8091ED9203300F7799D /* GCDAsyncSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91B9F8121ED9212200F7799D /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F80B1ED9203300F7799D /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C831001EFF4FA100836BE9 /* Xvtr.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -72,6 +73,7 @@
 		91B9F80A1ED9203300F7799D /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		91B9F80B1ED9203300F7799D /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		91B9F80C1ED9203300F7799D /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
+		91C831001EFF4FA100836BE9 /* Xvtr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Xvtr.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -158,6 +160,7 @@
 				91B9F7D91ED9170B00F7799D /* Tnf.swift */,
 				91B9F7DA1ED9170B00F7799D /* TXAudioStream.swift */,
 				91B9F7DB1ED9170B00F7799D /* Waterfall.swift */,
+				91C831001EFF4FA100836BE9 /* Xvtr.swift */,
 			);
 			name = Models;
 			path = Sources/Models;
@@ -286,6 +289,7 @@
 				91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */,
 				91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */,
 				91B9F7FB1ED9170B00F7799D /* TXAudioStream.swift in Sources */,
+				91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */,
 				91B9F7F01ED9170B00F7799D /* IqStream.swift in Sources */,
 				91B9F7EC1ED9170B00F7799D /* RadioParameters.swift in Sources */,
 				91B9F80E1ED9203300F7799D /* GCDAsyncSocket.m in Sources */,

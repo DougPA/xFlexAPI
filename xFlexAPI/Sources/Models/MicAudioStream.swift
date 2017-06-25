@@ -12,7 +12,6 @@ public protocol MicAudioStreamHandler {
     
     // method to process audio data stream
     func micAudioStreamHandler(_ frame: MicAudioStreamFrame) -> Void
-    
 }
 
 // ------------------------------------------------------------------------------
@@ -33,7 +32,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     // MARK: - Private properties
     
     
-    private weak var _radio: Radio?                 // The Radio that owns this MicAudioStream
+    private var _radio: Radio?                      // The Radio that owns this MicAudioStream
     private var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
     private var _initialized = false                // True if initialized by Radio hardware
     
@@ -193,7 +192,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler protocol methods
     
-    //      called by Radio on the udpQ
+    //      called by Radio on the udpReceiveQ
     //
     //      The payload of the incoming Vita struct is converted to a MicAudioStreamFrame and
     //      passed to the Mic Audio Stream Handler

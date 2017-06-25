@@ -40,7 +40,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     
     private var _initialized = false                    // True if initialized by Radio hardware
 
-    private weak var _radio: Radio?                     // The Radio that owns this Waterfall
+    private var _radio: Radio?                          // The Radio that owns this Waterfall
     private var _waterfallQ: DispatchQueue              // GCD queue that guards this object
     private var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream
 
@@ -155,7 +155,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler protocol methods
 
-    //      called by Radio on the udpQ
+    //      called by Radio on the udpReceiveQ
     //
     //      The payload of the incoming Vita struct is converted to a WaterfallFrame and
     //      passed to the Waterfall Stream Handler

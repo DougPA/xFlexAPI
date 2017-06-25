@@ -15,7 +15,6 @@ public protocol AudioStreamHandler {
     
     // method to process audio data stream
     func audioStreamHandler(_ frame: AudioStreamFrame) -> Void
-    
 }
 
 // ------------------------------------------------------------------------------
@@ -29,6 +28,9 @@ public protocol AudioStreamHandler {
 
 final public class AudioStream: NSObject {
     
+    // ------------------------------------------------------------------------------
+    // MARK: - Public properties
+    
     public private(set) var rxLostPacketCount = 0       // Rx lost packet count
     public private(set) var id: Radio.DaxStreamId = ""  // The Audio stream id
     
@@ -38,7 +40,7 @@ final public class AudioStream: NSObject {
     private var _initialized = false                // True if initialized by Radio hardware
     private var _radio: Radio?                      // The Radio that owns this Audio stream
     private var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
-    private var rxSeq: Int?                         // Rx sequence number
+    private var _rxSeq: Int?                        // Rx sequence number
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
@@ -56,13 +58,12 @@ final public class AudioStream: NSObject {
 
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kNoError = "0"                      // response without error
-
-    private let kStreamCreateCmd = "stream create "
     
-    // see FlexLib
+    // see FlexLib C# code
     private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
-
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Initialization
     
     /// Initialize an Audio Stream
     ///
@@ -79,64 +80,6 @@ final public class AudioStream: NSObject {
         
         super.init()
     }
-    
-    // ------------------------------------------------------------------------------
-    // MARK: - Public methods that send commands to the Radio (hardware)
-    
-//    public func requestAudioStream() -> Bool {          // DL3LSM
-//        
-//        // check to see if this object has already been activated
-//        if !_initialized { return false }
-//        
-//        // check to ensure this object is tied to a radio object
-//        if _radio == nil { return false }
-//        
-//        // check to make sure the radio is connected
-//        switch _radio!.connectionState {
-//        case .clientConnected:
-//            _radio!.send(kStreamCreateCmd + "dax=\(_daxChannel)", replyTo: updateStreamId)
-//            return true
-//        default:
-//            return false
-//        }
-//    }
-//    public func removeAudioStream() {           // DL3LSM
-//
-//        _radio?.send("stream remove 0x\(streamId)")
-//        _radio?.removeAudioStream(streamId)
-//    }
-    
-    // ------------------------------------------------------------------------------
-    // MARK: - Private methods
-    
-//    /// Process the Reply to a Stream Create command, reply format: <value>,<value>,...<value>
-//    ///
-//    /// - Parameters:
-//    ///   - seqNum:         the Sequence Number of the original command
-//    ///   - responseValue:  the response value
-//    ///   - reply:          the reply
-//    ///
-//    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {       // DL3LSM
-//
-//        guard responseValue == kNoError else {
-//            // Anything other than 0 is an error, log it and ignore the Reply
-//            _log.msg(command + ", non-zero response - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
-//            return
-//        }
-//
-//        // make the string 8 characters long -> add "0" at the beginning
-//        let fillCnt = 8 - reply.characters.count
-//        let fills = (fillCnt > 0 ? String(repeatElement("0", count: fillCnt)) : "")
-//        _streamId = fills + reply
-//
-//        // add the Audio Stream to the collection if not existing
-//        if let _ = _radio?.audioStreams[_streamId] {
-//            _log.msg(command + ", Attempted to Add AudioStream already in Radio audioStreams List", level: .warning, function: #function, file: #file, line: #line)
-//            return // already in the list
-//        }
-//
-//        _radio?.audioStreams[_streamId] = self
-//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
@@ -210,7 +153,7 @@ final public class AudioStream: NSObject {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler Protocol method
     
-    //      called by Radio on the udpQ
+    //      called by Radio on the udpReceiveQ
     //
     //      The payload of the incoming Vita struct is converted to an AudioStreamFrame and
     //      passed to the Audio Stream Handler
@@ -274,7 +217,7 @@ final public class AudioStream: NSObject {
         }
         
         // calculate the next Sequence Number
-        let expectedSequenceNumber = (rxSeq == nil ? vita.sequence : (rxSeq! + 1) % 16)
+        let expectedSequenceNumber = (_rxSeq == nil ? vita.sequence : (_rxSeq! + 1) % 16)
         
         // is the received Sequence Number correct?
         if vita.sequence != expectedSequenceNumber {
@@ -282,11 +225,11 @@ final public class AudioStream: NSObject {
             // NO, log the issue
             _log.msg("Missing packet(s), rcvdSeq: \(vita.sequence) != expectedSeq: \(expectedSequenceNumber)", level: .warning, function: #function, file: #file, line: #line)
             
-            rxSeq = nil
+            _rxSeq = nil
             rxLostPacketCount += 1
         } else {
             
-            rxSeq = expectedSequenceNumber
+            _rxSeq = expectedSequenceNumber
         }
     }
 }
@@ -307,10 +250,11 @@ public struct AudioStreamFrame {
     public var leftAudio = [Float]()                        /// Array of left audio samples
     public var rightAudio = [Float]()                       /// Array of right audio samples
     
-    /// Initialize a AudioStreamFrame
+    /// Initialize an AudioStreamFrame
     ///
-    /// - parameter payload: pointer to a Vita packet payload
-    /// - parameter numberOfWords: number of 32-bit Words in the payload
+    /// - Parameters:
+    ///   - payload:        pointer to a Vita packet payload
+    ///   - numberOfBytes:  number of bytes in the payload
     ///
     public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
         
@@ -336,11 +280,11 @@ extension AudioStream {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _daxChannel: Int {
+    private var _daxChannel: Int {
         get { return _audioStreamsQ.sync { __daxChannel } }
         set { _audioStreamsQ.sync(flags: .barrier) { __daxChannel = newValue } } }
     
-    fileprivate var _daxClients: Int {
+    private var _daxClients: Int {
         get { return _audioStreamsQ.sync { __daxClients } }
         set { _audioStreamsQ.sync(flags: .barrier) { __daxClients = newValue } } }
     
@@ -425,7 +369,6 @@ extension AudioStream {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
-    // DL3LSM
     
     public var delegate: AudioStreamHandler? {
         get { return _audioStreamsQ.sync { _delegate } }

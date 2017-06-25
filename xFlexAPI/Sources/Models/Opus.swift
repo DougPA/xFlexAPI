@@ -31,7 +31,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private weak var _radio: Radio?                 // The Radio that owns the Opus stream
+    private var _radio: Radio?                      // The Radio that owns the Opus stream
     private var _id: Radio.OpusId                   // The Opus stream id
 
     private var _initialized = false                // True if initialized by Radio hardware
@@ -193,7 +193,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler protocol methods
     
-    //      called by Radio on the udpQ
+    //      called by Radio on the udpReceiveQ
     //
     //      The payload of the incoming Vita struct is converted to an OpusFrame and
     //      passed to the Opus Stream Handler

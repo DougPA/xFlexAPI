@@ -21,12 +21,12 @@ public class Meter : KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public private(set) var id = ""                                 // Id that uniquely identifies this Meter
+    public private(set) var id = ""                              // Id that uniquely identifies this Meter
 
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private weak var _radio: Radio?                              // The Radio that owns this Meter
+    private var _radio: Radio?                                   // The Radio that owns this Meter
     private var _initialized = false                             // True if initialized by Radio (hardware)
     private var _meterQ: DispatchQueue                           // GCD queue that guards this object
 
@@ -72,7 +72,7 @@ public class Meter : KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Internal methods
     
-    /// Update meter readings, called by UdpManager, executes on the udpQ
+    /// Update meter readings, called by UdpManager, executes on the udpReceiveQ
     ///
     /// - parameter newValue: the new value for the Meter
     ///

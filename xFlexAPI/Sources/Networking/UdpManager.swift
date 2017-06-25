@@ -62,7 +62,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     /// Initialize a UdpManager
     ///
     /// - parameter radioParameters: a RadioParameters tuple
-    /// - parameter udpQ:  a serial Q for GCDAsyncUdpSocket activity
+    /// - parameter udpReceiveQ:  a serial Q for GCDAsyncUdpSocket activity
     ///
     public init(radioParameters: RadioParameters, udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
         

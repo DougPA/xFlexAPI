@@ -28,7 +28,7 @@ public final class Tnf : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Internal properties
     
-    private weak var _radio: Radio?                 // The Radio that owns this Tnf
+    private var _radio: Radio?                      // The Radio that owns this Tnf
     private var _tnfQ: DispatchQueue                // GCD queue that guards this object
     private var _initialized = false                // True if initialized by Radio hardware
 
@@ -148,7 +148,6 @@ public final class Tnf : NSObject, KeyValueParser {
             
             // notify all observers
             NC.post(.tnfHasBeenAdded, object: self as Any?)
-
         }
     }
 }

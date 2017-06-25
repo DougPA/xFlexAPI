@@ -17,39 +17,6 @@ public protocol LogHandler
     func msg(_ msg: String, level: MessageLevel, function: StaticString, file: StaticString, line: Int ) -> Void
 }
 
-public enum MessageLevel: Int {
-    
-    case debug = -2
-    case verbose = -1
-    case info = 0
-    case warning = 1
-    case error = 2
-    case severe = 3
-    
-    /// Return the MessageLevel of a Flex Command response
-    ///
-    /// - Parameter response:   the Flex response as a hex String
-    /// - Returns:              the equivalent xFlexAPI MessageLevel
-    ///
-    public static func from(_ response: String) -> MessageLevel {
-        var value = MessageLevel.verbose            // "1" is converted to .verbose
-        
-        // is the response "informational"
-        if response.characters.first != "1" {
-            
-            // NO, convert the hex String to an Int
-            let number = Int(response, radix: 16) ?? 0
-            
-            // mask out the error status (bits 24-25) & slide right
-            let bitValue =  ( number & 0x03000000 ) >> 24
-            
-            // convert to a Message Level
-            value = MessageLevel(rawValue: bitValue)!
-        }
-        return value
-    }
-}
-
 // ----------------------------------------------------------------------------
 // MARK: - Log implementation
 //
@@ -95,3 +62,37 @@ public final class Log {
         delegate?.msg(msg, level: level, function: function, file: file, line: line )
     }
 }
+
+public enum MessageLevel: Int {
+    
+    case debug = -2
+    case verbose = -1
+    case info = 0
+    case warning = 1
+    case error = 2
+    case severe = 3
+    
+    /// Return the MessageLevel of a Flex Command response
+    ///
+    /// - Parameter response:   the Flex response as a hex String
+    /// - Returns:              the equivalent xFlexAPI MessageLevel
+    ///
+    public static func from(_ response: String) -> MessageLevel {
+        var value = MessageLevel.verbose            // "1" is converted to .verbose
+        
+        // is the response "informational"
+        if response.characters.first != "1" {
+            
+            // NO, convert the hex String to an Int
+            let number = Int(response, radix: 16) ?? 0
+            
+            // mask out the error status (bits 24-25) & slide right
+            let bitValue =  ( number & 0x03000000 ) >> 24
+            
+            // convert to a Message Level
+            value = MessageLevel(rawValue: bitValue)!
+        }
+        return value
+    }
+}
+

@@ -15,7 +15,6 @@ public protocol PanadapterStreamHandler {
     
     // method to process Panadapter data stream
     func panadapterStreamHandler(_ frame: PanadapterFrame) -> Void
-    
 }
 
 // --------------------------------------------------------------------------------
@@ -31,11 +30,11 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public private(set) weak var radio: Radio?                  // The Radio that owns this Panadapter
-    public private(set) var id: String = ""                     // Id that uniquely identifies this Panadapter (StreamId)
+    public private(set) var radio: Radio?                   // The Radio that owns this Panadapter
+    public private(set) var id: String = ""                 // Id that uniquely identifies this Panadapter (StreamId)
     
-    public private(set) var lastFrameIndex: Int = 0             // Frame index of previous Vita payload
-    public private(set) var droppedPackets: Int = 0             // Number of dropped (out of sequence) packets
+    public private(set) var lastFrameIndex: Int = 0         // Frame index of previous Vita payload
+    public private(set) var droppedPackets: Int = 0         // Number of dropped (out of sequence) packets
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
@@ -320,7 +319,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - VitaHandler Protocol method
 
-    //      called by Radio on the udpQ
+    //      called by Radio on the udpReceiveQ
     //
     //      The payload of the incoming Vita struct is converted to a PanadapterFrame and
     //      passed to the Panadapter Stream Handler
