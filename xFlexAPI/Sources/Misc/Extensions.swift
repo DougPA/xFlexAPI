@@ -252,7 +252,7 @@ public extension CGFloat {
     ///   - divisor:    divisor
     /// - Returns:      a String representation of the CGFloat
     ///
-    private func floatToString(width: Int, precision: Int, divisor: CGFloat) -> String {
+    fileprivate func floatToString(width: Int, precision: Int, divisor: CGFloat) -> String {
         
         return String(format: "%\(width).\(precision)f", self / divisor)
     }

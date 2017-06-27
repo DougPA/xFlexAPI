@@ -40,7 +40,7 @@ public final class Log {
     ///
     public static var sharedInstance = Log()
     
-    private init() {
+    fileprivate init() {
         // "private" prevents others from calling init()
     }
     

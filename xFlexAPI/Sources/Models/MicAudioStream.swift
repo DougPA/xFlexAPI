@@ -29,35 +29,35 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     public var rxLostPacketCount = 0                    // Rx lost packet count
     
     // ------------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - fileprivate properties
     
     
-    private var _radio: Radio?                      // The Radio that owns this MicAudioStream
-    private var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
-    private var _initialized = false                // True if initialized by Radio hardware
+    fileprivate var _radio: Radio?                      // The Radio that owns this MicAudioStream
+    fileprivate var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
+    fileprivate var _initialized = false                // True if initialized by Radio hardware
     
-    private var rxSeq: Int?                         // Rx sequence number
+    fileprivate var rxSeq: Int?                         // Rx sequence number
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __inUse = false                     // true = in use                                //
-    private var __ip = ""                           // Ip Address                                   //
-    private var __port = 0                          // Port number                                  //
-    private var __micGain = 50                      // rx gain of stream                            //
-    private var __micGainScalar: Float = 1.0        // scalar gain value for multiplying            //
+    fileprivate var __inUse = false                     // true = in use                                //
+    fileprivate var __ip = ""                           // Ip Address                                   //
+    fileprivate var __port = 0                          // Port number                                  //
+    fileprivate var __micGain = 50                      // rx gain of stream                            //
+    fileprivate var __micGainScalar: Float = 1.0        // scalar gain value for multiplying            //
                                                                                                     //
-    private var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                    //
+    fileprivate var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                    //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ----//
     
     // constants
-    private let _log = Log.sharedInstance           // shared Log
-    private let kNoError = "0"                      // response without error
+    fileprivate let _log = Log.sharedInstance           // shared Log
+    fileprivate let kNoError = "0"                      // response without error
     
-    private let kMicStreamCreateCmd = "stream create daxmic"
+    fileprivate let kMicStreamCreateCmd = "stream create daxmic"
     
     // see FlexLib
-    private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
     /// Initialize an Mic Audio Stream
     ///
@@ -101,7 +101,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 //    }
     
     // ------------------------------------------------------------------------------
-    // MARK: - Private methods
+    // MARK: - fileprivate methods
     
     /// Process the Reply to a Stream Create command, reply format: <value>,<value>,...<value>
     ///
@@ -110,7 +110,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     ///   - responseValue:  the response value
     ///   - reply:          the reply
     ///
-//    private func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
+//    fileprivate func updateStreamId(_ command: String, seqNum: String, responseValue: String, reply: String) {
 //
 //        guard responseValue == kNoError else {
 //            // Anything other than 0 is an error, log it and ignore the Reply
@@ -321,26 +321,26 @@ public struct MicAudioStreamFrame {
 extension MicAudioStream {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - fileprivate properties - with synchronization
     
     // listed in alphabetical order
-    private var _inUse: Bool {
+    fileprivate var _inUse: Bool {
         get { return _micAudioStreamsQ.sync { __inUse } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    private var _ip: String {
+    fileprivate var _ip: String {
         get { return _micAudioStreamsQ.sync { __ip } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    private var _port: Int {
+    fileprivate var _port: Int {
         get { return _micAudioStreamsQ.sync { __port } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    private var _micGain: Int {
+    fileprivate var _micGain: Int {
         get { return _micAudioStreamsQ.sync { __micGain } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGain = newValue } } }
     
-    private var _micGainScalar: Float {
+    fileprivate var _micGainScalar: Float {
         get { return _micAudioStreamsQ.sync { __micGainScalar } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     

@@ -24,31 +24,31 @@ public final class Xvtr : NSObject, KeyValueParser {
     public private(set) var id: String = ""                 // Id that uniquely identifies this Xvtr
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - fileprivate properties
     
-    private var _initialized = false                    // True if initialized by Radio hardware
-    private var _radio: Radio?                          // The Radio that owns this Xvtr
-    private var _xvtrQ: DispatchQueue                   // GCD queue that guards this object
+    fileprivate var _initialized = false                    // True if initialized by Radio hardware
+    fileprivate var _radio: Radio?                          // The Radio that owns this Xvtr
+    fileprivate var _xvtrQ: DispatchQueue                   // GCD queue that guards this object
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __name = ""                             // Xvtr Name                                //
-    private var __ifFrequency = 0                       // If Frequency                             //
-    private var __inUse = false                         //                                          //
-    private var __isValid = false                       //                                          //
-    private var __loError = 0                           //                                          //
-    private var __maxPower = 0                          //                                          //
-    private var __order = 0                             //                                          //
-    private var __preferred = false                     //                                          //
-    private var __rfFrequency = 0                       //                                          //
-    private var __rxGain = 0                            //                                          //
-    private var __rxOnly = false                        //                                          //
-    private var __twoMeterInt = 0                       //                                          //
+    fileprivate var __name = ""                             // Xvtr Name                                //
+    fileprivate var __ifFrequency = 0                       // If Frequency                             //
+    fileprivate var __inUse = false                         //                                          //
+    fileprivate var __isValid = false                       //                                          //
+    fileprivate var __loError = 0                           //                                          //
+    fileprivate var __maxPower = 0                          //                                          //
+    fileprivate var __order = 0                             //                                          //
+    fileprivate var __preferred = false                     //                                          //
+    fileprivate var __rfFrequency = 0                       //                                          //
+    fileprivate var __rxGain = 0                            //                                          //
+    fileprivate var __rxOnly = false                        //                                          //
+    fileprivate var __twoMeterInt = 0                       //                                          //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // constants
-    private let _log = Log.sharedInstance               // shared log
+    fileprivate let _log = Log.sharedInstance               // shared log
     
     
     // ------------------------------------------------------------------------------
@@ -180,54 +180,54 @@ public final class Xvtr : NSObject, KeyValueParser {
 extension Xvtr {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - fileprivate properties - with synchronization
     
     // listed in alphabetical order
-    private var _name: String {
+    fileprivate var _name: String {
         get { return _xvtrQ.sync { __name } }
         set { _xvtrQ.sync(flags: .barrier) {__name = newValue } } }
     
-    private var _ifFrequency: Int {
+    fileprivate var _ifFrequency: Int {
         get { return _xvtrQ.sync { __ifFrequency } }
         set { _xvtrQ.sync(flags: .barrier) {__ifFrequency = newValue } } }
     
-    private var _inUse: Bool {
+    fileprivate var _inUse: Bool {
         get { return _xvtrQ.sync { __inUse } }
         set { _xvtrQ.sync(flags: .barrier) {__inUse = newValue } } }
     
-    private var _isValid: Bool {
+    fileprivate var _isValid: Bool {
         get { return _xvtrQ.sync { __isValid } }
         set { _xvtrQ.sync(flags: .barrier) {__isValid = newValue } } }
     
-    private var _loError: Int {
+    fileprivate var _loError: Int {
         get { return _xvtrQ.sync { __loError } }
         set { _xvtrQ.sync(flags: .barrier) {__loError = newValue } } }
     
-    private var _maxPower: Int {
+    fileprivate var _maxPower: Int {
         get { return _xvtrQ.sync { __maxPower } }
         set { _xvtrQ.sync(flags: .barrier) {__maxPower = newValue } } }
     
-    private var _order: Int {
+    fileprivate var _order: Int {
         get { return _xvtrQ.sync { __order } }
         set { _xvtrQ.sync(flags: .barrier) {__order = newValue } } }
     
-    private var _preferred: Bool {
+    fileprivate var _preferred: Bool {
         get { return _xvtrQ.sync { __preferred } }
         set { _xvtrQ.sync(flags: .barrier) {__preferred = newValue } } }
     
-    private var _rfFrequency: Int {
+    fileprivate var _rfFrequency: Int {
         get { return _xvtrQ.sync { __rfFrequency } }
         set { _xvtrQ.sync(flags: .barrier) {__rfFrequency = newValue } } }
     
-    private var _rxGain: Int {
+    fileprivate var _rxGain: Int {
         get { return _xvtrQ.sync { __rxGain } }
         set { _xvtrQ.sync(flags: .barrier) {__rxGain = newValue } } }
     
-    private var _rxOnly: Bool {
+    fileprivate var _rxOnly: Bool {
         get { return _xvtrQ.sync { __rxOnly } }
         set { _xvtrQ.sync(flags: .barrier) {__rxOnly = newValue } } }
     
-    private var _twoMeterInt: Int {
+    fileprivate var _twoMeterInt: Int {
         get { return _xvtrQ.sync { __twoMeterInt } }
         set { _xvtrQ.sync(flags: .barrier) {__twoMeterInt = newValue } } }
     

@@ -36,26 +36,26 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     public private(set) var isBeingRemoved = false          // true when in the process of being removed
 
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - fileprivate properties
     
-    private var _initialized = false                    // True if initialized by Radio hardware
-    private var _radio: Radio?                          // The Radio that owns this Waterfall
-    private var _waterfallQ: DispatchQueue              // GCD queue that guards this object
-    private var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream
+    fileprivate var _initialized = false                    // True if initialized by Radio hardware
+    fileprivate var _radio: Radio?                          // The Radio that owns this Waterfall
+    fileprivate var _waterfallQ: DispatchQueue              // GCD queue that guards this object
+    fileprivate var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream
 
     // constants
-    private let _log = Log.sharedInstance               // shared log
-    private let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
+    fileprivate let _log = Log.sharedInstance               // shared log
+    fileprivate let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __autoBlackEnabled = false              // State of auto black                      //
-    private var __autoBlackLevel: UInt32 = 0            //                                          //
-    private var __blackLevel = 0                        // Setting of black level (1 -> 100)        //
-    private var __colorGain = 0                         // Setting of color gain (1 -> 100)         //
-    private var __gradientIndex = 0                     // Index of selected color gradient         //
-    private var __lineDuration = 0                      // Line duration (milliseconds)             //
-    private var __panadapterId = ""                     // Panadaptor above this waterfall          //
+    fileprivate var __autoBlackEnabled = false              // State of auto black                      //
+    fileprivate var __autoBlackLevel: UInt32 = 0            //                                          //
+    fileprivate var __blackLevel = 0                        // Setting of black level (1 -> 100)        //
+    fileprivate var __colorGain = 0                         // Setting of color gain (1 -> 100)         //
+    fileprivate var __gradientIndex = 0                     // Index of selected color gradient         //
+    fileprivate var __lineDuration = 0                      // Line duration (milliseconds)             //
+    fileprivate var __panadapterId = ""                     // Panadaptor above this waterfall          //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
@@ -222,9 +222,9 @@ public struct WaterfallFrame {
     public var bins = [UInt16]()                        // Array of bin values
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - fileprivate properties
     
-    private struct WaterfallPayload {                   /// struct to mimic payload layout
+    fileprivate struct WaterfallPayload {                   /// struct to mimic payload layout
         var firstBinFreq: UInt64                        // 8 bytes
         var binBandwidth: UInt64                        // 8 bytes
         var lineDuration: UInt32                        // 4 bytes
@@ -270,34 +270,34 @@ public struct WaterfallFrame {
 extension Waterfall {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - fileprivate properties - with synchronization
     
     // listed in alphabetical order
-    private var _autoBlackEnabled: Bool {
+    fileprivate var _autoBlackEnabled: Bool {
         get { return _waterfallQ.sync { __autoBlackEnabled } }
         set { _waterfallQ.sync(flags: .barrier) {__autoBlackEnabled = newValue } } }
     
-    private var _autoBlackLevel: UInt32 {
+    fileprivate var _autoBlackLevel: UInt32 {
         get { return _waterfallQ.sync { __autoBlackLevel } }
         set { _waterfallQ.sync(flags: .barrier) { __autoBlackLevel = newValue } } }
     
-    private var _blackLevel: Int {
+    fileprivate var _blackLevel: Int {
         get { return _waterfallQ.sync { __blackLevel } }
         set { _waterfallQ.sync(flags: .barrier) {__blackLevel = newValue } } }
     
-    private var _colorGain: Int {
+    fileprivate var _colorGain: Int {
         get { return _waterfallQ.sync { __colorGain } }
         set { _waterfallQ.sync(flags: .barrier) {__colorGain = newValue } } }
     
-    private var _gradientIndex: Int {
+    fileprivate var _gradientIndex: Int {
         get { return _waterfallQ.sync { __gradientIndex } }
         set { _waterfallQ.sync(flags: .barrier) {__gradientIndex = newValue } } }
     
-    private var _lineDuration: Int {
+    fileprivate var _lineDuration: Int {
         get { return _waterfallQ.sync { __lineDuration } }
         set { _waterfallQ.sync(flags: .barrier) {__lineDuration = newValue } } }
     
-    private var _panadapterId: String {
+    fileprivate var _panadapterId: String {
         get { return _waterfallQ.sync { __panadapterId } }
         set { _waterfallQ.sync(flags: .barrier) { __panadapterId = newValue } } }
     

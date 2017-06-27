@@ -35,16 +35,16 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
         return _tcpSocket.isConnected
     }
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - fileprivate properties
     
-    private var _tcpQ: DispatchQueue                // serial GCD Queue for sending/receiving Radio Commands
-    private var _delegate: TcpManagerDelegate       // class to receive TCP data
-    private var _tcpSocket: GCDAsyncSocket!         // GCDAsync TCP socket object
-    private var seqNum = 0                          // Sequence number
+    fileprivate var _tcpQ: DispatchQueue                // serial GCD Queue for sending/receiving Radio Commands
+    fileprivate var _delegate: TcpManagerDelegate       // class to receive TCP data
+    fileprivate var _tcpSocket: GCDAsyncSocket!         // GCDAsync TCP socket object
+    fileprivate var seqNum = 0                          // Sequence number
     
     // constants
-    private let sendQ = DispatchQueue(label: "FlexAPITester" + ".sendQ") // Queue for sending commands
-    private let kConnectionTimeout = 0.5            // timeout in seconds
+    fileprivate let sendQ = DispatchQueue(label: "FlexAPITester" + ".sendQ") // Queue for sending commands
+    fileprivate let kConnectionTimeout = 0.5            // timeout in seconds
     
     // ----------------------------------------------------------------------------
     // MARK: - Initialization

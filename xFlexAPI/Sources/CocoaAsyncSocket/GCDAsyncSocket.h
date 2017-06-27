@@ -960,7 +960,7 @@ typedef NS_ENUM(NSInteger, GCDAsyncSocketError) {
  * 
  * These streams are only used as workarounds for specific iOS shortcomings:
  * 
- * - Apple has decided to keep the SecureTransport framework private is iOS.
+ * - Apple has decided to keep the SecureTransport framework fileprivate is iOS.
  *   This means the only supplied way to do SSL/TLS is via CFStream or some other API layered on top of it.
  *   Thus, in order to provide SSL/TLS support on iOS we are forced to rely on CFStream,
  *   instead of the preferred and faster and more powerful SecureTransport.

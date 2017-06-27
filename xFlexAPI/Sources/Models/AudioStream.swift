@@ -35,32 +35,32 @@ final public class AudioStream: NSObject {
     public private(set) var id: Radio.DaxStreamId = ""  // The Audio stream id
     
     // ------------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - fileprivate properties
     
-    private var _initialized = false                // True if initialized by Radio hardware
-    private var _radio: Radio?                      // The Radio that owns this Audio stream
-    private var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
-    private var _rxSeq: Int?                        // Rx sequence number
+    fileprivate var _initialized = false                // True if initialized by Radio hardware
+    fileprivate var _radio: Radio?                      // The Radio that owns this Audio stream
+    fileprivate var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
+    fileprivate var _rxSeq: Int?                        // Rx sequence number
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __daxChannel = 0                    // Channel in use (1 - 8)                       //
-    private var __daxClients = 0                    // Number of clients                            //
-    private var __inUse = false                     // true = in use                                //
-    private var __ip = ""                           // Ip Address                                   //
-    private var __port = 0                          // Port number                                  //
-    private var __rxGain = 50                       // rx gain of stream                            //
-    private var __slice: xFlexAPI.Slice?            // Source Slice                                 //
+    fileprivate var __daxChannel = 0                    // Channel in use (1 - 8)                       //
+    fileprivate var __daxClients = 0                    // Number of clients                            //
+    fileprivate var __inUse = false                     // true = in use                                //
+    fileprivate var __ip = ""                           // Ip Address                                   //
+    fileprivate var __port = 0                          // Port number                                  //
+    fileprivate var __rxGain = 50                       // rx gain of stream                            //
+    fileprivate var __slice: xFlexAPI.Slice?            // Source Slice                                 //
     //                                                                                              //
-    private var _delegate: AudioStreamHandler?      // Delegate for Audio stream                    //
+    fileprivate var _delegate: AudioStreamHandler?      // Delegate for Audio stream                    //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
     // constants
-    private let _log = Log.sharedInstance           // shared Log
+    fileprivate let _log = Log.sharedInstance           // shared Log
     
     // see FlexLib C# code
-    private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -277,34 +277,34 @@ public struct AudioStreamFrame {
 extension AudioStream {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - fileprivate properties - with synchronization
     
     // listed in alphabetical order
-    private var _daxChannel: Int {
+    fileprivate var _daxChannel: Int {
         get { return _audioStreamsQ.sync { __daxChannel } }
         set { _audioStreamsQ.sync(flags: .barrier) { __daxChannel = newValue } } }
     
-    private var _daxClients: Int {
+    fileprivate var _daxClients: Int {
         get { return _audioStreamsQ.sync { __daxClients } }
         set { _audioStreamsQ.sync(flags: .barrier) { __daxClients = newValue } } }
     
-    private var _inUse: Bool {
+    fileprivate var _inUse: Bool {
         get { return _audioStreamsQ.sync { __inUse } }
         set { _audioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    private var _ip: String {
+    fileprivate var _ip: String {
         get { return _audioStreamsQ.sync { __ip } }
         set { _audioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    private var _port: Int {
+    fileprivate var _port: Int {
         get { return _audioStreamsQ.sync { __port } }
         set { _audioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    private var _rxGain: Int {
+    fileprivate var _rxGain: Int {
         get { return _audioStreamsQ.sync { __rxGain } }
         set { _audioStreamsQ.sync(flags: .barrier) { __rxGain = newValue } } }
     
-    private var _slice: xFlexAPI.Slice? {
+    fileprivate var _slice: xFlexAPI.Slice? {
         get { return _audioStreamsQ.sync { __slice } }
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
     
