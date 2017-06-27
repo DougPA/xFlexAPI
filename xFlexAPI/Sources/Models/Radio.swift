@@ -94,8 +94,10 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let _sliceQ =           DispatchQueue(label: kApiId + ".sliceQ", attributes: [.concurrent])
     private let _tnfQ =             DispatchQueue(label: kApiId + ".tnfQ", attributes: [.concurrent])
     private let _txAudioStreamQ =   DispatchQueue(label: kApiId + ".txAudioStreamQ", attributes: [.concurrent])
+    private let _usbCableQ =        DispatchQueue(label: kApiId + ".usbCableQ", attributes: [.concurrent])
     private let _waterfallQ =       DispatchQueue(label: kApiId + ".waterfallQ", attributes: [.concurrent])
-
+    private let _xvtrQ =            DispatchQueue(label: kApiId + ".xvtrQ", attributes: [.concurrent])
+    
     private var _connectionHandle: String?                           // API conversation ID
     private var _hardwareVersion: String?                            // ???
     
@@ -130,6 +132,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let kTransmitSetCmd = "transmit set "
     private let kVersionCmd = "version"
     private let kXmitCmd = "xmit "
+    private let kXvtrCmd = "xvtr "
 
     private let kMinLevel = 0                                        // control range
     private let kMaxLevel = 100
@@ -160,6 +163,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private var _slices = [SliceId: Slice]()                         // Dictionary of Slices
     private var _tnfs = [TnfId: Tnf]()                               // Dictionary of Tnfs
     private var _txAudioStreams = [DaxStreamId: TXAudioStream]()     // Dictionary of Tx Audio streams
+    private var _usbCables = [UsbCableId: UsbCable]()                // Dictionary of UsbCables
     private var _waterfalls = [WaterfallId: Waterfall]()             // Dictionary of Waterfalls
     private var _xvtrs = [XvtrId: Xvtr]()                            // Dictionary of Xvtrs
     
@@ -617,6 +621,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func removeTxAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
     // ***** U *****
     public func requestUptime() { send(kRadioUptimeCmd, replyTo: replyHandler) }
+    // ***** X ****
+    public func createXvtr(callback: ReplyHandler? = nil) -> Bool {
+        return sendWithCheck(kXvtrCmd + "create", replyTo: callback)
+    }
+    public func removeXvtr(_ id: String) { send(kXvtrCmd + "remove " + id) }
 
     // ----------------------------------------------------------------------------
     // MARK: - Internal methods
@@ -1044,16 +1053,14 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case .usbCable:
             //      format:
             parseUsbCable( keyValuesArray(remainder))
-            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-
+            
         case .waveform:
             //      format: <key=value> <key=value> ...<key=value>
             parseWaveform( keyValuesArray(remainder))
 
         case .xvtr:
-            //      format:
-            parseXvtr( keyValuesArray(remainder))
-            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
+            //      format: <name> <key=value> <key=value> ...<key=value>
+            parseXvtr( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
         }
     }
     
@@ -2008,7 +2015,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseStream(_ keyValues: KeyValuesArray) {
-        // Format: <StreamId, ""> <"daxiq", value> <"pan", StreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
+        // Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
         
         //get the StreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
@@ -2329,25 +2336,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseUsbCable(_ keyValues: KeyValuesArray) {
         
-        // process each key/value pair, <key=value>
-        for kv in keyValues {
-            
-            // Check for Unknown token
-            guard let token = UsbCableToken(rawValue: kv.key.lowercased())  else {
-                
-                // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
-                continue
-            }
-            
-//            // Known tokens, in alphabetical order
-//            switch token {
-//
-//            case .waveformList:
-//                _waveformList = kv.value
-//
-//            }
-        }
+        // TODO: add code
+        
     }
     /// Parse a Waveform status message
     ///
@@ -2381,27 +2371,37 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    private func parseXvtr(_ keyValues: KeyValuesArray) {
+    private func parseXvtr(_ keyValues: KeyValuesArray, notInUse: Bool) {
+        // Format:  <name, > <"rf_freq", value> <"if_freq", value> <"lo_error", value> <"max_power", value>
+        //              <"rx_gain",value> <"order", value> <"rx_only", 1|0> <"is_valid", 1|0> <"preferred", 1|0>
+        //              <"two_meter_int", value>
+        //      OR
+        // Format: <index, > <"in_use", 0>
         
-        // process each key/value pair, <key=value>
-        for kv in keyValues {
-            
-            // Check for Unknown token
-            guard let token = XvtrToken(rawValue: kv.key.lowercased())  else {
-                
-                // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
-                continue
-            }
-            
-            //            // Known tokens, in alphabetical order
-            //            switch token {
-            //
-            //            case .waveformList:
-            //                _waveformList = kv.value
-            //
-            //            }
-        }
+//        // get the Name
+//        let name = String(keyValues[0].key)
+//
+//        // should the Xvtr be removed?
+//        if notInUse {
+//
+//            // YES, notify all observers
+//            NC.post(.xvtrWillBeRemoved, object: xvtrs[name] as Any?)
+//
+//            // remove it from the its collection
+//            removeObject(xvtrs[name])
+//
+//        } else {
+//
+//            // does the Xvtr exist?
+//            if xvtrs[name] == nil {
+//
+//                // NO, create a new Xvtr & add it to the Xvtrs collection
+//                xvtrs[name] = Xvtr(radio: self, name: name, queue: _xvtrQ)
+//            }
+//            // pass the remaining key values to the Xvtr for parsing
+//            xvtrs[name]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+//        }
+        
     }
     
     // --------------------------------------------------------------------------------
@@ -2410,9 +2410,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // MARK: ----- Panadapter -----
     
-    /// Synchronously find the active Panadapter
+    /// Find the active Panadapter
     ///
-    /// - returns: a reference to a Panadapter (or nil)
+    /// - Returns:      a reference to a Panadapter (or nil)
     ///
     public func findActivePanadapter() -> Panadapter? {
         var panadapter: Panadapter?
@@ -2426,9 +2426,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         return panadapter
     }
-    /// Synchronously find the Panadapter for a DaxIqChannel
+    /// Find the Panadapter for a DaxIqChannel
     ///
-    /// - returns: a reference to a Panadapter (or nil)
+    /// - Parameters:
+    ///   - daxIqChannel:   a Dax channel number
+    /// - Returns:          a Panadapter reference (or nil)
     ///
     public func findPanadapterBy(daxIqChannel: DaxIqChannel) -> Panadapter? {
         var panadapter: Panadapter?
@@ -2445,6 +2447,12 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // MARK: ----- IqStream -----
     
+    /// Find the IQ Stream for a DaxIqChannel
+    ///
+    /// - Parameters:
+    ///   - daxIqChannel:   a Dax IQ channel number
+    /// - Returns:          an IQ Stream reference (or nil)
+    ///
     public func findIqStreamBy(daxIqChannel: DaxIqChannel) -> IqStream? {
         var iqStream: IqStream?
         
@@ -2470,9 +2478,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Return references to all Slices on the specified Panadapter
     ///
-    /// - parameter pan: a Panadapter Id
-    ///
-    /// - returns: an array of Slices (may be empty)
+    /// - Parameters:
+    ///   - pan:        a Panadapter Id
+    /// - Returns:      an array of Slices (may be empty)
     ///
     public func findSlicesOn(_ id: PanadapterId) -> [Slice] {
         var sliceValues = [Slice]()
@@ -2488,10 +2496,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// Given a Frequency, return the Slice on the specified Panadapter containing it (if any)
     ///
     /// - Parameters:
-    ///   - pan:  a reference to A Panadapter
-    ///   - freq: a Frequency (in hz)
-    ///
-    /// - returns: a reference to a Slice (or nil)
+    ///   - pan:        a reference to A Panadapter
+    ///   - freq:       a Frequency (in hz)
+    /// - Returns:      a reference to a Slice (or nil)
     ///
     public func findSliceOn(_ id: PanadapterId, byFrequency freq: Int, panafallBandwidth: Int) -> Slice? {
         var slice: Slice?
@@ -2517,9 +2524,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Return the Active Slice on the specified Panadapter (if any)
     ///
-    /// - parameter pan: a reference to a Panadapter
-    ///
-    /// - returns: a Slice (or nil)
+    /// - Parameters:
+    ///   - pan:        a Panadapter reference
+    /// - Returns:      a Slice reference (or nil)
     ///
     public func findActiveSliceOn(_ id: PanadapterId) -> Slice? {
         var slice: Slice?
@@ -2550,9 +2557,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Given a Frequency, return a reference to the Tnf containing it (if any)
     ///
-    /// - parameter freq: a Frequency (in hz)
-    ///
-    /// - returns: a reference to a Tnf (or nil)
+    /// - Parameters:
+    ///   - freq:       a Frequency (in hz)
+    /// - Returns:      a Tnf reference (or nil)
     ///
     public func findTnfBy(frequency freq: Int, panafallBandwidth: Int) -> Tnf? {
         var tnf: Tnf?
@@ -2575,9 +2582,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Synchronously find a Meter by its ShortName
     ///
-    /// - parameter name: Short Name of a Meter
-    ///
-    /// - returns: a reference to the Meter
+    /// - Parameters:
+    ///   - name:       Short Name of a Meter
+    /// - Returns:      a Meter reference
     ///
     public func findMeteryBy(shortName name: MeterName) -> Meter? {
         var meter: Meter?
@@ -2687,7 +2694,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// Parse the Reply to an Info command, reply format: <key=value> <key=value> ...<key=value>
     ///
     /// - Parameters:
-    ///   - reply:          the reply
+    ///   - keyValues:          a KeyValuesArray
     ///
     private func parseInfoReply(_ keyValues: KeyValuesArray) {
         
@@ -2855,7 +2862,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// Parse the Reply to a Version command, reply format: <key=value>#<key=value>#...<key=value>
     ///
     /// - Parameters:
-    ///   - reply:          the reply
+    ///   - keyValues:          a KeyValuesArray
     ///
     private func parseVersionReply(_ keyValues: KeyValuesArray) {
         
@@ -2897,10 +2904,15 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private methods
     
-    /// Populate a Commands array
     ///
     ///     Note: commands will be in default order if one of the .all... values is passed
     ///             otherwise commands will be in the order found in the incoming array
+    ///
+    /// Populate a Commands array
+    ///
+    /// - Parameters:
+    ///   - commands:       an array of Commands
+    /// - Returns:          an array of CommandTuple
     ///
     private func setupCommands(_ commands: [Commands]) -> [(CommandTuple)] {
         var array = [(CommandTuple)]()
@@ -2965,6 +2977,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         return array
     }
     /// Send command sets to the Radio
+    ///
+    /// - Parameters:
+    ///   - commands:       an array of CommandTuple
     ///
     private func sendCommands(_ commands: [CommandTuple]) {
         
@@ -3158,7 +3173,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process .tcpPingStarted Notification
     ///
-    /// - Parameter note: a Notification instance
+    /// - Parameter note:   a Notification instance
     ///
     @objc private func tcpPingStarted(_ note: Notification) {
         
@@ -3166,7 +3181,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process .tcpPingTimeout Notification
     ///
-    /// - Parameter note: a Notification instance
+    /// - Parameter note:   a Notification instance
     ///
     @objc private func tcpPingTimeout(_ note: Notification) {
         
@@ -3266,7 +3281,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Receive a State Change message from UDP Manager
     ///
-    /// - Parameter active:     the state
+    /// - Parameters:
+    ///   - active:     the state
     ///
     public func udpStream(active: Bool) {
         
@@ -3275,7 +3291,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Receive an Error message from UDP Manager
     ///
-    /// - Parameter message:    error message
+    /// - Parameters:
+    ///   - message:    error message
     ///
     public func udpError(_ message: String) {
         
@@ -3288,7 +3305,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Process the Meter stream, called on the udpReceiveQ thread
     ///
-    /// - Parameter vitaPacket:     a Vita packet containing Meter data
+    /// - Parameters:
+    ///   - vitaPacket:     a Vita packet containing Meter data
     ///
     public func meterVitaHandler(_ vitaPacket: Vita) {
         
@@ -3316,7 +3334,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process the Panadapter Vita packets
     ///
-    /// - Parameter vitaPacket:     a Vita packet containing Panadapter data
+    /// - Parameters:
+    ///   - vitaPacket:     a Vita packet containing Panadapter data
     ///
     public func panadapterVitaHandler(_ vitaPacket: Vita) {
         
@@ -3325,7 +3344,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process the Waterfall Vita packets
     ///
-    /// - Parameter vitaPacket:     a Vita packet containing Waterfall data
+    /// - Parameters:
+    ///   - vitaPacket:     a Vita packet containing Waterfall data
     ///
     public func waterfallVitaHandler(_ vitaPacket: Vita) {
         
@@ -3334,7 +3354,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process the Opus Vita packets
     ///
-    /// - Parameter vitaPacket:     a Vita packet containing Opus data
+    /// - Parameters:
+    ///   - vitaPacket:     a Vita packet containing Opus data
     ///
     public func opusVitaHandler(_ vitaPacket: Vita) {
         
@@ -3343,7 +3364,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process the Dax Vita packets
     ///
-    /// - Parameter vitaPacket:     a Vita packet containing Dax Audiodata
+    /// - Parameters:
+    ///   - vitaPacket:     a Vita packet containing Dax Audiodata
     ///
     public func daxVitaHandler(_ vitaPacket: Vita) {
         
@@ -3366,7 +3388,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process the Dax Iq Vita packets
     ///
-    /// - Parameter vitaPacket:     a Vita packet containing DaxIq data
+    /// - Parameters:
+    ///   - vitaPacket:     a Vita packet containing DaxIq data
     ///
     public func daxIqVitaHandler(_ vitaPacket: Vita) {
         
@@ -4549,6 +4572,10 @@ extension Radio {
         get { return _objectQ.sync { _waterfalls } }
         set { _objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
 
+    public var xvtrs: [XvtrId: Xvtr] {                                                  // xvtrs
+        get { return _objectQ.sync { _xvtrs } }
+        set { _objectQ.sync(flags: .barrier) { _xvtrs = newValue } } }
+    
     // other
     public var connectionState: ConnectionState {                                       // connectionState
         get { return _radioQ.sync { _connectionState } }
@@ -4797,7 +4824,6 @@ extension Radio {
         case region
         case screensaver
         case softwareVersion = "software_ver"
-        
     }
     
     // ----------------------------------------------------------------------------
@@ -4883,6 +4909,7 @@ extension Radio {
     public typealias RfGainValue = String
     public typealias SliceId = String
     public typealias TnfId = String
+    public typealias UsbCableId = String
     public typealias ValuesArray = [String]
     public typealias WaterfallId = String
     public typealias XvtrId = String
@@ -4934,7 +4961,6 @@ extension Radio {
         case subUsbCable = "sub usb_cable all"
         case subXvtr = "sub xvtr all"
         case version
-        
         
         // Note: Do not include GROUP A values in these return vales
         

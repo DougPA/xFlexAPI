@@ -39,7 +39,6 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     // MARK: - Private properties
     
     private var _initialized = false                    // True if initialized by Radio hardware
-
     private var _radio: Radio?                          // The Radio that owns this Waterfall
     private var _waterfallQ: DispatchQueue              // GCD queue that guards this object
     private var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream

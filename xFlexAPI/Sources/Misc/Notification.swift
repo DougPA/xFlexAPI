@@ -77,7 +77,13 @@ public enum NotificationType : String {
     
     case udpDidBind
     
+    case usbCableHasBeenAdded
+    case usbCableWillBeRemoved
+    
     case waterfallHasBeenAdded
     case waterfallWillBeRemoved
+    
+    case xvtrHasBeenAdded
+    case xvtrWillBeRemoved
 }
 
