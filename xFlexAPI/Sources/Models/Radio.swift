@@ -902,8 +902,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             return
         }
         
-        // FIXME: file, mixer, stream, turf, usbCable & xvtr Not currently implemented
-
+        
+        // ---------------------------------------------------
+        // FIXME: file, mixer & turf NOT currently implemented
+        // ---------------------------------------------------
+        
         
         // Known Message Types, in alphabetical order
         switch token {
@@ -963,9 +966,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .daxiq:
             //      format: <daxChannel> <key=value> <key=value> ...<key=value>
-//            parseDaxiq( keyValuesArray(remainder))
             
-            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
+            // NO ACTION - message is obsolete, DAX is handled by .stream Status
+            break
             
         case .display:
             //     format: <displayType> <streamId> <key=value> <key=value> ...<key=value>
@@ -1069,8 +1072,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     //      Note: All are executed on the parseQ
     // --------------------------------------------------------------------------------
     
-    // FIXME: Should parsers ignore Status message sent to other connection handles?
-
     /// Prepare to parse an AudioStream status message
     ///
     /// - Parameters:
@@ -1161,30 +1162,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the key values to the Cwx for parsing
         cwx.parseKeyValues(keyValues)
     }
-    
-    // FIXME: How to integrate this with the Stream Status?
-    
-//    /// Prepare to parse a DaxIq status message
-//    ///
-//    /// - Parameters:
-//    ///   - keyValues:      a KeyValuesArray
-//    ///
-//    fileprivate func parseDaxiq(_ keyValues: KeyValuesArray) {
-//        // Format: <channel, ""> <"pan", streamId> <"rate", value> <"capacity", value> <"available", value>
-//
-//        // get the Dax Channel
-//        let channel = Int(keyValues[0].key) ?? 0
-//
-//        // does the DaxIQ stream exist?
-//        var iqStream = findIqStreamBy(daxIqChannel: channel)
-//        if iqStream == nil {
-//
-//            // NO, create a new Stream
-//            iqStream = IqStream(radio: self, id: queue: _iqStreamQ)
-//        }
-//        // pass the key values to the IqStream for parsing
-//        iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
-//    }
     /// Prepare to parse a Display status message
     ///
     /// - Parameters:
@@ -1699,15 +1676,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // Format:  <profileType, > <"list", value^value...^value>
         //      OR
         // Format:  <profileType, > <"current", value>
-        
-//        // find the space & get the Profile Type
-//        let spaceRange = remainder.range(of: "=")
-//        let profileType = remainder.substring(with: Range<String.Index>(remainder.startIndex..<spaceRange!.lowerBound))
-//
-//        // everything past the profileType is in the remainder
-//        let rest = remainder.substring(with: Range<String.Index>(spaceRange!.upperBound..<remainder.endIndex))
-//
-//        let values = valuesArray(rest, delimiter: "^")
         
         let values = valuesArray(keyValues[1].value, delimiter: "^")
         
