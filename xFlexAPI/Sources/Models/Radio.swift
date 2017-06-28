@@ -937,10 +937,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // is there an API Handle?
             if let apiHandle = _connectionHandle {
                 
-                // YES, is the Status Command directed to this client?
+                // YES, is the Status Command directed to me OR to all clients (handle == 0)?
                 isMyHandle = (apiHandle == components[0] || components[0] == "0")
             }
-            
             
             if isMyHandle {
                 
@@ -1158,7 +1157,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseCwx(_ keyValues: KeyValuesArray) {
-
+        // TODO: need format(s)
+        
         // pass the key values to the Cwx for parsing
         cwx.parseKeyValues(keyValues)
     }
@@ -1518,6 +1518,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - notInUse:       true = "in_use=0", otherwise false
     ///
     fileprivate func parseMemory(_ keyValues: KeyValuesArray, notInUse: Bool) {
+        // TODO: need format(s)
+        
         var memory: Memory?
         
         // get the Memory Id
@@ -1725,6 +1727,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseRadio(_ keyValues: KeyValuesArray) {
+        // TODO: need format(s)
+        
         var filterSharpness = false
         var cw = false
         var digital = false
@@ -1942,6 +1946,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - notInUse:       true = "in_use=0", otherwise false
     ///
     fileprivate func parseSlice(_ keyValues: KeyValuesArray, notInUse: Bool) {
+        // TODO: need format(s)
         
         // get the Slice Id
         let sliceId = keyValues[0].key
@@ -2003,6 +2008,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseTnf(_ keyValues: KeyValuesArray) {
+        // TODO: need format(s)
         
         // get the Tnf Id
         let tnfId = keyValues[0].key
@@ -2023,6 +2029,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseTransmit(_ keyValues: KeyValuesArray) {
+        // TODO: need format(s)
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -2303,6 +2310,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseUsbCable(_ keyValues: KeyValuesArray) {
+        // TODO: need format(s)
         
         // TODO: add code
         
@@ -2313,6 +2321,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseWaveform(_ keyValues: KeyValuesArray) {
+        // TODO: need format(s)
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
