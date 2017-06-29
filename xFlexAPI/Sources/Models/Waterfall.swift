@@ -190,7 +190,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
                     dataFrame.bins[i] = CFSwapInt16BigToHost(binsPtr.advanced(by: i).pointee)
                 }
             }
-            autoBlackLevel = dataFrame.autoBlackLevel
+            _autoBlackLevel = dataFrame.autoBlackLevel
             
             // Pass the data frame to this Waterfall's delegate
             delegate.waterfallStreamHandler(dataFrame)
