@@ -345,12 +345,11 @@ extension MicAudioStream {
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var inUse: Bool {
-        get { return _inUse }
-        set { _inUse = newValue } }
+        return _inUse }
     
     @objc dynamic public var ip: String {
         get { return _ip }

@@ -226,16 +226,14 @@ extension IqStream {
         set { _iqStreamsQ.sync(flags: .barrier) { __streaming = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var available: Int {
-        get { return _available }
-        set { if _available != newValue { _available = newValue } } }
+        return _available }
     
     @objc dynamic public var capacity: Int {
-        get { return _capacity }
-        set { if _capacity != newValue { _capacity = newValue } } }
+        return _capacity }
     
     @objc dynamic public var daxIqChannel: Int {
         get { return _daxIqChannel }

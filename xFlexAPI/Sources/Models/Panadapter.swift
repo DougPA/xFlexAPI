@@ -544,7 +544,7 @@ extension Panadapter {
         set { _pandapterQ.sync(flags: .barrier) { __xvtrLabel = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var antList: [String] {
@@ -556,8 +556,7 @@ extension Panadapter {
         set { _autoCenterEnabled = newValue } }
     
     @objc dynamic public var available: Int {
-        get { return _available }
-        set { _available = newValue } }
+        return _available }
     
     @objc dynamic public var average: Int {
         get { return _average }
@@ -572,8 +571,7 @@ extension Panadapter {
         set { if _bandwidth != newValue { _bandwidth = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) bandwidth=\(newValue.hzToMhz()) autocenter=\(autoCenterEnabled.asNumber())") } } }
     
     @objc dynamic public var capacity: Int {
-        get { return _capacity }
-        set { _capacity = newValue } }
+        return _capacity }
     
     @objc dynamic public var center: Int {
         get { return _center }
@@ -600,16 +598,14 @@ extension Panadapter {
         set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) loopb=\(newValue.asNumber())") } } }
     
     @objc dynamic public var maxBw: Int {
-        get { return _maxBw }
-        set { if _maxBw != newValue { _maxBw = newValue } } }
+        return _maxBw }
     
     @objc dynamic public var maxDbm: CGFloat {
         get { return _maxDbm }
         set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) max_dbm=\(value)") } } }
     
     @objc dynamic public var minBw: Int {
-        get { return _minBw }
-        set { if _minBw != newValue { _minBw = newValue } } }
+        return _minBw }
     
     @objc dynamic public var minDbm: CGFloat {
         get { return _minDbm }
@@ -648,8 +644,7 @@ extension Panadapter {
         set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rxant=\(newValue)") } } }
     
     @objc dynamic public var waterfallId: String {
-        get { return _waterfallId }
-        set { _waterfallId = newValue } }
+        return _waterfallId }
     
     @objc dynamic public var weightedAverageEnabled: Bool {
         get { return _weightedAverageEnabled }

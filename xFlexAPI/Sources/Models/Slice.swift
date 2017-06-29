@@ -965,7 +965,7 @@ extension xFlexAPI.Slice {
         set { _sliceQ.sync(flags: .barrier) { __xitOffset = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var active: Bool {
@@ -1089,8 +1089,7 @@ extension xFlexAPI.Slice {
         set { if !_locked { if _frequency != newValue { _frequency = newValue ; _radio!.send(kSliceTuneCommand + "\(id) \(newValue.hzToMhz())") } } } }
     
     @objc dynamic public var inUse: Bool {
-        get { return _inUse }
-        set { if _inUse != newValue { _inUse = newValue } } }
+        return _inUse }
     
     @objc dynamic public var locked: Bool {
         get { return _locked }

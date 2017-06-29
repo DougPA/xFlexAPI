@@ -521,10 +521,10 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         replyHandlers.removeAll()
         
         nickname = ""
-        smartSdrMB = ""
-        psocMbtrxVersion = ""
-        psocMbPa100Version = ""
-        fpgaMbVersion = ""
+        _smartSdrMB = ""
+        _psocMbtrxVersion = ""
+        _psocMbPa100Version = ""
+        _fpgaMbVersion = ""
         
         // clear lists
         antennaList.removeAll()
@@ -3961,7 +3961,7 @@ extension Radio {
         set { _radioQ.sync(flags: .barrier) { __waveformList = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
 
     // listed in alphabetical order
     @objc dynamic public var accTxEnabled: Bool {                                             // accTx
@@ -3993,8 +3993,7 @@ extension Radio {
         set { if _apfGain != newValue { _apfGain = newValue.bound(kMinLevel, kMaxLevel) ; send("eq apf gain=\(newValue)") } } }
     
     @objc dynamic public var atuPresent: Bool {                                               // atuPresent
-        get {  return _atuPresent }
-        set { if _atuPresent != newValue { _atuPresent = newValue } } }
+        return _atuPresent }
     
     @objc dynamic public var atuStatus: String {                                              // atuStatus
         get {  return _atuStatus }
@@ -4013,12 +4012,10 @@ extension Radio {
         set { if _atuUsingMemories != newValue { _atuUsingMemories = newValue } } }
     
     @objc dynamic public var availablePanadapters: Int {                                      // availablePanadapters
-        get {  return _availablePanadapters }
-        set { if _apfGain != newValue { _availablePanadapters = newValue } } }
+        return _availablePanadapters }
     
     @objc dynamic public var availableSlices: Int {                                           // availableSlices
-        get {  return _availableSlices }
-        set { if _availableSlices != newValue { _availableSlices = newValue } } }
+        return _availableSlices }
     
     @objc dynamic public var bandPersistenceEnabled: Bool {                                   // bandPersistence
         get {  return _bandPersistenceEnabled }
@@ -4117,12 +4114,10 @@ extension Radio {
         set { if _daxEnabled != newValue { _daxEnabled = newValue ; send(kTransmitSetCmd + "dax=\(newValue.asNumber())") } } }
     
     @objc dynamic public var daxIqAvailable: Int {                                            // daxIqAvailable
-        get {  return _daxIqAvailable }
-        set { if _daxIqAvailable != newValue { _daxIqAvailable = newValue } } }
+        return _daxIqAvailable }
     
     @objc dynamic public var daxIqCapacity: Int {                                             // daxIqCapacity
-        get {  return _daxIqCapacity }
-        set { if _daxIqCapacity != newValue { _daxIqCapacity = newValue } } }
+        return _daxIqCapacity }
     
     @objc dynamic public var enforcePrivateIpEnabled: Bool {                                  // enforcePrivateIp
         get {  return _enforcePrivateIpEnabled }
@@ -4153,8 +4148,7 @@ extension Radio {
         set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; send(kRadioCmd + "filter_sharpness voice level=\(newValue)") } } }
     
     @objc dynamic public var fpgaMbVersion: String {                                          // fpgaMbVersion
-        get {  return _fpgaMbVersion }
-        set { if _fpgaMbVersion != newValue { _fpgaMbVersion = newValue } } }
+        return _fpgaMbVersion }
     
     @objc dynamic public var freqErrorPpb: Int {                                              // freqErrorPpb
         get {  return _freqErrorPpb }
@@ -4197,8 +4191,7 @@ extension Radio {
         set { if _gpsLongitude != newValue { _gpsLongitude = newValue } } }
     
     @objc dynamic public var gpsPresent: Bool {                                               // gpsPresent
-        get {  return _gpsPresent }
-        set { if _gpsPresent != newValue { _gpsPresent = newValue } } }
+        return _gpsPresent }
     
     @objc dynamic public var gpsSpeed: String {                                               // gpsSpeed
         get {  return _gpsSpeed }
@@ -4313,24 +4306,19 @@ extension Radio {
         set { if _nickname != newValue { _nickname = newValue ; send(kRadioCmd + "name " + newValue) } } }
     
     @objc dynamic public var numberOfScus: Int {                                              // numberOfScus
-        get {  return _numberOfScus }
-        set { if _numberOfScus != newValue { _numberOfScus = newValue } } }
+        return _numberOfScus }
     
     @objc dynamic public var numberOfSlices: Int {                                            // numberOfSlices
-        get {  return _numberOfSlices }
-        set { if _numberOfSlices != newValue { _numberOfSlices = newValue } } }
+        return _numberOfSlices }
     
     @objc dynamic public var numberOfTx: Int {                                                // numberOfTx
-        get {  return _numberOfTx }
-        set { if _numberOfTx != newValue { _numberOfTx = newValue } } }
+        return _numberOfTx }
     
     @objc dynamic public var psocMbPa100Version: String {                                     // psocMbPa100Version
-        get {  return _psocMbPa100Version }
-        set { if _psocMbPa100Version != newValue { _psocMbPa100Version = newValue } } }
+        return _psocMbPa100Version }
     
     @objc dynamic public var psocMbtrxVersion: String {                                       // psocMbtrxVersion
-        get {  return _psocMbtrxVersion }
-        set { if _psocMbtrxVersion != newValue { _psocMbtrxVersion = newValue } } }
+        return _psocMbtrxVersion }
     
     @objc dynamic public var radioModel: String {                                             // radioModel
         get {  return _radioModel }
@@ -4381,16 +4369,14 @@ extension Radio {
         set { if _sbMonitorEnabled != newValue { _sbMonitorEnabled = newValue } } }
     
     @objc dynamic public var smartSdrMB: String {                                             // smartSdrMB
-        get {  return _smartSdrMB }
-        set { if _smartSdrMB != newValue { _smartSdrMB = newValue } } }
+        return _smartSdrMB }
     
     @objc dynamic public var snapTuneEnabled: Bool {                                          // snapTune
         get {  return _snapTuneEnabled }
         set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; send(kRadioCmd + "set snap_tune_enabled=\(newValue.asNumber())") } } }
     
     @objc dynamic public var softwareVersion: String {                                        // softwareVersion
-        get {  return _softwareVersion }
-        set { if _softwareVersion != newValue { _softwareVersion = newValue } } }
+        return _softwareVersion }
     
     @objc dynamic public var source: String {                                                 // source
         get {  return _source }

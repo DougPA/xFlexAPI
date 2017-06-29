@@ -49,7 +49,7 @@ public final class Xvtr : NSObject, KeyValueParser {
     
     // constants
     private let _log = Log.sharedInstance               // shared log
-    
+    fileprivate let kXvtrCommand = "xvtr "                  // Xvtr command prefix
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -232,56 +232,53 @@ extension Xvtr {
         set { _xvtrQ.sync(flags: .barrier) {__twoMeterInt = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var name: String {
         get { return _name }
-        set { if _name != newValue { _name = newValue } } }
+        set { if _name != newValue { _name = newValue ; _radio!.send(kXvtrCommand + "\(id) name=\(newValue)") } } }
     
     @objc dynamic public var ifFrequency: Int {
         get { return _ifFrequency }
-        set { if _ifFrequency != newValue { _ifFrequency = newValue } } }
+        set { if _ifFrequency != newValue { _ifFrequency = newValue ; _radio!.send(kXvtrCommand + "\(id) if_freq=\(newValue)") } } }
     
     @objc dynamic public var inUse: Bool {
-        get { return _inUse }
-        set { if _inUse != newValue { _inUse = newValue } } }
+        return _inUse }
     
     @objc dynamic public var isValid: Bool {
-        get { return _isValid }
-        set { if _isValid != newValue { _isValid = newValue } } }
+        return _isValid }
     
     @objc dynamic public var loError: Int {
         get { return _loError }
-        set { if _loError != newValue { _loError = newValue } } }
+        set { if _loError != newValue { _loError = newValue ; _radio!.send(kXvtrCommand + "\(id) lo_error=\(newValue)") } } }
     
     @objc dynamic public var maxPower: Int {
         get { return _maxPower }
-        set { if _maxPower != newValue { _maxPower = newValue } } }
+        set { if _maxPower != newValue { _maxPower = newValue ; _radio!.send(kXvtrCommand + "\(id) max_power=\(newValue)") } } }
     
     @objc dynamic public var order: Int {
         get { return _order }
-        set { if _order != newValue { _order = newValue } } }
+        set { if _order != newValue { _order = newValue ; _radio!.send(kXvtrCommand + "\(id) order=\(newValue)") } } }
     
     @objc dynamic public var preferred: Bool {
         get { return _preferred }
-        set { if _preferred != newValue { _preferred = newValue } } }
+        set { if _preferred != newValue { _preferred = newValue ; _radio!.send(kXvtrCommand + "\(id) preferred=\(newValue)") } } }
     
     @objc dynamic public var rfFrequency: Int {
         get { return _rfFrequency }
-        set { if _rfFrequency != newValue { _rfFrequency = newValue } } }
+        set { if _rfFrequency != newValue { _rfFrequency = newValue ; _radio!.send(kXvtrCommand + "\(id) rf_freq=\(newValue)") } } }
     
     @objc dynamic public var rxGain: Int {
         get { return _rxGain }
-        set { if _rxGain != newValue { _rxGain = newValue } } }
+        set { if _rxGain != newValue { _rxGain = newValue ; _radio!.send(kXvtrCommand + "\(id) rx_gain=\(newValue)") } } }
     
     @objc dynamic public var rxOnly: Bool {
         get { return _rxOnly }
-        set { if _rxOnly != newValue { _rxOnly = newValue } } }
+        set { if _rxOnly != newValue { _rxOnly = newValue ; _radio!.send(kXvtrCommand + "\(id) rx_only=\(newValue)") } } }
     
     @objc dynamic public var twoMeterInt: Int {
-        get { return _twoMeterInt }
-        set { if _twoMeterInt != newValue { _twoMeterInt = newValue } } }
+        return _twoMeterInt }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Waterfall messages (only populate values that != case value)

@@ -190,7 +190,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
                     dataFrame.bins[i] = CFSwapInt16BigToHost(binsPtr.advanced(by: i).pointee)
                 }
             }
-            autoBlackLevel = dataFrame.autoBlackLevel
+            _autoBlackLevel = dataFrame.autoBlackLevel
             
             // Pass the data frame to this Waterfall's delegate
             delegate.waterfallStreamHandler(dataFrame)
@@ -302,7 +302,7 @@ extension Waterfall {
         set { _waterfallQ.sync(flags: .barrier) { __panadapterId = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var autoBlackEnabled: Bool {
@@ -310,8 +310,7 @@ extension Waterfall {
         set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) auto_black=" + newValue.asNumber()) } } }
     
     @objc dynamic public var autoBlackLevel: UInt32 {
-        get { return _autoBlackLevel }
-        set { if _autoBlackLevel != newValue { _autoBlackLevel = newValue } } }
+        return _autoBlackLevel }
     
     @objc dynamic public var blackLevel: Int {
         get { return _blackLevel }
@@ -330,8 +329,7 @@ extension Waterfall {
         set { if _lineDuration != newValue { _lineDuration = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) line_duration=\(newValue)") } } }
     
     @objc dynamic public var panadapterId: String {
-        get { return _panadapterId }
-        set { if _panadapterId != newValue { _panadapterId = newValue } } }
+        return _panadapterId }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization

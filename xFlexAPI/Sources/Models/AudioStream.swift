@@ -309,7 +309,7 @@ extension AudioStream {
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
     @objc dynamic public var daxChannel: Int {        // DL3LSM
@@ -329,8 +329,7 @@ extension AudioStream {
         set { if _daxClients != newValue { _daxClients = newValue } } }
     
     @objc dynamic public var inUse: Bool {
-        get { return _inUse }
-        set { _inUse = newValue } }
+        return _inUse }
     
     @objc dynamic public var ip: String {
         get { return _ip }
