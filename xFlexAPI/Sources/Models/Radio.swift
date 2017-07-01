@@ -394,6 +394,15 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case is Waterfall:
             waterfalls[(object as! Waterfall).id] = nil
             
+        case is AudioStream:
+            audioStreams[(object as! AudioStream).id] = nil
+            
+        case is MicAudioStream:
+            micAudioStreams[(object as! MicAudioStream).id] = nil
+            
+        case is TXAudioStream:
+            txAudioStreams[(object as! TXAudioStream).id] = nil
+
         default:
             _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
         }
@@ -552,8 +561,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func createAudioStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
         return sendWithCheck(kStreamCreateCmd + "dax=\(channel)", replyTo: callback)
     }
-    public func removeAudioStream(_ channel: String) -> Bool {
-        return sendWithCheck(kStreamRemoveCmd + "0x\(channel)")
+    public func removeAudioStream(_ id: String) -> Bool {
+        return sendWithCheck(kStreamRemoveCmd + "0x\(id)")
     }
     // ***** I *****
     public func createIqStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
@@ -562,7 +571,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func requestIqStream(_ channel: String, ip: String, port: Int, callback: ReplyHandler? = nil) -> Bool {
         return sendWithCheck(kStreamCreateCmd + "daxiq=\(channel) ip=\(ip) port=\(port)", replyTo: callback)
     }
-    public func removeIqStream(_ channel: String) { send("stream remove 0x\(channel)") }
+    public func removeIqStream(_ id: String) { send("stream remove 0x\(id)") }
     // ***** M *****
     public func createMemory() { send("memory create") }
     public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
@@ -618,7 +627,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func createTxAudioStream(callback: ReplyHandler? = nil) -> Bool {
         return sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: callback)
     }
-    public func removeTxAudioStream(_ channel: String) { send(kStreamRemoveCmd + "0x\(channel)") }
+    public func removeTxAudioStream(_ id: String) { send(kStreamRemoveCmd + "0x\(id)") }
     // ***** U *****
     public func requestUptime() { send(kRadioUptimeCmd, replyTo: replyHandler) }
     // ***** X ****
