@@ -376,11 +376,17 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // cases are in alphabetical order
         switch object {
             
+        case is AudioStream:
+            audioStreams[(object as! AudioStream).id] = nil
+            
         case is Memory:
             memories[(object as! Memory).id] = nil
             
         case is Meter:
             meters[(object as! Meter).id] = nil
+            
+        case is MicAudioStream:
+            micAudioStreams[(object as! MicAudioStream).id] = nil
             
         case is Panadapter:
             panadapters[(object as! Panadapter).id] = nil
@@ -391,17 +397,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case is Tnf:
             tnfs[(object as! Tnf).id] = nil
             
-        case is Waterfall:
-            waterfalls[(object as! Waterfall).id] = nil
-            
-        case is AudioStream:
-            audioStreams[(object as! AudioStream).id] = nil
-            
-        case is MicAudioStream:
-            micAudioStreams[(object as! MicAudioStream).id] = nil
-            
         case is TXAudioStream:
             txAudioStreams[(object as! TXAudioStream).id] = nil
+            
+        case is Waterfall:
+            waterfalls[(object as! Waterfall).id] = nil
             
         default:
             _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
@@ -576,7 +576,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func createMemory() { send("memory create") }
     public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
     public func createMicAudioStream(callback: ReplyHandler? = nil) -> Bool {
-        return sendWithCheck(kMicStreamCreateCmd)
+        return sendWithCheck(kMicStreamCreateCmd, replyTo: callback)        // DL3LSM
     }
     public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
     public func requestMicList() { send(kMicListCmd, replyTo: replyHandler) }
@@ -1127,7 +1127,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = AtuToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                _log.msg("Unknown token - \(kv.key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1210,13 +1210,13 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // Format: <"waterfall", ""> <id, ""> <"daxiq", value> <"daxiq_rate", value> <"capacity", value> <"available", value>
         
         // get the Type & remove it
-        let displayType = keyValues[0].key
+        let displayType = keyValues[0].key.lowercased()
         
         //get the streamId (remove the "0x" prefix) & remove it
         let streamId = String(keyValues[1].key.characters.dropFirst(2))
         
         // Check for unknown Display Types
-        guard let token = DisplayToken(rawValue: displayType.lowercased()) else {
+        guard let token = DisplayToken(rawValue: displayType) else {
             
             // unknown Display Type, log it and ignore the message
             _log.msg("Unknown Display - \(displayType)", level: .debug, function: #function, file: #file, line: #line)
@@ -1285,7 +1285,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         var equalizer: Equalizer?
         
         // get the Type
-        let type = keyValues[0].key
+        let type = keyValues[0].key.lowercased()
         
         // determine the type of Equalizer
         switch type {
@@ -1304,7 +1304,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
 
         default:
             // unknown type, log & ignore it
-            _log.msg("Unknown EQ - \(type)", level: .debug, function: #function, file: #file, line: #line)
+            _log.msg("Unknown EQ - \(type.lowercased())", level: .debug, function: #function, file: #file, line: #line)
         }
         // if an equalizer was found
         if let equalizer = equalizer {
@@ -1329,7 +1329,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = GpsToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                _log.msg("Unknown token - \(kv.key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1417,7 +1417,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = InterlockToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                _log.msg("Unknown token - \(kv.key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -1727,7 +1727,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         } else {
             // unknown type
-            _log.msg("Unknown profile - \(remainder)", level: .debug, function: #function, file: #file, line: #line)
+            _log.msg("Unknown profile - \(keyValues[0].key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
         }
     }
     /// Parse a Radio status message
@@ -1753,7 +1753,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = RadioToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Display Type, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                _log.msg("Unknown token - \(kv.key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -2047,7 +2047,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = TransmitToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                _log.msg("Unknown token - \(kv.key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
@@ -2339,7 +2339,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             guard let token = WaveformToken(rawValue: kv.key.lowercased())  else {
                 
                 // unknown Token, log it and ignore this token
-                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                _log.msg("Unknown token - \(kv.key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
                 continue
             }
             
