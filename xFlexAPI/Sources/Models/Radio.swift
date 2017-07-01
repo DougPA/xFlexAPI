@@ -394,6 +394,15 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case is Waterfall:
             waterfalls[(object as! Waterfall).id] = nil
             
+        case is AudioStream:
+            audioStreams[(object as! AudioStream).id] = nil
+            
+        case is MicAudioStream:
+            micAudioStreams[(object as! MicAudioStream).id] = nil
+            
+        case is TXAudioStream:
+            txAudioStreams[(object as! TXAudioStream).id] = nil
+            
         default:
             _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
         }

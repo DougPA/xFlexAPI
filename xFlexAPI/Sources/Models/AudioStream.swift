@@ -134,9 +134,12 @@ final public class AudioStream: NSObject {
                 
             case .slice:
                 willChangeValue(forKey: "slice")
-                //_slice = _radio?.findSliceBy( daxChannel: iValue)     DL3LSM
                 _slice = _radio?.slices[kv.value]
                 didChangeValue(forKey: "slice")
+                // DL3LSM resend rxGain value
+                let gain = _rxGain;
+                _rxGain = 0;
+                rxGain = gain;
             }
         }
         // if this is not yet initialized and inUse becomes true
@@ -340,14 +343,16 @@ extension AudioStream {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
 
-    @objc dynamic public var rxGain: Int {        // DL3LSM
+    @objc dynamic public var rxGain: Int {
         get { return _rxGain  }
         set {
             if _rxGain != newValue {
                 let value = newValue.bound(0, 100)
                 if _rxGain != value {
                     _rxGain = value
-                    _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
+                    if _slice != nil {          // DL3LSM
+                        _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
+                    }
                 }
             }
         }
@@ -357,16 +362,11 @@ extension AudioStream {
         set {
             if _slice != newValue {
                 _slice = newValue
-                // resend the RX Gain for the new slice
-                if (_slice != nil) {
-                    let gain = _rxGain;
-                    _rxGain = 0;
-                    rxGain = gain;
-                }
+                // resend the RX Gain for the new slice - removed DL3LSM
             }
         }
     }
-    
+
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
