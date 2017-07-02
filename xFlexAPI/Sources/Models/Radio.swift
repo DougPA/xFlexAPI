@@ -1684,17 +1684,17 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     fileprivate func parseProfile(_ keyValues: KeyValuesArray) {
-        // Format:  <profileType, > <"list", value^value...^value>
+        // Format:  <profileType, > <"list", > <value^value...^value>
         //      OR
-        // Format:  <profileType, > <"current", value>
+        // Format:  <profileType, > <"current",> <value>
         
         let subType = keyValues[1].key.lowercased()
         let values = valuesArray(keyValues[2].value, delimiter: "^")
         
         // determine the type of Profile & save it
-        if let profile = ProfileType(rawValue: keyValues[0].key.lowercased()) {
+        if let profileType = ProfileType(rawValue: keyValues[0].key.lowercased()) {
             
-            switch profile {
+            switch profileType {
                 
             case .global:
                 if subType == "list" {
@@ -1737,7 +1737,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         } else {
             // unknown type
-            _log.msg("Unknown profile - \(keyValues[0].key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
+            _log.msg("Unknown profile - \(keyValues[0].key.lowercased()), \(keyValues[1].key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
         }
     }
     /// Parse a Radio status message
