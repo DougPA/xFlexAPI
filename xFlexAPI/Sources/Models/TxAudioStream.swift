@@ -1,5 +1,5 @@
 //
-//  TXAudioStream.swift
+//  TxAudioStream.swift
 //  xFlexAPI
 //
 //  Created by Mario Illgen on 27.03.17.
@@ -9,14 +9,14 @@
 import Cocoa
 
 // ------------------------------------------------------------------------------
-// MARK: - TXAudioStream Class implementation
+// MARK: - TxAudioStream Class implementation
 //
 //      creates a udp stream of audio, from the Client to the Radio (hardware),
 //      to be used by the Radio as transmit audio
 //
 // ------------------------------------------------------------------------------
 
-final public class TXAudioStream: NSObject, KeyValueParser {
+final public class TxAudioStream: NSObject, KeyValueParser {
     
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
@@ -26,8 +26,8 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _radio: Radio?                      // The Radio that owns this TXAudioStream
-    private var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TXAudioStreams
+    private var _radio: Radio?                      // The Radio that owns this TxAudioStream
+    private var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TxAudioStreams
     private var _initialized = false                // True if initialized by Radio hardware
     private var _txSeq = 0                          // Tx sequence number (modulo 16)
     
@@ -196,7 +196,7 @@ final public class TXAudioStream: NSObject, KeyValueParser {
 //              - AudioStream message enum
 // --------------------------------------------------------------------------------
 
-extension TXAudioStream {
+extension TxAudioStream {
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties - with synchronization

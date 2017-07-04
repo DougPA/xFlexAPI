@@ -162,7 +162,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private var _replyHandlers = [SequenceId: ReplyTuple]()          // Dictionary of pending replies
     private var _slices = [SliceId: Slice]()                         // Dictionary of Slices
     private var _tnfs = [TnfId: Tnf]()                               // Dictionary of Tnfs
-    private var _txAudioStreams = [DaxStreamId: TXAudioStream]()     // Dictionary of Tx Audio streams
+    private var _txAudioStreams = [DaxStreamId: TxAudioStream]()     // Dictionary of Tx Audio streams
     private var _usbCables = [UsbCableId: UsbCable]()                // Dictionary of UsbCables
     private var _waterfalls = [WaterfallId: Waterfall]()             // Dictionary of Waterfalls
     private var _xvtrs = [XvtrId: Xvtr]()                            // Dictionary of Xvtrs
@@ -400,8 +400,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case is MicAudioStream:
             micAudioStreams[(object as! MicAudioStream).id] = nil
             
-        case is TXAudioStream:
-            txAudioStreams[(object as! TXAudioStream).id] = nil
+        case is TxAudioStream:
+            txAudioStreams[(object as! TxAudioStream).id] = nil
             
         default:
             _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
@@ -1055,7 +1055,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .txAudioStream:
             //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-            parseTXAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseTxAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
             
         case .usbCable:
             //      format:
@@ -2312,7 +2312,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///   - notInUse:       true = "in_use=0", otherwise false
     ///
-    private func parseTXAudioStream(_ keyValues: KeyValuesArray, notInUse: Bool) {
+    private func parseTxAudioStream(_ keyValues: KeyValuesArray, notInUse: Bool) {
         // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
         
         //get the AudioStreamId (remove the "0x" prefix)
@@ -2333,7 +2333,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             if txAudioStreams[streamId] == nil {
                 
                 // NO, create a new AudioStream & add it to the AudioStreams collection
-                txAudioStreams[streamId] = TXAudioStream(radio: self, id: streamId, queue: _txAudioStreamQ)
+                txAudioStreams[streamId] = TxAudioStream(radio: self, id: streamId, queue: _txAudioStreamQ)
             }
             // pass the remaining key values to the AudioStream for parsing
             txAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
@@ -4567,7 +4567,7 @@ extension Radio {
         get { return _objectQ.sync { _tnfs } }
         set { _objectQ.sync(flags: .barrier) { _tnfs = newValue } } }
     
-    public var txAudioStreams: [DaxStreamId: TXAudioStream] {                           // txAudioStreams
+    public var txAudioStreams: [DaxStreamId: TxAudioStream] {                           // txAudioStreams
         get { return _objectQ.sync { _txAudioStreams } }
         set { _objectQ.sync(flags: .barrier) { _txAudioStreams = newValue } } }
     

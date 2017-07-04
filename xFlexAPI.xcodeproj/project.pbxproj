@@ -27,7 +27,7 @@
 		91B9F7F81ED9170B00F7799D /* RadioFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D71ED9170B00F7799D /* RadioFactory.swift */; };
 		91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D81ED9170B00F7799D /* Slice.swift */; };
 		91B9F7FA1ED9170B00F7799D /* Tnf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D91ED9170B00F7799D /* Tnf.swift */; };
-		91B9F7FB1ED9170B00F7799D /* TXAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7DA1ED9170B00F7799D /* TXAudioStream.swift */; };
+		91B9F7FB1ED9170B00F7799D /* TxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7DA1ED9170B00F7799D /* TxAudioStream.swift */; };
 		91B9F7FC1ED9170B00F7799D /* Waterfall.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7DB1ED9170B00F7799D /* Waterfall.swift */; };
 		91B9F7FD1ED9170B00F7799D /* Pinger.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7DD1ED9170B00F7799D /* Pinger.swift */; };
 		91B9F7FE1ED9170B00F7799D /* TcpManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7DE1ED9170B00F7799D /* TcpManager.swift */; };
@@ -64,7 +64,7 @@
 		91B9F7D71ED9170B00F7799D /* RadioFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioFactory.swift; sourceTree = "<group>"; };
 		91B9F7D81ED9170B00F7799D /* Slice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Slice.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7D91ED9170B00F7799D /* Tnf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Tnf.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		91B9F7DA1ED9170B00F7799D /* TXAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TXAudioStream.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		91B9F7DA1ED9170B00F7799D /* TxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TxAudioStream.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7DB1ED9170B00F7799D /* Waterfall.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Waterfall.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7DD1ED9170B00F7799D /* Pinger.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Pinger.swift; sourceTree = "<group>"; };
 		91B9F7DE1ED9170B00F7799D /* TcpManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TcpManager.swift; sourceTree = "<group>"; };
@@ -160,7 +160,7 @@
 				91B9F7D71ED9170B00F7799D /* RadioFactory.swift */,
 				91B9F7D81ED9170B00F7799D /* Slice.swift */,
 				91B9F7D91ED9170B00F7799D /* Tnf.swift */,
-				91B9F7DA1ED9170B00F7799D /* TXAudioStream.swift */,
+				91B9F7DA1ED9170B00F7799D /* TxAudioStream.swift */,
 				91C831021F001D0500836BE9 /* UsbCable.swift */,
 				91B9F7DB1ED9170B00F7799D /* Waterfall.swift */,
 				91C831001EFF4FA100836BE9 /* Xvtr.swift */,
@@ -291,7 +291,7 @@
 				91B9F7F71ED9170B00F7799D /* Radio.swift in Sources */,
 				91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */,
 				91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */,
-				91B9F7FB1ED9170B00F7799D /* TXAudioStream.swift in Sources */,
+				91B9F7FB1ED9170B00F7799D /* TxAudioStream.swift in Sources */,
 				91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */,
 				91B9F7F01ED9170B00F7799D /* IqStream.swift in Sources */,
 				91B9F7EC1ED9170B00F7799D /* RadioParameters.swift in Sources */,
