@@ -183,10 +183,6 @@ extension Xvtr {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _name: String {
-        get { return _xvtrQ.sync { __name } }
-        set { _xvtrQ.sync(flags: .barrier) {__name = newValue } } }
-    
     private var _ifFrequency: Int {
         get { return _xvtrQ.sync { __ifFrequency } }
         set { _xvtrQ.sync(flags: .barrier) {__ifFrequency = newValue } } }
@@ -202,6 +198,10 @@ extension Xvtr {
     private var _loError: Int {
         get { return _xvtrQ.sync { __loError } }
         set { _xvtrQ.sync(flags: .barrier) {__loError = newValue } } }
+    
+    private var _name: String {
+        get { return _xvtrQ.sync { __name } }
+        set { _xvtrQ.sync(flags: .barrier) {__name = newValue } } }
     
     private var _maxPower: Int {
         get { return _xvtrQ.sync { __maxPower } }
@@ -234,14 +234,7 @@ extension Xvtr {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
-    
     // listed in alphabetical order
-    @objc dynamic public var name: String {
-        get { return _name }
-        set { if _name != newValue { _name = newValue ; _radio!.send(kXvtrCommand + "\(id) name=\(newValue)") } } }
-    
     @objc dynamic public var ifFrequency: Int {
         get { return _ifFrequency }
         set { if _ifFrequency != newValue { _ifFrequency = newValue ; _radio!.send(kXvtrCommand + "\(id) if_freq=\(newValue)") } } }
@@ -249,6 +242,10 @@ extension Xvtr {
     @objc dynamic public var loError: Int {
         get { return _loError }
         set { if _loError != newValue { _loError = newValue ; _radio!.send(kXvtrCommand + "\(id) lo_error=\(newValue)") } } }
+    
+    @objc dynamic public var name: String {
+        get { return _name }
+        set { if _name != newValue { _name = newValue ; _radio!.send(kXvtrCommand + "\(id) name=\(newValue)") } } }
     
     @objc dynamic public var maxPower: Int {
         get { return _maxPower }
@@ -276,6 +273,9 @@ extension Xvtr {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // FIXME: Should any of these send a message to the Radio?
+    //          If yes, implement it, if not should they be "get" only?
     
     // listed in alphabetical order
     @objc dynamic public var inUse: Bool {

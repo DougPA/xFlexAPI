@@ -4325,6 +4325,9 @@ extension Radio {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
+    // FIXME: Should any of these send a message to the Radio?
+    //          If yes, implement it, if not should they be "get" only?
+    
     // listed in alphabetical order
     @objc dynamic public var atuPresent: Bool {                                               // atuPresent
         return _atuPresent }
