@@ -232,6 +232,9 @@ extension Xvtr {
         set { _xvtrQ.sync(flags: .barrier) {__twoMeterInt = newValue } } }
     
     // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    
+    // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
     
     // listed in alphabetical order
@@ -242,12 +245,6 @@ extension Xvtr {
     @objc dynamic public var ifFrequency: Int {
         get { return _ifFrequency }
         set { if _ifFrequency != newValue { _ifFrequency = newValue ; _radio!.send(kXvtrCommand + "\(id) if_freq=\(newValue)") } } }
-    
-    @objc dynamic public var inUse: Bool {
-        return _inUse }
-    
-    @objc dynamic public var isValid: Bool {
-        return _isValid }
     
     @objc dynamic public var loError: Int {
         get { return _loError }
@@ -277,8 +274,19 @@ extension Xvtr {
         get { return _rxOnly }
         set { if _rxOnly != newValue { _rxOnly = newValue ; _radio!.send(kXvtrCommand + "\(id) rx_only=\(newValue)") } } }
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // listed in alphabetical order
+    @objc dynamic public var inUse: Bool {
+        return _inUse }
+    
+    @objc dynamic public var isValid: Bool {
+        return _isValid }
+    
     @objc dynamic public var twoMeterInt: Int {
         return _twoMeterInt }
+    
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Waterfall messages (only populate values that != case value)

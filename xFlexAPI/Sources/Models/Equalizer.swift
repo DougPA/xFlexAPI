@@ -76,7 +76,8 @@ public final class Equalizer : NSObject, KeyValueParser {
     
     /// Parse Equalizer key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -195,7 +196,7 @@ extension Equalizer {
         set { _eqQ.sync(flags: .barrier) { __level8000Hz = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var eqEnabled: Bool {
@@ -233,6 +234,9 @@ extension Equalizer {
     @objc dynamic public var level8000Hz: Int {
         get { return _level8000Hz }
         set { if _level8000Hz != newValue { _level8000Hz = newValue ; _radio!.send(kEqCommand + eqType.rawValue + " \(Token.level8000Hz.rawValue)=\(newValue)") } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Equalizer messages (only populate values that != case value)

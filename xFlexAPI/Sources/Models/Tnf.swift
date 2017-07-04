@@ -182,7 +182,7 @@ extension Tnf {
         set { _tnfQ.sync(flags: .barrier) { __width = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var depth: Int {
@@ -200,6 +200,9 @@ extension Tnf {
     @objc dynamic public var width: Int {
         get { return _width  }
         set { if _width != newValue { if width.within(minWidth, maxWidth) { _width = newValue ; _radio!.send(kSetCommand + "\(id) width=\(newValue.hzToMhz())") } } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Tnf messages (only populate values that != case value)

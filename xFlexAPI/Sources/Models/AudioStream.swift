@@ -87,7 +87,8 @@ final public class AudioStream: NSObject {
     
     /// Parse Audio Stream key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -164,7 +165,8 @@ final public class AudioStream: NSObject {
     
     /// Process the AudioStream Vita struct
     ///
-    /// - parameter vita:   a Vita struct
+    /// - Parameters:
+    ///   - vita:       a Vita struct
     ///
     func vitaHandler(_ vita: Vita) {
         
@@ -313,7 +315,26 @@ extension AudioStream {
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    
+    // listed in alphabetical order
+    @objc dynamic public var rxGain: Int {
+        get { return _rxGain  }
+        set {
+            if _rxGain != newValue {
+                let value = newValue.bound(0, 100)
+                if _rxGain != value {
+                    _rxGain = value
+                    if _slice != nil {          // DL3LSM
+                        _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
+                    }
+                }
+            }
+        }
+    }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var daxChannel: Int {        // DL3LSM
@@ -343,20 +364,6 @@ extension AudioStream {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
 
-    @objc dynamic public var rxGain: Int {
-        get { return _rxGain  }
-        set {
-            if _rxGain != newValue {
-                let value = newValue.bound(0, 100)
-                if _rxGain != value {
-                    _rxGain = value
-                    if _slice != nil {          // DL3LSM
-                        _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
-                    }
-                }
-            }
-        }
-    }
     @objc dynamic public var slice: xFlexAPI.Slice? {
         get { return _slice }
         set {

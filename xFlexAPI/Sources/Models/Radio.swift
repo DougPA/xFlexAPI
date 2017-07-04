@@ -3971,7 +3971,7 @@ extension Radio {
         set { _radioQ.sync(flags: .barrier) { __waveformList = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var accTxEnabled: Bool {                                             // accTx
@@ -4002,13 +4002,6 @@ extension Radio {
         get {  return _apfGain }
         set { if _apfGain != newValue { _apfGain = newValue.bound(kMinLevel, kMaxLevel) ; send("eq apf gain=\(newValue)") } } }
     
-    @objc dynamic public var atuPresent: Bool {                                               // atuPresent
-        return _atuPresent }
-    
-    @objc dynamic public var atuStatus: String {                                              // atuStatus
-        get {  return _atuStatus }
-        set { if _atuStatus != newValue { _atuStatus = newValue } } }
-    
     @objc dynamic public var atuEnabled: Bool {                                               // atuEnabled
         get {  return _atuEnabled }
         set { if _atuEnabled != newValue { _atuEnabled = newValue ; send(kAtuCmd + "atu_enabled=\(newValue.asNumber())") } } }
@@ -4016,16 +4009,6 @@ extension Radio {
     @objc dynamic public var atuMemoriesEnabled: Bool {                                       // atuMemoriesEnabled
         get {  return _atuMemoriesEnabled }
         set { if _atuMemoriesEnabled != newValue { _atuMemoriesEnabled = newValue ; send(kAtuCmd + "atu_memories_enabled=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var atuUsingMemories: Bool {                                         // atuUsingMemories
-        get {  return _atuUsingMemories }
-        set { if _atuUsingMemories != newValue { _atuUsingMemories = newValue } } }
-    
-    @objc dynamic public var availablePanadapters: Int {                                      // availablePanadapters
-        return _availablePanadapters }
-    
-    @objc dynamic public var availableSlices: Int {                                           // availableSlices
-        return _availableSlices }
     
     @objc dynamic public var bandPersistenceEnabled: Bool {                                   // bandPersistence
         get {  return _bandPersistenceEnabled }
@@ -4046,10 +4029,6 @@ extension Radio {
     @objc dynamic public var carrierLevel: Int {                                              // carrierLevel
         get {  return _carrierLevel }
         set { if _carrierLevel != newValue { _carrierLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "am_carrier=\(newValue)") } } }
-    
-    @objc dynamic public var chassisSerial: String {                                          // chassisSerial
-        get {  return _chassisSerial }
-        set { if _chassisSerial != newValue { _chassisSerial = newValue } } }
     
     @objc dynamic public var companderEnabled: Bool {                                         // compander
         get {  return _companderEnabled }
@@ -4123,12 +4102,6 @@ extension Radio {
         get {  return _daxEnabled }
         set { if _daxEnabled != newValue { _daxEnabled = newValue ; send(kTransmitSetCmd + "dax=\(newValue.asNumber())") } } }
     
-    @objc dynamic public var daxIqAvailable: Int {                                            // daxIqAvailable
-        return _daxIqAvailable }
-    
-    @objc dynamic public var daxIqCapacity: Int {                                             // daxIqCapacity
-        return _daxIqCapacity }
-    
     @objc dynamic public var enforcePrivateIpEnabled: Bool {                                  // enforcePrivateIp
         get {  return _enforcePrivateIpEnabled }
         set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; send(kRadioCmd + "enforce_private_ip_connections=\(newValue.asNumber())") } } }
@@ -4136,10 +4109,6 @@ extension Radio {
     @objc dynamic public var filterCwAutoLevel: Int {                                         // filterCwAutoLevel
         get {  return _filterCwAutoLevel }
         set { if _filterCwAutoLevel != newValue { _filterCwAutoLevel = newValue ; send(kRadioCmd + "filter_sharpness cw autoLevel=\(newValue)") } } }
-    
-    @objc dynamic public var filterDigitalAutoLevel: Int {                                    // filterDigitalAutoLevel
-        get {  return _filterDigitalAutoLevel }
-        set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue } } }
     
     @objc dynamic public var filterVoiceAutoLevel: Int {                                      // filterVoiceAutoLevel
         get {  return _filterVoiceAutoLevel }
@@ -4157,20 +4126,243 @@ extension Radio {
         get {  return _filterVoiceLevel }
         set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; send(kRadioCmd + "filter_sharpness voice level=\(newValue)") } } }
     
-    @objc dynamic public var fpgaMbVersion: String {                                          // fpgaMbVersion
-        return _fpgaMbVersion }
-    
     @objc dynamic public var freqErrorPpb: Int {                                              // freqErrorPpb
         get {  return _freqErrorPpb }
         set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; send(kRadioCmd + "set freq_error_ppb=\(newValue)") } } }
     
-    @objc dynamic public var frequency: Int {                                                 // frequency
-        get {  return _frequency }
-        set { if _frequency != newValue { _frequency = newValue } } }
-    
     @objc dynamic public var fullDuplexEnabled: Bool {                                        // fullDuplex
         get {  return _fullDuplexEnabled }
         set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; send(kRadioCmd + "set full_duplex=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var headphoneGain: Int {                                             // headphoneGain
+        get {  return _headphoneGain }
+        set { if _headphoneGain != newValue { _headphoneGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "headphone gain \(newValue)") } } }
+    
+    @objc dynamic public var headphoneMute: Bool {                                            // headphoneMute
+        get {  return _headphoneMute }
+        set { if _headphoneMute != newValue { _headphoneMute = newValue; send(kMixerCmd + "headphone mute " + newValue.asNumber())  } } }
+    
+    @objc dynamic public var hwAlcEnabled: Bool {                                             // hwAlc
+        get {  return _hwAlcEnabled }
+        set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; send(kTransmitSetCmd + "hwalc_enabled=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var inhibit: Bool {                                                  // inhibit
+        get {  return _inhibit }
+        set { if _inhibit != newValue { _inhibit = newValue ; send(kTransmitSetCmd + "inhibit=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var lineoutGain: Int {                                               // lineoutGain
+        get {  return _lineoutGain }
+        set { if _lineoutGain != newValue { _lineoutGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "lineout gain \(newValue)") } } }
+    
+    @objc dynamic public var lineoutMute: Bool {                                              // lineoutMute
+        get {  return _lineoutMute }
+        set { if _lineoutMute != newValue { _lineoutMute = newValue ; send(kMixerCmd + "lineout mute " + newValue.asNumber())} } }
+    
+    @objc dynamic public var maxPowerLevel: Int {                                             // maxPowerLevel
+        get {  return _maxPowerLevel }
+        set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "max_power_level=\(newValue)") } } }
+    
+    @objc dynamic public var metInRxEnabled: Bool {                                           // metInRx
+        get {  return _metInRxEnabled }
+        set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; send(kTransmitSetCmd + "met_in_rx=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micBiasEnabled: Bool {                                           // micBias
+        get {  return _micBiasEnabled }
+        set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; send(kMicCmd + "bias \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micBoostEnabled: Bool {                                          // micBoost
+        get {  return _micBoostEnabled }
+        set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; send(kMicCmd + "boost \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micLevel: Int {                                                  // micLevel
+        get {  return _micLevel }
+        set { if _micLevel != newValue { _micLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "miclevel=\(newValue)") } } }
+    
+    @objc dynamic public var micSelection: String {                                           // micSelection
+        get {  return _micSelection }
+        set { if _micSelection != newValue { _micSelection = newValue ; send(kMicCmd + "input " + newValue) } } }
+    
+    @objc dynamic public var monAvailable: Bool {                                             // monAvailable
+        get {  return _monAvailable }
+        set { if _monAvailable != newValue { _monAvailable = newValue ; send(kTransmitSetCmd + "mon=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var monGainCw: Int {                                                 // monCwGain
+        get {  return _monGainCw }
+        set { if _monGainCw != newValue { _monGainCw = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "mon_gain_cw=\(newValue)") } } }
+    
+    @objc dynamic public var monGainSb: Int {                                                 // monGainSb
+        get {  return _monGainSb }
+        set { if _monGainSb != newValue { _monGainSb = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "mon_gain_sb=\(newValue)") } } }
+    
+    @objc dynamic public var nickname: String {                                               // nickname
+        get {  return _nickname }
+        set { if _nickname != newValue { _nickname = newValue ; send(kRadioCmd + "name " + newValue) } } }
+    
+    @objc dynamic public var radioScreenSaver: String {                                       // radioScreenSaver
+        get {  return _radioScreenSaver }
+        set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; send(kRadioCmd + "screensaver " + newValue) } } }
+    
+    @objc dynamic public var rcaTxReqEnabled: Bool {                                          // rcaTxReq
+        get {  return _rcaTxReqEnabled}
+        set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; send(kInterlockCmd + "rca_txreq_enable=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var rcaTxReqPolarity: Bool {                                         // rcaTxReqPolarity
+        get {  return _rcaTxReqPolarity }
+        set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; send(kInterlockCmd + "rca_txreq_polarity=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var remoteOnEnabled: Bool {                                          // remoteOn
+        get {  return _remoteOnEnabled }
+        set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; send(kRadioCmd + "set remote_on_enabled=" + newValue.asNumber()) } } }
+    
+    @objc dynamic public var rfPower: Int {                                                   // rfPower
+        get {  return _rfPower }
+        set { if _rfPower != newValue { _rfPower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "rfpower=\(newValue)") } } }
+    
+    @objc dynamic public var rttyMark: Int {                                                  // rttyMark
+        get {  return _rttyMark }
+        set { if _rttyMark != newValue { _rttyMark = newValue ; send(kRadioCmd + "set rtty_mark_default=\(newValue)") } } }
+    
+    @objc dynamic public var snapTuneEnabled: Bool {                                          // snapTune
+        get {  return _snapTuneEnabled }
+        set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; send(kRadioCmd + "set snap_tune_enabled=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var speechProcessorEnabled: Bool {                                   // speechProcessor
+        get {  return _speechProcessorEnabled }
+        set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; send(kTransmitSetCmd + "speech_processor_enable=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var speechProcessorLevel: Int {                                      // speechProcessorLevel
+        get {  return _speechProcessorLevel }
+        set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; send(kTransmitSetCmd + "speech_processor_level=\(newValue)") } } }
+    
+    @objc dynamic public var ssbPeakControlEnabled: Bool {                                    // ssbPeakControl
+        get {  return _ssbPeakControlEnabled }
+        set { if _ssbPeakControlEnabled != newValue { _ssbPeakControlEnabled = newValue ; send(kTransmitSetCmd + "ssb_peak_control=\(newValue.asNumber())")} } }
+    
+    @objc dynamic public var staticGateway: String {                                          // staticGateway
+        get {  return _staticGateway }
+        set { if _staticGateway != newValue { _staticGateway = newValue ; send(kRadioCmd + "static_net_params ip = \(staticIp) gateway=\(newValue) netmask=\(staticNetmask)") } } }
+    
+    @objc dynamic public var staticIp: String {                                               // staticIp
+        get {  return _staticIp }
+        set { if _staticIp != newValue { _staticIp = newValue ; send(kRadioCmd + "static_net_params ip = \(newValue) gateway=\(staticGateway) netmask=\(staticNetmask)") } } }
+    
+    @objc dynamic public var staticNetmask: String {                                          // staticNetmask
+        get {  return _staticNetmask }
+        set { if _staticNetmask != newValue { _staticNetmask = newValue ; send(kRadioCmd + "static_net_params ip = \(staticIp) gateway=\(staticGateway) netmask=\(newValue)")} } }
+    
+    @objc dynamic public var timeout: Int {                                                   // timeout
+        get {  return _timeout }
+        set { if _timeout != newValue { _timeout = newValue ; send(kInterlockCmd + "timeout=\(newValue)") } } }
+    
+    @objc dynamic public var tnfEnabled: Bool {                                               // tnfEnabled
+        get {  return _tnfEnabled }
+        set { if _tnfEnabled != newValue { _tnfEnabled = newValue ; send(kRadioCmd + "set tnf_enabled=" + newValue.asString()) } } }
+    
+    @objc dynamic public var tune: Bool {                                                     // tune
+        get {  return _tune }
+        set { if _tune != newValue { _tune = newValue ; send(kTransmitCmd + "tune \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var tunePower: Int {                                                 // tunePower
+        get {  return _tunePower }
+        set { if _tunePower != newValue { _tunePower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "tunepower=\(newValue)") } } }
+    
+    @objc dynamic public var txEnabled: Bool {                                                // tx
+        get { return _txEnabled }
+        set { if _txEnabled != newValue { _txEnabled = newValue ; send(kInterlockCmd + "tx_allowed=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var txDelay: Int {                                                   // txDelay
+        get { return _txDelay }
+        set { if _txDelay != newValue { _txDelay = newValue ; send(kInterlockCmd + "acc_tx_delay=\(newValue)") } } }
+    
+    @objc dynamic public var txFilterHigh: Int {                                              // txFilterHigh
+        get { return _txFilterHigh }
+        set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; send(kTransmitSetCmd + "filter_high=\(value)")} } }
+    
+    @objc dynamic public var txFilterLow: Int {                                               // txFilterLow
+        get { return _txFilterLow }
+        set { if _txFilterLow != newValue { let value = txFilterLowLimits(newValue, txFilterHigh) ; _txFilterLow = value ; send(kTransmitSetCmd + "filter_low=\(value)") } } }
+    
+    @objc dynamic public var txInWaterfallEnabled: Bool {                                            // txInWaterfall
+        get { return _txInWaterfallEnabled }
+        set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; send(kTransmitSetCmd + "show_tx_in_waterfall=\(newValue.asNumber())")} } }
+    
+    @objc dynamic public var tx1Enabled: Bool {                                               // tx1
+        get { return _tx1Enabled }
+        set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; send(kInterlockCmd + "tx1_enabled=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var tx1Delay: Int {                                                  // tx1Delay
+        get { return _tx1Delay }
+        set { if _tx1Delay != newValue { _tx1Delay = newValue  ; send(kInterlockCmd + "tx1_delay=\(newValue)") } } }
+    
+    @objc dynamic public var tx2Enabled: Bool {                                               // tx2
+        get { return _tx2Enabled }
+        set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; send(kInterlockCmd + "tx2_enabled=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var tx2Delay: Int {                                                  // tx2Delay
+        get { return _tx2Delay }
+        set { if _tx2Delay != newValue { _tx2Delay = newValue ; send(kInterlockCmd + "tx2_delay=\(newValue)") } } }
+    
+    @objc dynamic public var tx3Enabled: Bool {                                               // tx3
+        get { return _tx3Enabled }
+        set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; send(kInterlockCmd + "tx3_enabled=\(newValue.asLetter())")} } }
+    
+    @objc dynamic public var tx3Delay: Int {                                                  // tx3Delay
+        get { return _tx3Delay }
+        set { if _tx3Delay != newValue { _tx3Delay = newValue ; send(kInterlockCmd + "tx3_delay=\(newValue)")} } }
+    
+    @objc dynamic public var voxEnabled: Bool {                                               // vox
+        get { return _voxEnabled }
+        set { if _voxEnabled != newValue { _voxEnabled = newValue ; send(kTransmitSetCmd + "vox_enabled=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var voxDelay: Int {                                                  // voxDelay
+        get { return _voxDelay }
+        set { if _voxDelay != newValue { _voxDelay = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "vox_delay=\(newValue)") } } }
+    
+    @objc dynamic public var voxLevel: Int {                                                  // voxLevel
+        get { return _voxLevel }
+        set { if _voxLevel != newValue { _voxLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "vox_level=\(newValue)") } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // listed in alphabetical order
+    @objc dynamic public var atuPresent: Bool {                                               // atuPresent
+        return _atuPresent }
+    
+    @objc dynamic public var atuStatus: String {                                              // atuStatus
+        get {  return _atuStatus }
+        set { if _atuStatus != newValue { _atuStatus = newValue } } }
+    
+    @objc dynamic public var atuUsingMemories: Bool {                                         // atuUsingMemories
+        get {  return _atuUsingMemories }
+        set { if _atuUsingMemories != newValue { _atuUsingMemories = newValue } } }
+    
+    @objc dynamic public var availablePanadapters: Int {                                      // availablePanadapters
+        return _availablePanadapters }
+    
+    @objc dynamic public var availableSlices: Int {                                           // availableSlices
+        return _availableSlices }
+    
+    @objc dynamic public var chassisSerial: String {                                          // chassisSerial
+        get {  return _chassisSerial }
+        set { if _chassisSerial != newValue { _chassisSerial = newValue } } }
+    
+    @objc dynamic public var daxIqAvailable: Int {                                            // daxIqAvailable
+        return _daxIqAvailable }
+    
+    @objc dynamic public var daxIqCapacity: Int {                                             // daxIqCapacity
+        return _daxIqCapacity }
+    
+    @objc dynamic public var filterDigitalAutoLevel: Int {                                    // filterDigitalAutoLevel
+        get {  return _filterDigitalAutoLevel }
+        set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue } } }
+    
+    @objc dynamic public var fpgaMbVersion: String {                                          // fpgaMbVersion
+        return _fpgaMbVersion }
+    
+    @objc dynamic public var frequency: Int {                                                 // frequency
+        get {  return _frequency }
+        set { if _frequency != newValue { _frequency = newValue } } }
     
     @objc dynamic public var gateway: String {                                                // gateway
         get {  return _gateway }
@@ -4223,22 +4415,6 @@ extension Radio {
         get {  return _gpsVisible }
         set { if _gpsVisible != newValue { _gpsVisible = newValue } } }
     
-    @objc dynamic public var headphoneGain: Int {                                             // headphoneGain
-        get {  return _headphoneGain }
-        set { if _headphoneGain != newValue { _headphoneGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "headphone gain \(newValue)") } } }
-    
-    @objc dynamic public var headphoneMute: Bool {                                            // headphoneMute
-        get {  return _headphoneMute }
-        set { if _headphoneMute != newValue { _headphoneMute = newValue; send(kMixerCmd + "headphone mute " + newValue.asNumber())  } } }
-    
-    @objc dynamic public var hwAlcEnabled: Bool {                                             // hwAlc
-        get {  return _hwAlcEnabled }
-        set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; send(kTransmitSetCmd + "hwalc_enabled=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var inhibit: Bool {                                                  // inhibit
-        get {  return _inhibit }
-        set { if _inhibit != newValue { _inhibit = newValue ; send(kTransmitSetCmd + "inhibit=\(newValue.asNumber())") } } }
-    
     @objc dynamic public var ipAddress: String {                                              // ipAddress
         get {  return _ipAddress }
         set { if _ipAddress != newValue { _ipAddress = newValue } } }
@@ -4251,53 +4427,9 @@ extension Radio {
         get {  return _macAddress }
         set { if _macAddress != newValue { _macAddress = newValue } } }
     
-    @objc dynamic public var lineoutGain: Int {                                               // lineoutGain
-        get {  return _lineoutGain }
-        set { if _lineoutGain != newValue { _lineoutGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "lineout gain \(newValue)") } } }
-    
-    @objc dynamic public var lineoutMute: Bool {                                              // lineoutMute
-        get {  return _lineoutMute }
-        set { if _lineoutMute != newValue { _lineoutMute = newValue ; send(kMixerCmd + "lineout mute " + newValue.asNumber())} } }
-    
-    @objc dynamic public var maxPowerLevel: Int {                                             // maxPowerLevel
-        get {  return _maxPowerLevel }
-        set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "max_power_level=\(newValue)") } } }
-    
-    @objc dynamic public var metInRxEnabled: Bool {                                           // metInRx
-        get {  return _metInRxEnabled }
-        set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; send(kTransmitSetCmd + "met_in_rx=\(newValue.asNumber())") } } }
-    
     @objc dynamic public var micAccEnabled: Bool {                                            // micAcc
         get {  return _micAccEnabled }
         set { if _micAccEnabled != newValue { _micAccEnabled = newValue } } }
-    
-    @objc dynamic public var micBiasEnabled: Bool {                                           // micBias
-        get {  return _micBiasEnabled }
-        set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; send(kMicCmd + "bias \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var micBoostEnabled: Bool {                                          // micBoost
-        get {  return _micBoostEnabled }
-        set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; send(kMicCmd + "boost \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var micLevel: Int {                                                  // micLevel
-        get {  return _micLevel }
-        set { if _micLevel != newValue { _micLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "miclevel=\(newValue)") } } }
-    
-    @objc dynamic public var micSelection: String {                                           // micSelection
-        get {  return _micSelection }
-        set { if _micSelection != newValue { _micSelection = newValue ; send(kMicCmd + "input " + newValue) } } }
-    
-    @objc dynamic public var monAvailable: Bool {                                             // monAvailable
-        get {  return _monAvailable }
-        set { if _monAvailable != newValue { _monAvailable = newValue ; send(kTransmitSetCmd + "mon=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var monGainCw: Int {                                                 // monCwGain
-        get {  return _monGainCw }
-        set { if _monGainCw != newValue { _monGainCw = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "mon_gain_cw=\(newValue)") } } }
-    
-    @objc dynamic public var monGainSb: Int {                                                 // monGainSb
-        get {  return _monGainSb }
-        set { if _monGainSb != newValue { _monGainSb = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "mon_gain_sb=\(newValue)") } } }
     
     @objc dynamic public var monPanCw: Int {                                                  // monPanCw
         get {  return _monPanCw }
@@ -4310,10 +4442,6 @@ extension Radio {
     @objc dynamic public var netmask: String {                                                // netmask
         get {  return _netmask }
         set { if _netmask != newValue { _netmask = newValue } } }
-    
-    @objc dynamic public var nickname: String {                                               // nickname
-        get {  return _nickname }
-        set { if _nickname != newValue { _nickname = newValue ; send(kRadioCmd + "name " + newValue) } } }
     
     @objc dynamic public var numberOfScus: Int {                                              // numberOfScus
         return _numberOfScus }
@@ -4338,21 +4466,9 @@ extension Radio {
         get {  return _radioOptions }
         set { if _radioOptions != newValue { _radioOptions = newValue } } }
     
-    @objc dynamic public var radioScreenSaver: String {                                       // radioScreenSaver
-        get {  return _radioScreenSaver }
-        set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; send(kRadioCmd + "screensaver " + newValue) } } }
-    
     @objc dynamic public var rawIqEnabled: Bool {                                             // rawIq
         get {  return _rawIqEnabled }
         set { if _rawIqEnabled != newValue { _rawIqEnabled = newValue } } }
-    
-    @objc dynamic public var rcaTxReqEnabled: Bool {                                          // rcaTxReq
-        get {  return _rcaTxReqEnabled}
-        set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; send(kInterlockCmd + "rca_txreq_enable=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var rcaTxReqPolarity: Bool {                                         // rcaTxReqPolarity
-        get {  return _rcaTxReqPolarity }
-        set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; send(kInterlockCmd + "rca_txreq_polarity=\(newValue.asLetter())") } } }
     
     @objc dynamic public var reason: String {                                                 // reason
         get {  return _reason }
@@ -4362,18 +4478,6 @@ extension Radio {
         get {  return _region }
         set { if _region != newValue { _region = newValue } } }
     
-    @objc dynamic public var remoteOnEnabled: Bool {                                          // remoteOn
-        get {  return _remoteOnEnabled }
-        set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; send(kRadioCmd + "set remote_on_enabled=" + newValue.asNumber()) } } }
-    
-    @objc dynamic public var rfPower: Int {                                                   // rfPower
-        get {  return _rfPower }
-        set { if _rfPower != newValue { _rfPower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "rfpower=\(newValue)") } } }
-    
-    @objc dynamic public var rttyMark: Int {                                                  // rttyMark
-        get {  return _rttyMark }
-        set { if _rttyMark != newValue { _rttyMark = newValue ; send(kRadioCmd + "set rtty_mark_default=\(newValue)") } } }
-    
     @objc dynamic public var sbMonitorEnabled: Bool {                                         // sbMonitor
         get {  return _sbMonitorEnabled }
         set { if _sbMonitorEnabled != newValue { _sbMonitorEnabled = newValue } } }
@@ -4381,28 +4485,12 @@ extension Radio {
     @objc dynamic public var smartSdrMB: String {                                             // smartSdrMB
         return _smartSdrMB }
     
-    @objc dynamic public var snapTuneEnabled: Bool {                                          // snapTune
-        get {  return _snapTuneEnabled }
-        set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; send(kRadioCmd + "set snap_tune_enabled=\(newValue.asNumber())") } } }
-    
     @objc dynamic public var softwareVersion: String {                                        // softwareVersion
         return _softwareVersion }
     
     @objc dynamic public var source: String {                                                 // source
         get {  return _source }
         set { if _source != newValue { _source = newValue } } }
-    
-    @objc dynamic public var speechProcessorEnabled: Bool {                                   // speechProcessor
-        get {  return _speechProcessorEnabled }
-        set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; send(kTransmitSetCmd + "speech_processor_enable=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var speechProcessorLevel: Int {                                      // speechProcessorLevel
-        get {  return _speechProcessorLevel }
-        set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; send(kTransmitSetCmd + "speech_processor_level=\(newValue)") } } }
-    
-    @objc dynamic public var ssbPeakControlEnabled: Bool {                                    // ssbPeakControl
-        get {  return _ssbPeakControlEnabled }
-        set { if _ssbPeakControlEnabled != newValue { _ssbPeakControlEnabled = newValue ; send(kTransmitSetCmd + "ssb_peak_control=\(newValue.asNumber())")} } }
     
     @objc dynamic public var startOffset: Bool {                                              // startOffsetEnabled
         get {  return _startOffset }
@@ -4412,102 +4500,18 @@ extension Radio {
         get {  return _state }
         set { if _state != newValue { _state = newValue } } }
     
-    @objc dynamic public var staticGateway: String {                                          // staticGateway
-        get {  return _staticGateway }
-        set { if _staticGateway != newValue { _staticGateway = newValue ; send(kRadioCmd + "static_net_params ip = \(staticIp) gateway=\(newValue) netmask=\(staticNetmask)") } } }
-    
-    @objc dynamic public var staticIp: String {                                               // staticIp
-        get {  return _staticIp }
-        set { if _staticIp != newValue { _staticIp = newValue ; send(kRadioCmd + "static_net_params ip = \(newValue) gateway=\(staticGateway) netmask=\(staticNetmask)") } } }
-    
-    @objc dynamic public var staticNetmask: String {                                          // staticNetmask
-        get {  return _staticNetmask }
-        set { if _staticNetmask != newValue { _staticNetmask = newValue ; send(kRadioCmd + "static_net_params ip = \(staticIp) gateway=\(staticGateway) netmask=\(newValue)")} } }
-    
-    @objc dynamic public var timeout: Int {                                                   // timeout
-        get {  return _timeout }
-        set { if _timeout != newValue { _timeout = newValue ; send(kInterlockCmd + "timeout=\(newValue)") } } }
-    
-    @objc dynamic public var tnfEnabled: Bool {                                               // tnfEnabled
-        get {  return _tnfEnabled }
-        set { if _tnfEnabled != newValue { _tnfEnabled = newValue ; send(kRadioCmd + "set tnf_enabled=" + newValue.asString()) } } }
-    
-    @objc dynamic public var tune: Bool {                                                     // tune
-        get {  return _tune }
-        set { if _tune != newValue { _tune = newValue ; send(kTransmitCmd + "tune \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var tunePower: Int {                                                 // tunePower
-        get {  return _tunePower }
-        set { if _tunePower != newValue { _tunePower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "tunepower=\(newValue)") } } }
-    
-    @objc dynamic public var txEnabled: Bool {                                                // tx
-        get { return _txEnabled }
-        set { if _txEnabled != newValue { _txEnabled = newValue ; send(kInterlockCmd + "tx_allowed=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var txDelay: Int {                                                   // txDelay
-        get { return _txDelay }
-        set { if _txDelay != newValue { _txDelay = newValue ; send(kInterlockCmd + "acc_tx_delay=\(newValue)") } } }
-    
     @objc dynamic public var txFilterChanges: Bool {                                          // txFilterChanges
         get { return _txFilterChanges }
         set { if _txFilterChanges != newValue { _txFilterChanges = newValue } } }
-    
-    @objc dynamic public var txFilterHigh: Int {                                              // txFilterHigh
-        get { return _txFilterHigh }
-        set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; send(kTransmitSetCmd + "filter_high=\(value)")} } }
-    
-    @objc dynamic public var txFilterLow: Int {                                               // txFilterLow
-        get { return _txFilterLow }
-        set { if _txFilterLow != newValue { let value = txFilterLowLimits(newValue, txFilterHigh) ; _txFilterLow = value ; send(kTransmitSetCmd + "filter_low=\(value)") } } }
-    
-    @objc dynamic public var txInWaterfallEnabled: Bool {                                            // txInWaterfall
-        get { return _txInWaterfallEnabled }
-        set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; send(kTransmitSetCmd + "show_tx_in_waterfall=\(newValue.asNumber())")} } }
     
     @objc dynamic public var txRfPowerChanges: Bool {                                         // txRfPowerChanges
         get { return _txRfPowerChanges }
         set { if _txRfPowerChanges != newValue { _txRfPowerChanges = newValue } } }
     
-    @objc dynamic public var tx1Enabled: Bool {                                               // tx1
-        get { return _tx1Enabled }
-        set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; send(kInterlockCmd + "tx1_enabled=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var tx1Delay: Int {                                                  // tx1Delay
-        get { return _tx1Delay }
-        set { if _tx1Delay != newValue { _tx1Delay = newValue  ; send(kInterlockCmd + "tx1_delay=\(newValue)") } } }
-    
-    @objc dynamic public var tx2Enabled: Bool {                                               // tx2
-        get { return _tx2Enabled }
-        set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; send(kInterlockCmd + "tx2_enabled=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var tx2Delay: Int {                                                  // tx2Delay
-        get { return _tx2Delay }
-        set { if _tx2Delay != newValue { _tx2Delay = newValue ; send(kInterlockCmd + "tx2_delay=\(newValue)") } } }
-    
-    @objc dynamic public var tx3Enabled: Bool {                                               // tx3
-        get { return _tx3Enabled }
-        set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; send(kInterlockCmd + "tx3_enabled=\(newValue.asLetter())")} } }
-    
-    @objc dynamic public var tx3Delay: Int {                                                  // tx3Delay
-        get { return _tx3Delay }
-        set { if _tx3Delay != newValue { _tx3Delay = newValue ; send(kInterlockCmd + "tx3_delay=\(newValue)")} } }
-    
-    @objc dynamic public var voxEnabled: Bool {                                               // vox
-        get { return _voxEnabled }
-        set { if _voxEnabled != newValue { _voxEnabled = newValue ; send(kTransmitSetCmd + "vox_enabled=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var voxDelay: Int {                                                  // voxDelay
-        get { return _voxDelay }
-        set { if _voxDelay != newValue { _voxDelay = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "vox_delay=\(newValue)") } } }
-    
-    @objc dynamic public var voxLevel: Int {                                                  // voxLevel
-        get { return _voxLevel }
-        set { if _voxLevel != newValue { _voxLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "vox_level=\(newValue)") } } }
-    
     @objc dynamic public var waveformList: String {                                           // waveformList
         get { return _waveformList }
         set { if _waveformList != newValue { _waveformList = newValue } } }
-
+    
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     

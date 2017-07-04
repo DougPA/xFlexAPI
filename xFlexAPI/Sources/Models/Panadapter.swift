@@ -143,7 +143,8 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     
     /// Parse Panadapter key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -326,7 +327,8 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     
     /// Process the Panadapter Vita struct
     ///
-    /// - parameter vita:     a Vita struct
+    /// - Parameters:
+    ///   - vita:        a Vita struct
     ///
     func vitaHandler(_ vita: Vita) {
         let kByteOffsetToBins = 16              // Bins are located 16 bytes into payload
@@ -385,7 +387,8 @@ public struct PanadapterFrame {
     
     /// Initialize a PanadapterFRame
     ///
-    /// - parameter payload:    pointer to a Vita payload
+    /// - Parameters:
+    ///   - payload:        pointer to a Vita payload
     ///
     public init(payload: UnsafeRawPointer) {
         
@@ -544,20 +547,9 @@ extension Panadapter {
         set { _pandapterQ.sync(flags: .barrier) { __xvtrLabel = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
-    @objc dynamic public var antList: [String] {
-        get { return _antList }
-        set { _antList = newValue } }
-    
-    @objc dynamic public var autoCenterEnabled: Bool {
-        get { return _autoCenterEnabled }
-        set { _autoCenterEnabled = newValue } }
-    
-    @objc dynamic public var available: Int {
-        return _available }
-    
     @objc dynamic public var average: Int {
         get { return _average }
         set {if _average != newValue { _average = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) average=\(newValue)") } } }
@@ -569,9 +561,6 @@ extension Panadapter {
     @objc dynamic public var bandwidth: Int {
         get { return _bandwidth }
         set { if _bandwidth != newValue { _bandwidth = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) bandwidth=\(newValue.hzToMhz()) autocenter=\(autoCenterEnabled.asNumber())") } } }
-    
-    @objc dynamic public var capacity: Int {
-        return _capacity }
     
     @objc dynamic public var center: Int {
         get { return _center }
@@ -597,15 +586,9 @@ extension Panadapter {
         get { return _loopBEnabled }
         set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) loopb=\(newValue.asNumber())") } } }
     
-    @objc dynamic public var maxBw: Int {
-        return _maxBw }
-    
     @objc dynamic public var maxDbm: CGFloat {
         get { return _maxDbm }
         set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) max_dbm=\(value)") } } }
-    
-    @objc dynamic public var minBw: Int {
-        return _minBw }
     
     @objc dynamic public var minDbm: CGFloat {
         get { return _minDbm }
@@ -615,13 +598,53 @@ extension Panadapter {
         get { return _panDimensions }
         set { if _panDimensions != newValue { _panDimensions = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) xpixels=\(newValue.width) ypixels=\(newValue.height)") } } }
     
-    @objc dynamic public var preamp: String {
-        get { return _preamp }
-        set { _preamp = newValue } }
-    
     @objc dynamic public var rfGain: Int {
         get { return _rfGain }
         set { if _rfGain != newValue { _rfGain = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rfgain=\(newValue)") } } }
+    
+    @objc dynamic public var rxAnt: String {
+        get { return _rxAnt }
+        set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rxant=\(newValue)") } } }
+    
+    @objc dynamic public var weightedAverageEnabled: Bool {
+        get { return _weightedAverageEnabled }
+        set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) weighted_average=" + newValue.asNumber()) } } }
+    
+    @objc dynamic public var wnbEnabled: Bool {
+        get { return _wnbEnabled }
+        set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var wnbLevel: Int {
+        get { return _wnbLevel }
+        set { if _wnbLevel != newValue { _wnbLevel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb_level=\(newValue)") } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // listed in alphabetical order
+    @objc dynamic public var antList: [String] {
+        get { return _antList }
+        set { _antList = newValue } }
+    
+    @objc dynamic public var autoCenterEnabled: Bool {
+        get { return _autoCenterEnabled }
+        set { _autoCenterEnabled = newValue } }
+    
+    @objc dynamic public var available: Int {
+        return _available }
+    
+    @objc dynamic public var capacity: Int {
+        return _capacity }
+    
+    @objc dynamic public var maxBw: Int {
+        return _maxBw }
+    
+    @objc dynamic public var minBw: Int {
+        return _minBw }
+    
+    @objc dynamic public var preamp: String {
+        get { return _preamp }
+        set { _preamp = newValue } }
     
     @objc dynamic public var rfGainHigh: Int {
         get { return _rfGainHigh }
@@ -639,28 +662,12 @@ extension Panadapter {
         get { return _rfGainValues }
         set { _rfGainValues = newValue } }
     
-    @objc dynamic public var rxAnt: String {
-        get { return _rxAnt }
-        set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rxant=\(newValue)") } } }
-    
     @objc dynamic public var waterfallId: String {
         return _waterfallId }
-    
-    @objc dynamic public var weightedAverageEnabled: Bool {
-        get { return _weightedAverageEnabled }
-        set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) weighted_average=" + newValue.asNumber()) } } }
     
     @objc dynamic public var wide: Bool {
         get { return _wide }
         set { _wide = newValue } }
-    
-    @objc dynamic public var wnbEnabled: Bool {
-        get { return _wnbEnabled }
-        set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var wnbLevel: Int {
-        get { return _wnbLevel }
-        set { if _wnbLevel != newValue { _wnbLevel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb_level=\(newValue)") } } }
     
     @objc dynamic public var wnbUpdating: Bool {
         get { return _wnbUpdating }
@@ -669,6 +676,7 @@ extension Panadapter {
     @objc dynamic public var xvtrLabel: String {
         get { return _xvtrLabel }
         set { _xvtrLabel = newValue } }
+    
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization

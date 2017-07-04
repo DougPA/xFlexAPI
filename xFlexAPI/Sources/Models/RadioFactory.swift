@@ -26,7 +26,6 @@ public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-//    private var _vita = Vita()                          // a Vita-49 packet
     private var _notSeenInterval: TimeInterval = 3.0    // Interval that represents a timeout
     private var _udpSocket: GCDAsyncUdpSocket?          // socket to receive broadcasts
     private var _timeoutTimer: DispatchSourceTimer!     // timer fired every "checkInterval"
@@ -155,10 +154,11 @@ public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {
     
     /// The Socket received data
     ///
-    /// - parameter sock:          the GCDAsyncUdpSocket
-    /// - parameter data:          the Data received
-    /// - parameter address:       the Address of the sender
-    /// - parameter filterContext: the FilterContext
+    /// - Parameters:
+    ///   - sock:           the GCDAsyncUdpSocket
+    ///   - data:           the Data received
+    ///   - address:        the Address of the sender
+    ///   - filterContext:  the FilterContext
     ///
     @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
         

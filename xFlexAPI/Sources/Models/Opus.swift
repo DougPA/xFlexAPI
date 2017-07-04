@@ -131,7 +131,8 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     
     ///  Parse Opus key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -200,7 +201,8 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
 
     ///  Process the Opus Vita struct
     ///
-    /// - parameter vita:     an Opus Vita struct
+    /// - Parameters:
+    ///   - vita:       an Opus Vita struct
     ///
     public func vitaHandler(_ vita: Vita) {
         
@@ -256,8 +258,9 @@ public struct OpusFrame {
     
     /// Initialize an OpusFrame
     ///
-    /// - parameter payload:         pointer to the Vita packet payload
-    /// - parameter numberOfSamples: number of Samples in the payload
+    /// - Parameters:
+    ///   - payload:            pointer to the Vita packet payload
+    ///   - numberOfSamples:    number of Samples in the payload
     ///
     public init(payload: UnsafeRawPointer, numberOfSamples: Int) {
         

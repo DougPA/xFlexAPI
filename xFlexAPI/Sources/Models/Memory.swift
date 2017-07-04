@@ -384,7 +384,7 @@ extension Memory {
         set { _memoryQ.sync(flags: .barrier) { __toneValue = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var digitalLowerOffset: Int {
@@ -463,6 +463,10 @@ extension Memory {
         get { return _toneValue }
         set { if _toneValue != newValue && toneValueValid(newValue) { _toneValue = newValue ; _radio.send("memory set \(id) tone_value=\(newValue)") } } }
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Memory messages (only populate values that != case value)
     

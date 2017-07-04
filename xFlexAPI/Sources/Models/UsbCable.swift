@@ -35,4 +35,12 @@ public final class UsbCable : NSObject, KeyValueParser {
         // TODO: add code
         
     }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+
 }

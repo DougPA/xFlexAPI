@@ -74,7 +74,8 @@ public class Meter : KeyValueParser {
     
     /// Update meter readings, called by UdpManager, executes on the udpReceiveQ
     ///
-    /// - parameter newValue: the new value for the Meter
+    /// - Parameters:
+    ///   - newValue:   the new value for the Meter
     ///
     func update(_ newValue: Int16) {
         let oldValue = value
@@ -107,7 +108,8 @@ public class Meter : KeyValueParser {
     //
     /// Parse Meter key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -185,7 +187,10 @@ public class Meter : KeyValueParser {
 extension Meter {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant Setters / Getters with synchronization
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var description: String {
@@ -262,6 +267,5 @@ extension Meter {
             case amps
             case degrees
         }
-    
     
 }

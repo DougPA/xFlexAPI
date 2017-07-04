@@ -241,9 +241,10 @@ public final class Cwx : NSObject, KeyValueParser {
     
     /// Undo any changes made to a Macro string by the fixString method on Radio
     ///
-    /// - parameter string:     a String processed by fixString
+    /// - Parameters:
+    ///   - string:         a String processed by fixString
     ///
-    /// - returns:              the String after undoing the fixString changes
+    /// - Returns:          the String after undoing the fixString changes
     ///
     private func unfixString(_ string: String) -> String {
         var newString: String = ""
@@ -268,7 +269,8 @@ public final class Cwx : NSObject, KeyValueParser {
     
     /// Parse Cwx key/value pairs, called by Radio, executes on the radioQ
     ///
-    /// - parameter keyValues:  array of Key/Value tuples
+    /// - Parameters:
+    ///   - keyValues:      array of Key/Value tuples
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
         
@@ -365,7 +367,7 @@ extension Cwx {
         set { _cwxQ.sync(flags: .barrier) { __speed = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var delay: Int {

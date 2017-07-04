@@ -63,69 +63,6 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods for sending tx audio to the Radio (hardware)
     
-//    private var _vita: Vita?
-//    public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {
-//        
-//        // skip this if we are not the DAX TX Client
-//        if !_transmit { return false }
-//        
-//        if _vita == nil {
-//            // get a new Vita struct (w/defaults & IfDataWithStream, daxAudio, StreamId, tsi.other)
-//            _vita = Vita(packetType: .ifDataWithStream, classCode: .daxAudio, streamId: _streamId, tsi: .other)
-//        }
-//        
-//        var samplesSent = 0
-//        
-//        while samplesSent < samples {
-//            
-//            // how many samples should we send?
-//            let numSamplesToSend = min(128, samples - samplesSent)
-//            
-//            // create new array for payload (interleaved L/R samples)
-//            var payload = [Float](repeating: 0.0, count: samples * 2)
-//            // scale with rx gain
-//            let scale = self._txGainScalar
-//            // TODO: use Accelerate
-//            for i in 0..<samples {
-//                payload[2 * i + 0] = left[i] * scale
-//                payload[2 * i + 1] = left[i] * scale
-//            }
-//            
-//            // now process payload
-//            let payloadPtr = UnsafeMutableRawPointer(mutating: payload)
-//            let payloadInWords = samples * 2
-//            // get a pointer to the data in the payload
-//            let wordsPtr = payloadPtr.bindMemory(to: UInt32.self, capacity: payloadInWords)
-//            
-//            // swap endianess of the samples
-//            for i in 0..<payloadInWords {
-//                wordsPtr.advanced(by: i).pointee = CFSwapInt32HostToBig(wordsPtr.advanced(by: i).pointee)
-//            }
-//            _vita?.payload = UnsafeMutableRawPointer(mutating: payload)
-//            
-//            // set the length of the packet
-//            let payloadSize = numSamplesToSend * 2 * 4  // 32-Bit L/R samples
-//            _vita?.payloadSize = payloadSize
-//            _vita?.packetSize = payloadSize + MemoryLayout<VitaHeader>.size // payload size + header size
-//            
-//            _vita?.sequence = _txSeq
-//            
-//            // encode vita packet to data and send to radio
-//            if let packet = _vita!.encode() {
-//                
-//                // send packet to radio
-//                _radio?.sendVitaData(packet)
-//            }
-//
-//            _txSeq = (_txSeq + 1) % 16
-//            
-//            // adjust the samples sent
-//            samplesSent += numSamplesToSend
-//        }
-//        
-//        return true
-//    }
-    
     private var _vita: Vita?
     public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {
         
@@ -196,7 +133,8 @@ final public class TXAudioStream: NSObject, KeyValueParser {
     
     /// Parse TX Audio Stream key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -289,7 +227,20 @@ extension TXAudioStream {
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    
+    @objc dynamic public var transmit: Bool {
+        get { return _transmit  }
+        set {
+            if _transmit != newValue {
+                _transmit = newValue
+                _radio?.send("dax tx \(_transmit.asNumber())")
+            }
+        }
+    }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var inUse: Bool {
@@ -303,15 +254,6 @@ extension TXAudioStream {
         get { return _port  }
         set { if _port != newValue { _port = newValue } } }
     
-    @objc dynamic public var transmit: Bool {
-        get { return _transmit  }
-        set {
-            if _transmit != newValue {
-                _transmit = newValue
-                _radio?.send("dax tx \(_transmit.asNumber())")
-            }
-        }
-    }
     
     @objc dynamic public var txGain: Int {
         get { return _txGain  }

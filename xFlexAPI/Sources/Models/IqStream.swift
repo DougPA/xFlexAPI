@@ -47,9 +47,6 @@ final public class IqStream: NSObject {
     
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kNoError = "0"                      // response without error
-    private let kStreamCmd = "stream "              // Command string prefixes
-    private let kStreamCreateCmd = "stream create "
     
     /// Initialize an IQ Stream
     ///
@@ -65,38 +62,7 @@ final public class IqStream: NSObject {
         self._iqStreamsQ = queue
         
         super.init()
-        
-//        self._daxIqChannel = channel
-//        _pan = radio.findPanadapterBy(daxIqChannel: daxIqChannel)
     }
-    
-    // ------------------------------------------------------------------------------
-    // MARK: - Public methods that send commands to the Radio (hardware)
-    
-    public func requestIqStream() { _radio?.send(kStreamCreateCmd + "daxiq=\(_daxIqChannel)", replyTo: _radio.replyHandler) }
-    public func requestIqStream(ip: String, port: Int) { _radio?.send(kStreamCreateCmd + "daxiq=\(_daxIqChannel) ip=\(ip) port=\(port)", replyTo: _radio.replyHandler) }
-    public func removeIqStream(_ channel: String) { _radio?.send("stream remove 0x\(channel)") }
-    
-    // ------------------------------------------------------------------------------
-    // MARK: - Private methods
-    
-    /// Process the Reply to a Stream Create command, reply format: <value>,<value>,...<value>
-    ///
-    /// - Parameters:
-    ///   - seqNum:         the Sequence Number of the original command
-    ///   - responseValue:  the response value
-    ///   - reply:          the reply
-    ///
-//    private func updateStreamId(_ seqNum: String, responseValue: String, reply: String) {
-//        
-//        guard responseValue == kNoError else {
-//            // Anything other than 0 is an error, log it and ignore the Reply
-//            _log.msg(command + ", non-zero reply - \(responseValue)", level: .error, function: #function, file: #file, line: #line)
-//            return
-//        }
-//        //get the streamId (remove the "0x" prefix)
-//        _streamId = String(reply.characters.dropFirst(2))
-//    }
     
     // ------------------------------------------------------------------------------
     // MARK: - KeyValueParser Protocol methods
@@ -104,7 +70,8 @@ final public class IqStream: NSObject {
     
     /// Parse IQ Stream key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -217,16 +184,15 @@ extension IqStream {
         get { return _iqStreamsQ.sync { __rate } }
         set { _iqStreamsQ.sync(flags: .barrier) { __rate = newValue } } }
     
-//    private var _streamId: String {
-//        get { return _iqStreamsQ.sync { __streamId } }
-//        set { _iqStreamsQ.sync(flags: .barrier) { __streamId = newValue } } }
-//
     private var _streaming: Bool {
         get { return _iqStreamsQ.sync { __streaming } }
         set { _iqStreamsQ.sync(flags: .barrier) { __streaming = newValue } } }
+        
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
+    // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var available: Int {
@@ -255,10 +221,6 @@ extension IqStream {
         get { return _rate  }
         set { if _rate != newValue { _rate = newValue } } }
     
-//    @objc dynamic public var streamId: String {
-//        get { return _streamId }
-//        set { if _streamId != newValue { _streamId = newValue } } }
-//
     @objc dynamic public var streaming: Bool {
         get { return _streaming  }
         set { if _streaming != newValue { _streaming = newValue } } }

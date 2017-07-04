@@ -302,15 +302,11 @@ extension Waterfall {
         set { _waterfallQ.sync(flags: .barrier) { __panadapterId = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
-    // listed in alphabetical order
     @objc dynamic public var autoBlackEnabled: Bool {
         get { return _autoBlackEnabled }
         set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) auto_black=" + newValue.asNumber()) } } }
-    
-    @objc dynamic public var autoBlackLevel: UInt32 {
-        return _autoBlackLevel }
     
     @objc dynamic public var blackLevel: Int {
         get { return _blackLevel }
@@ -327,6 +323,13 @@ extension Waterfall {
     @objc dynamic public var lineDuration: Int {
         get { return _lineDuration }
         set { if _lineDuration != newValue { _lineDuration = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) line_duration=\(newValue)") } } }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // listed in alphabetical order
+    @objc dynamic public var autoBlackLevel: UInt32 {
+        return _autoBlackLevel }
     
     @objc dynamic public var panadapterId: String {
         return _panadapterId }
