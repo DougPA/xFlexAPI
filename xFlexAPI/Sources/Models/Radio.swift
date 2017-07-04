@@ -15,7 +15,7 @@ let kDomainId = "net.k3tzr"
 // MARK: - Protocols
 
 public protocol KeyValueParser {
-
+    
     func parseKeyValues(_ keyValues: Radio.KeyValuesArray) -> Void
 }
 
@@ -32,7 +32,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
-
+    
     public var pingerEnabled = true
     public private(set) var uptime = 0
     
@@ -40,28 +40,28 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // MARK: - Public properties (Read Only)
     
     @objc dynamic public var radioVersion: String { return selectedRadio?.firmwareVersion ?? "" }
-
+    
     public private(set) var selectedRadio: RadioParameters?             // Radio we are connected to
-
+    
     public private(set) var cwx: Cwx!                                   // CWX class
     public private(set) var pinger: Pinger?                             // Pinger class
     
     public private(set) var primaryCommandsArray = [CommandTuple]()     // Primary commands to be sent
     public private(set) var secondaryCommandsArray = [CommandTuple]()   // Secondary commands to be sent
     public private(set) var subscriptionCommandsArray = [CommandTuple]()// Subscription commands to be sent
-
+    
     public private(set) var antennaList = [AntennaPort]()               // Array of available Antenna ports
     public private(set) var micList = [MicrophonePort]()                // Array of Microphone ports
     public private(set) var rfGainList = [RfGainValue]()                // Array of RfGain parameters
     public private(set) var sliceList = [SliceId]()                     // Array of available Slice id's
-
+    
     public private(set) var sliceErrors = [String]()                    // frequency error of a Slice (milliHz)
     
     public private(set) var filters: [FilterMode: [FilterSpec]]!        // Dictionary of Filters
     
     public let kApiFirmwareSupport = "1.10.16.x"                        // The Radio Firmware version supported by this API
-
-
+    
+    
     // ----------------------------------------------------------------------------
     // MARK: - Internal properties
     
@@ -79,7 +79,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let _udpReceiveQ =      DispatchQueue(label: kApiId + ".udpReceiveQ")
     private let _udpSendQ =         DispatchQueue(label: kApiId + ".udpSendQ")
     private let _pingQ =            DispatchQueue(label: kApiId + ".pingQ")
-
+    
     // GCD Concurrent Queues
     private let _audioStreamQ =     DispatchQueue(label: kApiId + ".audioStreamQ", attributes: [.concurrent])
     private let _cwxQ =             DispatchQueue(label: kApiId + ".cwxQ", attributes: [.concurrent])
@@ -133,7 +133,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let kVersionCmd = "version"
     private let kXmitCmd = "xmit "
     private let kXvtrCmd = "xvtr "
-
+    
     private let kMinLevel = 0                                        // control range
     private let kMaxLevel = 100
     private let kMinPitch = 100
@@ -327,7 +327,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private var __waveformList = ""                                  //
     //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
-
+    
     // ----------------------------------------------------------------------------
     // MARK: - Initialization
     
@@ -344,19 +344,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         super.init()
         
         _log.msg("xFlexAPI initialized, isGui = \(_isGui)", level: .debug, function: #function, file: #file, line: #line)
-
+        
         // check the version
         checkFirmwareVersion(radioParameters)
         
         // initialize filters
         filters = loadFilters(filterPath: appFolder().path + "/Filters.plist")
-                
+        
         // initialize Cwx
         cwx = Cwx(radio: self, queue: _cwxQ)
         
         // initialize a Manager for the TCP Command stream
         _tcp = TcpManager(tcpQ: _tcpQ, delegate: self)
-
+        
         // initialize a Manager for the UDP Data Streams
         _udp = UdpManager(radioParameters: radioParameters, udpReceiveQ: _udpReceiveQ, udpSendQ: _udpSendQ, delegate: self)
         
@@ -402,7 +402,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case is TXAudioStream:
             txAudioStreams[(object as! TXAudioStream).id] = nil
-
+            
         default:
             _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
         }
@@ -434,10 +434,10 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Returns:                  success/failure
     ///
     public func connect(selectedRadio: RadioParameters, primaryCommands: [Commands] = [.allPrimary], secondaryCommands: [Commands] = [.allSecondary], subscriptionCommands: [Commands] = [.allSubscription] ) -> Bool {
-
+        
         // enable the sending of Initial & secondary commands
         _connectSimple = false
-
+        
         // initialize Equalizers (use the newer "sc" type)
         equalizers[.rxsc] = Equalizer(radio: self, eqType: .rxsc, queue: _equalizerQ)
         equalizers[.txsc] = Equalizer(radio: self, eqType: .txsc, queue: _equalizerQ)
@@ -449,8 +449,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         return _tcp.connect(radioParameters: selectedRadio)
     }
-    
-    
     /// Send a command to the Radio (hardware)
     ///
     /// - Parameters:
@@ -492,23 +490,23 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func disconnect() {
         
-
+        
         // FIXME: Add missing components
         
         
         NC.post(.tcpWillDisconnect, object: selectedRadio as Any?)
         
-         _log.msg("Radio @ \(String(describing: selectedRadio?.ipAddress)) will disconnect", level: .info, function: #function, file: #file, line: #line)
-
+        _log.msg("Radio @ \(String(describing: selectedRadio?.ipAddress)) will disconnect", level: .info, function: #function, file: #file, line: #line)
+        
         // if active, stop pinging
         if pinger != nil { pinger = nil }
-
+        
         // disconnect TCP
         _tcp.disconnect()
         
         // unbind and close udp
         _udp.unbind()
-
+        
         // ----- remove all objects -----
         
         // remove all xvtrs
@@ -635,7 +633,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         return sendWithCheck(kXvtrCmd + "create", replyTo: callback)
     }
     public func removeXvtr(_ id: String) { send(kXvtrCmd + "remove " + id) }
-
+    
     // ----------------------------------------------------------------------------
     // MARK: - Internal methods
     
@@ -732,7 +730,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 self._log.msg("UDP bound to Port \(port)", level: .verbose, function: #function, file: #file, line: #line)
                 
                 NC.post(.udpDidBind, object: nil)
-
+                
                 // a UDP bind has been established
                 self._udp.beginReceiving()
                 
@@ -742,7 +740,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 // send the initial commands
                 if !self._connectSimple { self.sendCommands(self.primaryCommandsArray) }
-
+                
                 // TCP & UDP connections established, inform observers
                 NC.post(.clientDidConnect, object: self.selectedRadio as Any?)
                 
@@ -751,13 +749,13 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 // send the secondary commands
                 if !self._connectSimple { self.sendCommands(self.secondaryCommandsArray) }
-
+                
                 // tell the radio which UDP port number was selected for incoming UDP streams
                 self.send(Commands.clientUdpPort.rawValue + "\(self._udp.port)")
                 
                 // start pinging
                 if self.pingerEnabled { self.pinger = Pinger(tcpManager: self._tcp, pingQ: self._pingQ) }
-
+                
             case .disconnected(let reason):
                 
                 // TCP connection disconnected
@@ -854,7 +852,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // ignore incorrectly formatted replies
         if components.count < 2 {
-           
+            
             _log.msg("Incomplete reply, c\(commandSuffix)", level: .warning, function: #function, file: #file, line: #line)
             return
         }
@@ -871,7 +869,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // Remove the object from the notification list
             replyHandlers[components[0]] = nil
-
+            
         } else {
             
             // no Object is waiting for this reply, log it if it is a non-zero Reply (i.e a possible error)
@@ -912,11 +910,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         }
         
         // FIXME: file, mixer, stream, turf, usbCable & xvtr Not currently implemented
-
+        
         
         // Known Message Types, in alphabetical order
         switch token {
-
+            
         case .audioStream:
             //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
             parseAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
@@ -961,7 +959,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                     _log.msg("Disconnect, forced=\(keyValues[2].value)", level: .verbose, function: #function, file: #file, line: #line)
                     
                 } else {
-                
+                    
                     _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
                 }
             }
@@ -972,7 +970,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .daxiq:
             //      format: <daxChannel> <key=value> <key=value> ...<key=value>
-//            parseDaxiq( keyValuesArray(remainder))
+            //            parseDaxiq( keyValuesArray(remainder))
             
             _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
             
@@ -993,7 +991,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case .file:
             
             _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
-
+            
         case .gps:
             //     format: <key=value>#<key=value>#...<key=value>
             parseGps( keyValuesArray(remainder, delimiter: "#"))
@@ -1009,7 +1007,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case .meter:
             //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
             parseMeter( keyValuesArray(remainder, delimiter: "#"), notInUse: remainder.contains("removed"))
-        
+            
         case .micAudioStream:
             //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
             parseMicAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
@@ -1066,7 +1064,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case .waveform:
             //      format: <key=value> <key=value> ...<key=value>
             parseWaveform( keyValuesArray(remainder))
-
+            
         case .xvtr:
             //      format: <name> <key=value> <key=value> ...<key=value>
             parseXvtr( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
@@ -1079,7 +1077,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // --------------------------------------------------------------------------------
     
     // FIXME: Should parsers ignore Status message sent to other connection handles?
-
+    
     /// Prepare to parse an AudioStream status message
     ///
     /// - Parameters:
@@ -1166,34 +1164,34 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseCwx(_ keyValues: KeyValuesArray) {
-
+        
         // pass the key values to the Cwx for parsing
         cwx.parseKeyValues(keyValues)
     }
     
     // FIXME: How to integrate this with the Stream Status?
     
-//    /// Prepare to parse a DaxIq status message
-//    ///
-//    /// - Parameters:
-//    ///   - keyValues:      a KeyValuesArray
-//    ///
-//    private func parseDaxiq(_ keyValues: KeyValuesArray) {
-//        // Format: <channel, ""> <"pan", streamId> <"rate", value> <"capacity", value> <"available", value>
-//
-//        // get the Dax Channel
-//        let channel = Int(keyValues[0].key) ?? 0
-//
-//        // does the DaxIQ stream exist?
-//        var iqStream = findIqStreamBy(daxIqChannel: channel)
-//        if iqStream == nil {
-//
-//            // NO, create a new Stream
-//            iqStream = IqStream(radio: self, id: queue: _iqStreamQ)
-//        }
-//        // pass the key values to the IqStream for parsing
-//        iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
-//    }
+    //    /// Prepare to parse a DaxIq status message
+    //    ///
+    //    /// - Parameters:
+    //    ///   - keyValues:      a KeyValuesArray
+    //    ///
+    //    private func parseDaxiq(_ keyValues: KeyValuesArray) {
+    //        // Format: <channel, ""> <"pan", streamId> <"rate", value> <"capacity", value> <"available", value>
+    //
+    //        // get the Dax Channel
+    //        let channel = Int(keyValues[0].key) ?? 0
+    //
+    //        // does the DaxIQ stream exist?
+    //        var iqStream = findIqStreamBy(daxIqChannel: channel)
+    //        if iqStream == nil {
+    //
+    //            // NO, create a new Stream
+    //            iqStream = IqStream(radio: self, id: queue: _iqStreamQ)
+    //        }
+    //        // pass the key values to the IqStream for parsing
+    //        iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+    //    }
     /// Prepare to parse a Display status message
     ///
     /// - Parameters:
@@ -1253,7 +1251,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             switch token {
                 
             case .panadapter:
-
+                
                 // notify all observers
                 NC.post(.panadapterWillBeRemoved, object: panadapters[streamId] as Any?)
                 
@@ -1266,9 +1264,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 removeObject(waterfalls[streamId])
             }
-        
+            
         } else {
-
+            
             // NO, Which Display Type?
             switch token {
                 
@@ -1278,7 +1276,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 if panadapters[streamId] == nil {
                     
                     // NO, Create a Panadapter & add it to the Panadapters collection
-                    panadapters[streamId] = Panadapter(streamId: streamId, radio: self, queue: _panadapterQ)
+                    panadapters[streamId] = Panadapter(radio: self, id: streamId, queue: _panadapterQ)
                 }
                 // pass the key values to the Panadapter for parsing
                 panadapters[streamId]!.parseKeyValues(Array(keyValues.dropFirst(2)))
@@ -1312,19 +1310,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // determine the type of Equalizer
         switch type {
-
+            
         case EqualizerType.txsc.rawValue:
             // transmit equalizer
             equalizer = equalizers[.txsc]
-
+            
         case EqualizerType.rxsc.rawValue:
             // receive equalizer
             equalizer = equalizers[.rxsc]
-
+            
         case EqualizerType.rx.rawValue, EqualizerType.tx.rawValue:
             // obslete type, ignore it
             break
-
+            
         default:
             // unknown type, log & ignore it
             _log.msg("Unknown EQ - \(type)", level: .debug, function: #function, file: #file, line: #line)
@@ -1419,7 +1417,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 didChangeValue(forKey: "gpsVisible")
             }
         }
-
+        
     }
     /// Parse an Interlock status message
     ///
@@ -1510,7 +1508,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "txDelay")
                 _txDelay = iValue
                 didChangeValue(forKey: "txDelay")
-
+                
             case .tx1Enabled:
                 willChangeValue(forKey: "key")
                 _tx1Enabled = bValue
@@ -1554,7 +1552,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // get the Memory Id
         let memoryId = keyValues[0].key
-
+        
         // is it marked for removal?
         if notInUse {
             
@@ -1571,7 +1569,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             if memory == nil {
                 
                 // NO, create a new Memory & add it to the Memories collection
-                memory = Memory(radio: self, memoryId: memoryId, queue: _memoryQ)
+                memory = Memory(radio: self, id: memoryId, queue: _memoryQ)
                 memories[memoryId] = memory
             }
             // pass the key values to the Memory for parsing
@@ -1666,7 +1664,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // remove it from the its collection
             removeObject(micAudioStreams[streamId])
-        
+            
         } else {
             
             // NO, does the MicAudioStream exist?
@@ -1709,14 +1707,14 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         //      OR
         // Format:  <profileType, > <"current", value>
         
-//        // find the space & get the Profile Type
-//        let spaceRange = remainder.range(of: "=")
-//        let profileType = remainder.substring(with: Range<String.Index>(remainder.startIndex..<spaceRange!.lowerBound))
-//
-//        // everything past the profileType is in the remainder
-//        let rest = remainder.substring(with: Range<String.Index>(spaceRange!.upperBound..<remainder.endIndex))
-//
-//        let values = valuesArray(rest, delimiter: "^")
+        //        // find the space & get the Profile Type
+        //        let spaceRange = remainder.range(of: "=")
+        //        let profileType = remainder.substring(with: Range<String.Index>(remainder.startIndex..<spaceRange!.lowerBound))
+        //
+        //        // everything past the profileType is in the remainder
+        //        let rest = remainder.substring(with: Range<String.Index>(spaceRange!.upperBound..<remainder.endIndex))
+        //
+        //        let values = valuesArray(rest, delimiter: "^")
         
         let values = valuesArray(keyValues[1].value, delimiter: "^")
         
@@ -1843,7 +1841,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
             case .digital:
                 digital = true
-            
+                
             case .freqErrorPpb:
                 willChangeValue(forKey: "freqErrorPpb")
                 _freqErrorPpb = iValue
@@ -1950,7 +1948,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
             case .staticNetParams:
                 staticNetParams = true
-
+                
             case .tnfEnabled:
                 willChangeValue(forKey: "tnfEnabled")
                 _tnfEnabled = bValue
@@ -1960,7 +1958,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "txInWaterfallEnabled")
                 _txInWaterfallEnabled = bValue
                 didChangeValue(forKey: "txInWaterfallEnabled")
-            
+                
             case .voice:
                 voice = true
                 
@@ -1992,7 +1990,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // YES, notify all observers
             NC.post(.sliceWillBeRemoved, object: slices[sliceId] as Any?)
-                
+            
             // remove it from the its collection
             removeObject(slices[sliceId])
             
@@ -2107,7 +2105,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "cwBreakInDelay")
                 _cwBreakInDelay = iValue
                 didChangeValue(forKey: "cwBreakInDelay")
-
+                
             case .cwIambicEnabled:
                 willChangeValue(forKey: "cwIambicEnabled")
                 _cwIambicEnabled = bValue
@@ -2152,82 +2150,82 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "daxEnabled")
                 _daxEnabled = bValue
                 didChangeValue(forKey: "daxEnabled")
-
+                
             case .frequency:
                 willChangeValue(forKey: "frequency")
                 _frequency = kv.value.mhzToHz()
                 didChangeValue(forKey: "frequency")
-
+                
             case .hwAlcEnabled:
                 willChangeValue(forKey: "hwAlcEnabled")
                 _hwAlcEnabled = bValue
                 didChangeValue(forKey: "hwAlcEnabled")
-
+                
             case .inhibit:
                 willChangeValue(forKey: "inhibit")
                 _inhibit = bValue
                 didChangeValue(forKey: "inhibit")
-
+                
             case .maxPowerLevel:
                 willChangeValue(forKey: "maxPowerLevel")
                 _maxPowerLevel = iValue
                 didChangeValue(forKey: "maxPowerLevel")
-
+                
             case .metInRxEnabled:
                 willChangeValue(forKey: "metInRxEnabled")
                 _metInRxEnabled = bValue
                 didChangeValue(forKey: "metInRxEnabled")
-
+                
             case .micAccEnabled:
                 willChangeValue(forKey: "micAccEnabled")
                 _micAccEnabled = bValue
                 didChangeValue(forKey: "micAccEnabled")
-
+                
             case .micBoostEnabled:
                 willChangeValue(forKey: "micBoostEnabled")
                 _micBoostEnabled = bValue
                 didChangeValue(forKey: "micBoostEnabled")
-
+                
             case .micBiasEnabled:
                 willChangeValue(forKey: "micBiasEnabled")
                 _micBiasEnabled = bValue
                 didChangeValue(forKey: "micBiasEnabled")
-
+                
             case .micLevel:
                 willChangeValue(forKey: "micLevel")
                 _micLevel = iValue
                 didChangeValue(forKey: "micLevel")
-
+                
             case .micSelection:
                 willChangeValue(forKey: "micSelection")
                 _micSelection = kv.value
                 didChangeValue(forKey: "micSelection")
-
+                
             case .monAvailable:
                 willChangeValue(forKey: "monAvailable")
                 _monAvailable = bValue
                 didChangeValue(forKey: "monAvailable")
-
+                
             case .monGainCw:
                 willChangeValue(forKey: "monGainCw")
                 _monGainCw = iValue
                 didChangeValue(forKey: "monGainCw")
-
+                
             case .monGainSb:
                 willChangeValue(forKey: "monGainSb")
                 _monGainSb = iValue
                 didChangeValue(forKey: "monGainSb")
-
+                
             case .monPanCw:
                 willChangeValue(forKey: "monPanCw")
                 _monPanCw = iValue
                 didChangeValue(forKey: "monPanCw")
-
+                
             case .monPanSb:
                 willChangeValue(forKey: "monPanSb")
                 _monPanSb = iValue
                 didChangeValue(forKey: "monPanSb")
-
+                
             case .rawIqEnabled:
                 willChangeValue(forKey: "rawIqEnabled")
                 _rawIqEnabled = bValue
@@ -2237,27 +2235,27 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "rfPower")
                 _rfPower = iValue
                 didChangeValue(forKey: "rfPower")
-
+                
             case .sbMonitorEnabled:
                 willChangeValue(forKey: "sbMonitorEnabled")
                 _sbMonitorEnabled = bValue
                 didChangeValue(forKey: "sbMonitorEnabled")
-
+                
             case .speechProcessorEnabled:
                 willChangeValue(forKey: "speechProcessorEnabled")
                 _speechProcessorEnabled = bValue
                 didChangeValue(forKey: "speechProcessorEnabled")
-
+                
             case .speecProcessorLevel:
                 willChangeValue(forKey: "speechProcessorLevel")
                 _speechProcessorLevel = iValue
                 didChangeValue(forKey: "speechProcessorLevel")
-
+                
             case .txFilterChanges:
                 willChangeValue(forKey: "txFilterChanges")
                 _txFilterChanges = bValue
                 didChangeValue(forKey: "txFilterChanges")
-
+                
             case .txFilterHigh:
                 willChangeValue(forKey: "txFilterHigh")
                 _txFilterHigh = iValue
@@ -2277,27 +2275,27 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "txRfPowerChanges")
                 _txRfPowerChanges = bValue
                 didChangeValue(forKey: "txRfPowerChanges")
-
+                
             case .tune:
                 willChangeValue(forKey: "tune")
                 _tune = bValue
                 didChangeValue(forKey: "tune")
-
+                
             case .tunePower:
                 willChangeValue(forKey: "tunePower")
                 _tunePower = iValue
                 didChangeValue(forKey: "tunePower")
-
+                
             case .voxEnabled:
                 willChangeValue(forKey: "voxEnabled")
                 _voxEnabled = bValue
                 didChangeValue(forKey: "voxEnabled")
-
+                
             case .voxDelay:
                 willChangeValue(forKey: "voxDelay")
                 _voxDelay = iValue
                 didChangeValue(forKey: "voxDelay")
-
+                
             case .voxLevel:
                 willChangeValue(forKey: "voxLevel")
                 _voxLevel = iValue
@@ -2313,7 +2311,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     private func parseTXAudioStream(_ keyValues: KeyValuesArray, notInUse: Bool) {
         // Format:  <streamId, > <"dax_tx", channel> <"in_use", 1|0> <"ip", ip> <"port", port>
-
+        
         //get the AudioStreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
         
@@ -2387,29 +2385,29 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         //      OR
         // Format: <index, > <"in_use", 0>
         
-//        // get the Name
-//        let name = String(keyValues[0].key)
-//
-//        // should the Xvtr be removed?
-//        if notInUse {
-//
-//            // YES, notify all observers
-//            NC.post(.xvtrWillBeRemoved, object: xvtrs[name] as Any?)
-//
-//            // remove it from the its collection
-//            removeObject(xvtrs[name])
-//
-//        } else {
-//
-//            // does the Xvtr exist?
-//            if xvtrs[name] == nil {
-//
-//                // NO, create a new Xvtr & add it to the Xvtrs collection
-//                xvtrs[name] = Xvtr(radio: self, name: name, queue: _xvtrQ)
-//            }
-//            // pass the remaining key values to the Xvtr for parsing
-//            xvtrs[name]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
-//        }
+        //        // get the Name
+        //        let name = String(keyValues[0].key)
+        //
+        //        // should the Xvtr be removed?
+        //        if notInUse {
+        //
+        //            // YES, notify all observers
+        //            NC.post(.xvtrWillBeRemoved, object: xvtrs[name] as Any?)
+        //
+        //            // remove it from the its collection
+        //            removeObject(xvtrs[name])
+        //
+        //        } else {
+        //
+        //            // does the Xvtr exist?
+        //            if xvtrs[name] == nil {
+        //
+        //                // NO, create a new Xvtr & add it to the Xvtrs collection
+        //                xvtrs[name] = Xvtr(radio: self, name: name, queue: _xvtrQ)
+        //            }
+        //            // pass the remaining key values to the Xvtr for parsing
+        //            xvtrs[name]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+        //        }
         
     }
     
@@ -2473,7 +2471,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     
     // MARK: ----- Slice -----
-
+    
     /// Disable all TxEnabled
     ///
     public func disableTx() {
@@ -2513,15 +2511,15 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         var slice: Slice?
         
         let minWidth = Int( CGFloat(panafallBandwidth) * kSliceClickBandwidth )
-
+        
         // find the Panadapter containing the Slice (if any)
         for (_, s) in slices where s.panadapterId == id {
             
-//            let width = CGFloat(s.filterHigh) - CGFloat(s.filterLow)
-
+            //            let width = CGFloat(s.filterHigh) - CGFloat(s.filterLow)
+            
             let widthDown = min(-minWidth/2, s.filterLow)
             let widthUp = max(minWidth/2, s.filterHigh)
-
+            
             if freq >= s.frequency + widthDown && freq <= s.frequency + widthUp {
                 
                 // YES, return the Slice
@@ -2608,7 +2606,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // --------------------------------------------------------------------------------
     // MARK: - Radio Reply Handler
-
+    
     /// Process the Reply to a command, reply format: <value>,<value>,...<value>
     ///
     /// - Parameters:
@@ -2634,7 +2632,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case kAntListCmd:
             // save the list
             antennaList = valuesArray(reply, delimiter: ",")
-        
+            
         case kMeterListCmd:
             // process the reply
             parseMeterListReply(reply)
@@ -2650,13 +2648,13 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case kRadioUptimeCmd:
             // save the returned Uptime (seconds)
             uptime = Int(reply) ?? 0
-        
+            
         case kVersionCmd:
             // process the reply
             parseVersionReply(keyValuesArray(reply, delimiter: "#"))
             
         default:
-        
+            
             if command.hasPrefix(kDisplayPanCmd + "create") {
                 
                 // separate the Stream Ids
@@ -2664,12 +2662,12 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 // create the new Panadapter & add it to the collection
                 let panadapterId = String( components[0].characters.dropFirst(2) )
-                panadapters[panadapterId] = Panadapter(streamId: panadapterId, radio: self, queue: _panadapterQ)
+                panadapters[panadapterId] = Panadapter(radio: self, id: panadapterId, queue: _panadapterQ)
                 
                 // create the new Waterfall & add it to the collection
                 let waterfallId = String( components[1].characters.dropFirst(2) )
                 waterfalls[waterfallId] = Waterfall(streamId: waterfallId, radio: self, queue: _waterfallQ)
-            
+                
             } else if command.hasPrefix(kStreamCreateCmd + "dax=") {
                 
                 // FIXME: add code
@@ -2679,7 +2677,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 // FIXME: add code
                 break
-
+                
             } else if command.hasPrefix(kStreamCreateCmd + "daxtx") {
                 
                 // FIXME: add code
@@ -2694,7 +2692,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
                 // save the errors, format: <rx_error_value>,<tx_error_value>
                 sliceErrors = valuesArray(reply, delimiter: ",")
-
+                
             } else {
                 _log.msg(command + ", unprocessed reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
             }
@@ -2729,87 +2727,87 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "atuPresent")
                 _atuPresent = bValue
                 didChangeValue(forKey: "atuPresent")
-            
+                
             case .callsign:
                 willChangeValue(forKey: "callsign")
                 _callsign = sValue
                 didChangeValue(forKey: "callsign")
-            
+                
             case .chassisSerial:
                 willChangeValue(forKey: "chassisSerial")
                 _chassisSerial = sValue
                 didChangeValue(forKey: "chassisSerial")
-            
+                
             case .gateway:
                 willChangeValue(forKey: "gateway")
                 _gateway = sValue
                 didChangeValue(forKey: "gateway")
-            
+                
             case .gps:
                 willChangeValue(forKey: "gpsPresent")
                 _gpsPresent = bValue
                 didChangeValue(forKey: "gpsPresent")
-            
+                
             case .ipAddress:
                 willChangeValue(forKey: "ipAddress")
                 _ipAddress = sValue
                 didChangeValue(forKey: "ipAddress")
-            
+                
             case .location:
                 willChangeValue(forKey: "location")
                 _location = sValue
                 didChangeValue(forKey: "location")
-            
+                
             case .macAddress:
                 willChangeValue(forKey: "macAddress")
                 _macAddress = sValue
                 didChangeValue(forKey: "macAddress")
-            
+                
             case .model:
                 willChangeValue(forKey: "radioModel")
                 _radioModel = sValue
                 didChangeValue(forKey: "radioModel")
-            
+                
             case .netmask:
                 willChangeValue(forKey: "netmask")
                 _netmask = sValue
                 didChangeValue(forKey: "netmask")
-            
+                
             case .name:
                 willChangeValue(forKey: "nickname")
                 _nickname = sValue
                 didChangeValue(forKey: "nickname")
-            
+                
             case .numberOfScus:
                 willChangeValue(forKey: "numberOfScus")
                 _numberOfScus = iValue
                 didChangeValue(forKey: "numberOfScus")
-            
+                
             case .numberOfSlices:
                 willChangeValue(forKey: "numberOfSlices")
                 _numberOfSlices = iValue
                 didChangeValue(forKey: "numberOfSlices")
-            
+                
             case .numberOfTx:
                 willChangeValue(forKey: "numberOfTx")
                 _numberOfTx = iValue
                 didChangeValue(forKey: "numberOfTx")
-            
+                
             case .options:
                 willChangeValue(forKey: "radioOptions")
                 _radioOptions = sValue
                 didChangeValue(forKey: "radioOptions")
-            
+                
             case .region:
                 willChangeValue(forKey: "region")
                 _region = sValue
                 didChangeValue(forKey: "region")
-            
+                
             case .screensaver:
                 willChangeValue(forKey: "radioScreenSaver")
                 _radioScreenSaver = sValue
                 didChangeValue(forKey: "radioScreenSaver")
-            
+                
             case .softwareVersion:
                 willChangeValue(forKey: "softwareVersion")
                 _softwareVersion = sValue
@@ -2845,22 +2843,22 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // extract the first Meter Number
         var id = keyValues[0].key.components(separatedBy: ".")[0]
-
+        
         // loop through the kv pairs separating them into individual meters
         for (i, kv) in keyValues.enumerated() {
             
             // is this the start of a different meter?
             if id != kv.key.components(separatedBy: ".")[0] {
-
+                
                 // YES, add the current meter
                 addMeter(id: id, keyValues: meterKeyValues)
-
+                
                 // recycle the keyValues
                 meterKeyValues.removeAll(keepingCapacity: true)
                 
                 // get the new meter id
                 id = keyValues[i].key.components(separatedBy: ".")[0]
-
+                
             }
             // add the current kv pair to the current set of meter kv pairs
             meterKeyValues.append(keyValues[i])
@@ -2891,17 +2889,17 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 willChangeValue(forKey: "smartSdrMB")
                 _smartSdrMB = kv.value
                 didChangeValue(forKey: "smartSdrMB")
-            
+                
             case .psocMbTrx:
                 willChangeValue(forKey: "psocMbtrxVersion")
                 _psocMbtrxVersion = kv.value
                 didChangeValue(forKey: "psocMbtrxVersion")
-            
+                
             case .psocMbPa100:
                 willChangeValue(forKey: "psocMbPa100Version")
                 _psocMbPa100Version = kv.value
                 didChangeValue(forKey: "psocMbPa100Version")
-            
+                
             case .fpgaMb:
                 willChangeValue(forKey: "fpgaMbVersion")
                 _fpgaMbVersion = kv.value
@@ -2934,11 +2932,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             if commands.contains(.allPrimary) {                             // All Primary
                 
                 adjustedCommands = Commands.allPrimaryCommands()
-            
+                
             } else if commands.contains(.allSecondary) {                    // All Secondary
                 
                 adjustedCommands = Commands.allSecondaryCommands()
-            
+                
             } else if commands.contains(.allSubscription) {                 // All Subscription
                 
                 adjustedCommands = Commands.allSubscriptionCommands()
@@ -2951,33 +2949,33 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                     
                 case .clientProgram:
                     array.append( (command.rawValue + _clientName, false, nil) )
-                
+                    
                 case .meterList:
                     array.append( (command.rawValue, false, replyHandler) )
-                
+                    
                 case .info:
                     array.append( (command.rawValue, false, replyHandler) )
-                
+                    
                 case .version:
                     array.append( (command.rawValue, false, replyHandler) )
-                
+                    
                 case .antList:
                     array.append( (command.rawValue, false, replyHandler) )
-                
+                    
                 case .micList:
                     array.append( (command.rawValue, false, replyHandler) )
-                
+                    
                 case .clientGui:
                     if _isGui { array.append( (command.rawValue, false, nil) ) }
-
+                    
                     // FIXME:
                     
-//                case .clientUdpPort:
-//                    array.append( (command.rawValue + "\(_udp.port)", false, nil) )
-                
+                    //                case .clientUdpPort:
+                    //                    array.append( (command.rawValue + "\(_udp.port)", false, nil) )
+                    
                 case .none, .allPrimary, .allSecondary, .allSubscription:   // should never occur
                     break
-                
+                    
                 default:
                     array.append( (command.rawValue, false, nil) )
                 }
@@ -3008,7 +3006,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         let fileManager = FileManager()
         let urls = fileManager.urls(for: .applicationSupportDirectory, in: .userDomainMask ) as [URL]
         let appFolder = urls.first!.appendingPathComponent( Bundle.main.bundleIdentifier! )
-
+        
         // does the folder exist?
         if !fileManager.fileExists( atPath: appFolder.path ) {
             
@@ -3034,7 +3032,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // compare the versions
         if xFlexVersionParts[0] != radioVersionParts[0] || xFlexVersionParts[1] != radioVersionParts[1] || xFlexVersionParts[2] != radioVersionParts[2] {
-             _log.msg("Firmware update needed, Radio Version = \(selectedRadio.firmwareVersion!), xFlexAPI Firmware Support = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
+            _log.msg("Firmware update needed, Radio Version = \(selectedRadio.firmwareVersion!), xFlexAPI Firmware Support = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
         }
     }
     /// Replace spaces and equal signs in a CWX Macro with alternate characters
@@ -3053,13 +3051,13 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         for char in string.characters {
             if char == "\"" {
                 quotes = !quotes
-            
+                
             } else if char == " " && quotes {
                 newString += "\u{007F}"
-            
+                
             } else if char == "=" && quotes {
                 newString += "*"
-            
+                
             } else {
                 newString.append(char)
             }
@@ -3082,7 +3080,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // user file exists
             theDict = NSDictionary( contentsOfFile: userFilePath)! as! [String:AnyObject]
-        
+            
         } else {
             
             // no User file exists, use the default file
@@ -3176,7 +3174,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // Pinging Started
         NC.makeObserver(self, with: #selector(tcpPingStarted(_:)), of: .tcpPingStarted, object: nil)
-
+        
         // Ping Timeout
         NC.makeObserver(self, with: #selector(tcpPingTimeout(_:)), of: .tcpPingTimeout, object: nil)
     }
@@ -3209,7 +3207,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func sentMessage(_ text: String) {
         
-//        _log.command(String(text.characters.dropLast()))
+        //        _log.command(String(text.characters.dropLast()))
     }
     /// Process a received message
     ///
@@ -3218,8 +3216,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func receivedMessage(_ text: String) {
         
-//        _log.command(String(text.characters.dropLast()))
-
+        //        _log.command(String(text.characters.dropLast()))
+        
         // pass it to the parser
         parse(String(text.characters.dropLast()))
     }
@@ -3232,7 +3230,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - error:      error message
     ///
     public func tcpState(connected: Bool, host: String, port: UInt16, error: String) {
-
+        
         // connected?
         if connected {
             
@@ -3260,7 +3258,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - message:    the error message
     ///
     public func tcpError(_ message: String) {
-
+        
         _log.msg("TCP error:  \(message)", level: .error, function: #function, file: #file, line: #line)
     }
     
@@ -3281,7 +3279,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // YES, set state
             setConnectionState(.udpBound(port: port))
-        
+            
         } else {
             
             // YES, disconnect with error
@@ -3971,7 +3969,7 @@ extension Radio {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant with Radio update (where appropriate)
-
+    
     // listed in alphabetical order
     @objc dynamic public var accTxEnabled: Bool {                                             // accTx
         get {  return _accTxEnabled }
@@ -4151,7 +4149,7 @@ extension Radio {
     @objc dynamic public var filterDigitalLevel: Int {                                        // filterDigitalLevel
         get {  return _filterDigitalLevel }
         set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; send(kRadioCmd + "filter_sharpness digital level=\(newValue)") } } }
-
+    
     @objc dynamic public var filterVoiceLevel: Int {                                          // filterVoiceLevel
         get {  return _filterVoiceLevel }
         set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; send(kRadioCmd + "filter_sharpness voice level=\(newValue)") } } }
@@ -4285,7 +4283,7 @@ extension Radio {
     @objc dynamic public var micSelection: String {                                           // micSelection
         get {  return _micSelection }
         set { if _micSelection != newValue { _micSelection = newValue ; send(kMicCmd + "input " + newValue) } } }
-
+    
     @objc dynamic public var monAvailable: Bool {                                             // monAvailable
         get {  return _monAvailable }
         set { if _monAvailable != newValue { _monAvailable = newValue ; send(kTransmitSetCmd + "mon=\(newValue.asNumber())") } } }
@@ -4394,7 +4392,7 @@ extension Radio {
     @objc dynamic public var speechProcessorEnabled: Bool {                                   // speechProcessor
         get {  return _speechProcessorEnabled }
         set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; send(kTransmitSetCmd + "speech_processor_enable=\(newValue.asNumber())") } } }
-
+    
     @objc dynamic public var speechProcessorLevel: Int {                                      // speechProcessorLevel
         get {  return _speechProcessorLevel }
         set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; send(kTransmitSetCmd + "speech_processor_level=\(newValue)") } } }
@@ -4434,7 +4432,7 @@ extension Radio {
     @objc dynamic public var tune: Bool {                                                     // tune
         get {  return _tune }
         set { if _tune != newValue { _tune = newValue ; send(kTransmitCmd + "tune \(newValue.asNumber())") } } }
-
+    
     @objc dynamic public var tunePower: Int {                                                 // tunePower
         get {  return _tunePower }
         set { if _tunePower != newValue { _tunePower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "tunepower=\(newValue)") } } }
@@ -4566,7 +4564,7 @@ extension Radio {
     public var waterfalls: [WaterfallId: Waterfall] {                                   // waterfalls
         get { return _objectQ.sync { _waterfalls } }
         set { _objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
-
+    
     public var xvtrs: [XvtrId: Xvtr] {                                                  // xvtrs
         get { return _objectQ.sync { _xvtrs } }
         set { _objectQ.sync(flags: .barrier) { _xvtrs = newValue } } }
@@ -4579,6 +4577,7 @@ extension Radio {
     public var _udpPort: UInt16 {                                                       // udpPort
         get { return _radioQ.sync { __udpPort } }
         set { _radioQ.sync(flags: .barrier) { __udpPort = newValue } } }
+    
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Status messages (only populate values that != case value)
@@ -4868,7 +4867,7 @@ extension Radio {
         case tx         // deprecated type
         case txsc
     }
-
+    
     public struct FilterSpec {
         var filterHigh: Int
         var filterLow: Int
@@ -4882,7 +4881,7 @@ extension Radio {
         var high = 0
         var low = 0
     }
-
+    
     // --------------------------------------------------------------------------------
     // MARK: - Type Alias (alphabetical)
     
@@ -4975,6 +4974,5 @@ extension Radio {
                     .subUsbCable, .subAmplifier, .subFoundation, .subScu]
         }
     }
-    
 }
 
