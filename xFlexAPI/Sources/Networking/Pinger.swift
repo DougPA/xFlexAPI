@@ -31,7 +31,8 @@ public final class Pinger {
     
     /// Initialize a Pinger
     ///
-    /// - parameter tcpManager: a TcpManager class instance
+    /// - Parameters:
+    ///   - tcpManager:     a TcpManager class instance
     ///
     public init(tcpManager: TcpManager, pingQ: DispatchQueue) {
         

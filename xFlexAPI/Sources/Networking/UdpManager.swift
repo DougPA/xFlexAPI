@@ -61,8 +61,9 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     
     /// Initialize a UdpManager
     ///
-    /// - parameter radioParameters: a RadioParameters tuple
-    /// - parameter udpReceiveQ:  a serial Q for GCDAsyncUdpSocket activity
+    /// - Parameters:
+    ///   - radioParameters:    a RadioParameters tuple
+    ///   - udpReceiveQ:        a serial Q for GCDAsyncUdpSocket activity
     ///
     public init(radioParameters: RadioParameters, udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
         
@@ -101,7 +102,8 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     
     /// Send a Broadcast
     ///
-    /// - Parameter data: a Vita-49 packet as Data
+    /// - Parameters:
+    ///   - data:       a Vita-49 packet as Data
     ///
     public func sendBroadcast(data: Data) {
         
@@ -109,7 +111,8 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     }
     /// Send Vita packet to radio
     ///
-    /// - Parameter data: a Vita-49 packet as Data
+    /// - Parameters:
+    ///   - data:       a Vita-49 packet as Data
     ///
     public func sendData(_ data: Data) {
         
@@ -189,10 +192,11 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     
     /// Called when data has been read from the UDP connection
     ///
-    /// - parameter sock:          the receiving socket
-    /// - parameter data:          the data received
-    /// - parameter address:       the Host address
-    /// - parameter filterContext: a filter context (if any)
+    /// - Parameters:
+    ///   - sock:          the receiving socket
+    ///   - data:          the data received
+    ///   - address:       the Host address
+    ///   - filterContext: a filter context (if any)
     ///
     @objc public func udpSocket(_ sock: GCDAsyncUdpSocket, didReceive data: Data, fromAddress address: Data, withFilterContext filterContext: Any?) {
         

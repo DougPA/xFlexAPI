@@ -22,8 +22,9 @@ public final class RadioParameters : Equatable {
     
     /// Create a RadioParameters instance from a valuesArray
     ///
-    /// - Parameter valuesArray: an array of Values
-    /// - Returns: a RadioParameters instance
+    /// - Parameters:
+    ///   - valuesArray:    an array of Values
+    /// - Returns:          a RadioParameters instance
     ///
     public static func parametersFromArray(valuesArray: [String]) -> RadioParameters {
         
@@ -49,8 +50,8 @@ public final class RadioParameters : Equatable {
     /// Returns a Boolean value indicating whether two RadioParameter instances are equal.
     ///
     /// - Parameters:
-    ///   - lhs: A value to compare.
-    ///   - rhs: Another value to compare.
+    ///   - lhs:            A value to compare.
+    ///   - rhs:            Another value to compare.
     ///
     public static func ==(lhs: RadioParameters, rhs: RadioParameters) -> Bool {
         return lhs.serialNumber == rhs.serialNumber && lhs.ipAddress == rhs.ipAddress
@@ -78,7 +79,8 @@ public final class RadioParameters : Equatable {
     
     /// Initialize a RadioParameters struct
     ///
-    /// - parameter lastSeen: the DateTime
+    /// - Parameters:
+    ///   - lastSeen:       the DateTime
     ///
     public init(lastSeen: Date = Date(), ipAddress: String = "", port: Int = 0, model: String = "", serialNumber: String = "") {
         
@@ -94,9 +96,9 @@ public final class RadioParameters : Equatable {
     
     ///  Return a String value given a property name
     ///
-    /// - parameter id: a Property Name
-    ///
-    /// - returns: String value of the Property
+    /// - Parameters:
+    ///   - id:         a Property Name
+    /// - Returns:      String value of the Property
     ///
     public func valueForName(_ name: String) -> String? {
         
@@ -147,7 +149,7 @@ public final class RadioParameters : Equatable {
     }
     /// Return an array containing the Radio Parameters
     ///
-    /// - Returns: an array of values
+    /// - Returns:      an array of values
     ///
     public func valuesArray() -> [String] {
         

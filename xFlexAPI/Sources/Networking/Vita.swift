@@ -114,8 +114,9 @@ public struct Vita {
     // MARK: - Static methods
     /// Create a Discovery Data packet
     ///
-    /// - Parameter payload:    the Discovery payload (as an array of String)
-    /// - Returns:              a Vita Discovery Data packet
+    /// - Parameters:
+    ///   - payload:        the Discovery payload (as an array of String)
+    /// - Returns:          a Vita Discovery Data packet
     ///
     public static func discovery(payload: [String]) -> Data? {
         let kDiscoveryStreamId = "00000800"
@@ -152,8 +153,9 @@ public struct Vita {
     }
     /// Decode a Vita Data packet into a Vita struct
     ///
-    /// - Parameter packet:     a Vita packet (as a Data)
-    /// - Returns:              a Vita struct
+    /// - Parameters:
+    ///   - packet:         a Vita packet (as a Data)
+    /// - Returns:          a Vita struct
     ///
     public static func decode(vitaPacket data: Data) -> Vita? {
         let kVitaMinimumBytes = 28          // Minimum size of a Vita packet (bytes)
@@ -275,7 +277,8 @@ public struct Vita {
     
     /// Populate a Vita Data packet from this Vita struct
     ///
-    /// - Parameter vita:   a Vita struct
+    /// - Parameters:
+    ///   - vita:           a Vita struct
     /// - Returns:          a Vita packet (as a Data)
     ///
     public func encode() -> Data? {
@@ -336,7 +339,7 @@ public struct Vita {
     }
     /// Parse this Vita struct as a Discovery struct
     ///
-    /// - returns:      a RadioParameters struct (or nil)
+    /// - Returns:      a RadioParameters struct (or nil)
     ///
     public func parseDiscoveryPacket() -> RadioParameters? {
         
@@ -414,7 +417,7 @@ public struct Vita {
     }
     /// Return a String description of this Vita struct
     ///
-    /// - returns:          a String describing the Vita struct
+    /// - Returns:          a String describing the Vita struct
     ///
     public func desc() -> String {
         

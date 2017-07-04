@@ -73,8 +73,9 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     
     /// Attempt to connect to the Radio (hardware)
     ///
-    /// - Parameter radioParameters:    a RadioParameters instance
-    /// - Returns:                      success / failure
+    /// - Parameters:
+    ///   - radioParameters:        a RadioParameters instance
+    /// - Returns:                  success / failure
     ///
     public func connect(radioParameters: RadioParameters) -> Bool {
         var success = true
@@ -109,8 +110,7 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     ///   - cmd:            a Command string
     ///   - diagnostic:     whether to add "D" suffix
     ///   - replyTo:        ReplyHandler (if any)
-    ///
-    /// - returns:          the Sequence Number of the Command
+    /// - Returns:          the Sequence Number of the Command
     ///
     public func send(_ cmd: String, diagnostic: Bool = false, replyTo callback: ReplyHandler? = nil) -> Int {
         var lastSeqNum = 0
