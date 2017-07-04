@@ -63,10 +63,10 @@ public final class Memory : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
     
-    init(radio: Radio, memoryId: Radio.MemoryId, queue: DispatchQueue) {
+    init(radio: Radio, id: Radio.MemoryId, queue: DispatchQueue) {
         
         self._radio = radio
-        self.id = memoryId
+        self.id = id
         self._memoryQ = queue
         
         super.init()

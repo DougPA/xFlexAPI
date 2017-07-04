@@ -94,14 +94,14 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     /// Initialize a Panadapter
     ///
     /// - Parameters:
-    ///   - streamId: a Panadapter Id
-    ///   - radio: parent Radio class
-    ///   - queue: Panadapter Concurrent queue
+    ///   - radio:      parent Radio class
+    ///   - id:         a Panadapter Id
+    ///   - queue:      Panadapter Concurrent queue
     ///
-    init(streamId: String, radio: Radio, queue: DispatchQueue) {
+    init(radio: Radio, id: String, queue: DispatchQueue) {
         
         self.radio = radio
-        self.id = streamId
+        self.id = id
         self._pandapterQ = queue
         
         super.init()
