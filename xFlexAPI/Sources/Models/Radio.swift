@@ -1702,60 +1702,63 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    private func parseProfile(_ keyValues: KeyValuesArray) {
-        // Format:  <profileType, > <"list", value^value...^value>
+    fileprivate func parseProfile(_ keyValues: KeyValuesArray) {
+        // Format:  <profileType, > <"list",value^value...^value>
         //      OR
         // Format:  <profileType, > <"current", value>
-        
-        //        // find the space & get the Profile Type
-        //        let spaceRange = remainder.range(of: "=")
-        //        let profileType = remainder.substring(with: Range<String.Index>(remainder.startIndex..<spaceRange!.lowerBound))
-        //
-        //        // everything past the profileType is in the remainder
-        //        let rest = remainder.substring(with: Range<String.Index>(spaceRange!.upperBound..<remainder.endIndex))
-        //
-        //        let values = valuesArray(rest, delimiter: "^")
         
         let values = valuesArray(keyValues[1].value, delimiter: "^")
         
         // determine the type of Profile & save it
-        if let profile = ProfileType(rawValue: keyValues[0].key.lowercased()) {
+        if let profileType = ProfileType(rawValue: keyValues[0].key.lowercased()), let subType = ProfileSubType(rawValue: keyValues[1].key.lowercased()) {
             
-            switch profile {
+            switch profileType {
                 
             case .global:
-                willChangeValue(forKey: "profiles")
-                _profiles[.global] = values
-                didChangeValue(forKey: "profiles")
-                
-            case .globalCurrent:
-                willChangeValue(forKey: "currentGlobalProfile")
-                _currentGlobalProfile = values[0]
-                didChangeValue(forKey: "currentGlobalProfile")
-                
-            case .tx:
-                willChangeValue(forKey: "profiles")
-                _profiles[.tx] = values
-                didChangeValue(forKey: "profiles")
-                
-            case .txCurrent:
-                willChangeValue(forKey: "currentTxProfile")
-                _currentTxProfile = values[0]
-                didChangeValue(forKey: "currentTxProfile")
+                switch subType {
+                case .list:
+                    // Global List
+                    willChangeValue(forKey: "profiles")
+                    _profiles[.global] = values
+                    didChangeValue(forKey: "profiles")
+                case .current:
+                    // Global Current
+                    willChangeValue(forKey: "currentGlobalProfile")
+                    _currentGlobalProfile = values[0]
+                    didChangeValue(forKey: "currentGlobalProfile")
+                }
                 
             case .mic:
-                willChangeValue(forKey: "profiles")
-                _profiles[.mic] = values
-                didChangeValue(forKey: "profiles")
+                switch subType {
+                case .list:
+                    // Mic List
+                    willChangeValue(forKey: "profiles")
+                    _profiles[.mic] = values
+                    didChangeValue(forKey: "profiles")
+                case .current:
+                    // Mic Current
+                    willChangeValue(forKey: "currentMicProfile")
+                    _currentMicProfile = values[0]
+                    didChangeValue(forKey: "currentMicProfile")
+                }
                 
-            case .micCurrent:
-                willChangeValue(forKey: "currentMicProfile")
-                _currentMicProfile = values[0]
-                didChangeValue(forKey: "currentMicProfile")
+            case .tx:
+                switch subType {
+                case .list:
+                    // Tx List
+                    willChangeValue(forKey: "profiles")
+                    _profiles[.tx] = values
+                    didChangeValue(forKey: "profiles")
+                case .current:
+                    // Tx Current
+                    willChangeValue(forKey: "currentTxProfile")
+                    _currentTxProfile = values[0]
+                    didChangeValue(forKey: "currentTxProfile")
+                }
             }
         } else {
             // unknown type
-            _log.msg("Unknown profile - \(remainder)", level: .debug, function: #function, file: #file, line: #line)
+            _log.msg("Unknown profile - \(keyValues[0].key.lowercased()), \(keyValues[1].key.lowercased())", level: .debug, function: #function, file: #file, line: #line)
         }
     }
     /// Parse a Radio status message
@@ -4853,12 +4856,14 @@ extension Radio {
     }
     
     public enum ProfileType: String {
-        case global = "global list"
-        case globalCurrent = "global current"
-        case mic = "mic list"
-        case micCurrent = "mic current"
-        case tx = "tx list"
-        case txCurrent = "tx current"
+        case global
+        case mic
+        case tx
+    }
+    
+    public enum ProfileSubType: String {
+        case current
+        case list
     }
     
     public enum EqualizerType: String {
