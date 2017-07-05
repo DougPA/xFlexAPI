@@ -39,52 +39,52 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _pandapterQ: DispatchQueue                  // GCD queue that guards this object
-    private var _initialized = false                        // True if initialized by Radio (hardware)
+    fileprivate var _pandapterQ: DispatchQueue                  // GCD queue that guards this object
+    fileprivate var _initialized = false                        // True if initialized by Radio (hardware)
     
     // constants
-    private let _log = Log.sharedInstance                   // shared Log
-    private let kDisplayPanafallSetCmd = "display panafall set " // Panafall "set" command prefix
-    private let kMinLevel = 0                               // control range
-    private let kMaxLevel = 100
-    private let kNoError = "0"                              // response without error
+    fileprivate let _log = Log.sharedInstance                   // shared Log
+    fileprivate let kDisplayPanafallSetCmd = "display panafall set " // Panafall "set" command prefix
+    fileprivate let kMinLevel = 0                               // control range
+    fileprivate let kMaxLevel = 100
+    fileprivate let kNoError = "0"                              // response without error
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __antList = [String]()                      // Available antenna choices            //
-    private var __autoCenterEnabled = false                 //                                      //
-    private var __available = 0                             // Capacity available (read only)       //
-    private var __average = 0                               // Setting of average (1 -> 100)        //
-    private var __band = ""                                 // Band encompassed by this pan         //
-    private var __bandwidth = 0                             // Bandwidth in Hz                      //
-    private var __capacity = 0                              // Capacity maximum indicator           //
-    private var __center = 0                                // Center in Hz                         //
-    private var __daxIqChannel = 0                          // DAX IQ channel number (0=none)       //
-    private var __daxIqRate = 0                             // DAX IQ Rate in bps                   //
-    private var __fps = 0                                   // Refresh rate (frames/second)         //
-    private var __loopAEnabled = false                      // Enable LOOPA for RXA                 //
-    private var __loopBEnabled = false                      // Enable LOOPB for RXB                 //
-    private var __maxBw = 0                                 // Maximum bandwidth                    //
-    private var __minBw = 0                                 // Minimum bandwidthl                   //
-    private var __maxDbm: CGFloat = 0.0                     // Maximum dBm level                    //
-    private var __minDbm: CGFloat = 0.0                     // Minimum dBm level                    //
-    private var __panDimensions = CGSize(width: 0, height: 0) // frame size                         //
-    private var __preamp = ""                               // Label of preselector selected        //
-    private var __rfGain = 0                                // RF Gain of preamp/attenuator         //
-    private var __rfGainHigh = 0                            // RF Gain high value                   //
-    private var __rfGainLow = 0                             // RF Gain low value                    //
-    private var __rfGainStep = 0                            // RF Gain step value                   //
-    private var __rfGainValues = ""                         // Possible Rf Gain values              //
-    private var __rxAnt = ""                                // Receive antenna name                 //
-    private var __waterfallId = ""                          // Waterfall belowo this Panadapter     //
-    private var __weightedAverageEnabled = false            // Enable weighted averaging            //
-    private var __wide = false                              // Preselector state                    //
-    private var __wnbEnabled = false                        // Wideband noise blanking enabled      //
-    private var __wnbLevel = 0                              // Wideband noise blanking level        //
-    private var __wnbUpdating = false                       // WNB is updating                      //
-    private var __xvtrLabel = ""                            // Label of selected XVTR profile       //
+    fileprivate var __antList = [String]()                      // Available antenna choices            //
+    fileprivate var __autoCenterEnabled = false                 //                                      //
+    fileprivate var __available = 0                             // Capacity available (read only)       //
+    fileprivate var __average = 0                               // Setting of average (1 -> 100)        //
+    fileprivate var __band = ""                                 // Band encompassed by this pan         //
+    fileprivate var __bandwidth = 0                             // Bandwidth in Hz                      //
+    fileprivate var __capacity = 0                              // Capacity maximum indicator           //
+    fileprivate var __center = 0                                // Center in Hz                         //
+    fileprivate var __daxIqChannel = 0                          // DAX IQ channel number (0=none)       //
+    fileprivate var __daxIqRate = 0                             // DAX IQ Rate in bps                   //
+    fileprivate var __fps = 0                                   // Refresh rate (frames/second)         //
+    fileprivate var __loopAEnabled = false                      // Enable LOOPA for RXA                 //
+    fileprivate var __loopBEnabled = false                      // Enable LOOPB for RXB                 //
+    fileprivate var __maxBw = 0                                 // Maximum bandwidth                    //
+    fileprivate var __minBw = 0                                 // Minimum bandwidthl                   //
+    fileprivate var __maxDbm: CGFloat = 0.0                     // Maximum dBm level                    //
+    fileprivate var __minDbm: CGFloat = 0.0                     // Minimum dBm level                    //
+    fileprivate var __panDimensions = CGSize(width: 0, height: 0) // frame size                         //
+    fileprivate var __preamp = ""                               // Label of preselector selected        //
+    fileprivate var __rfGain = 0                                // RF Gain of preamp/attenuator         //
+    fileprivate var __rfGainHigh = 0                            // RF Gain high value                   //
+    fileprivate var __rfGainLow = 0                             // RF Gain low value                    //
+    fileprivate var __rfGainStep = 0                            // RF Gain step value                   //
+    fileprivate var __rfGainValues = ""                         // Possible Rf Gain values              //
+    fileprivate var __rxAnt = ""                                // Receive antenna name                 //
+    fileprivate var __waterfallId = ""                          // Waterfall belowo this Panadapter     //
+    fileprivate var __weightedAverageEnabled = false            // Enable weighted averaging            //
+    fileprivate var __wide = false                              // Preselector state                    //
+    fileprivate var __wnbEnabled = false                        // Wideband noise blanking enabled      //
+    fileprivate var __wnbLevel = 0                              // Wideband noise blanking level        //
+    fileprivate var __wnbUpdating = false                       // WNB is updating                      //
+    fileprivate var __xvtrLabel = ""                            // Label of selected XVTR profile       //
                                                                                                     //
-    private var _delegate: PanadapterStreamHandler?         // Delegate for Panadapter stream       //
+    fileprivate var _delegate: PanadapterStreamHandler?         // Delegate for Panadapter stream       //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
@@ -418,131 +418,131 @@ extension Panadapter {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties - with synchronization
 
-    private var _antList: [String] {
+    fileprivate var _antList: [String] {
         get { return _pandapterQ.sync { __antList } }
         set { _pandapterQ.sync(flags: .barrier) { __antList = newValue } } }
     
-    private var _autoCenterEnabled: Bool {
+    fileprivate var _autoCenterEnabled: Bool {
         get { return _pandapterQ.sync { __autoCenterEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __autoCenterEnabled = newValue } } }
     
-    private var _available: Int {
+    fileprivate var _available: Int {
         get { return _pandapterQ.sync { __available } }
         set { _pandapterQ.sync(flags: .barrier) { __available = newValue } } }
     
-    private var _average: Int {
+    fileprivate var _average: Int {
         get { return _pandapterQ.sync { __average } }
         set { _pandapterQ.sync(flags: .barrier) { __average = newValue } } }
     
-    private var _band: String {
+    fileprivate var _band: String {
         get { return _pandapterQ.sync { __band } }
         set { _pandapterQ.sync(flags: .barrier) { __band = newValue } } }
     
-    private var _bandwidth: Int {
+    fileprivate var _bandwidth: Int {
         get { return _pandapterQ.sync { __bandwidth } }
         set { _pandapterQ.sync(flags: .barrier) { __bandwidth = newValue } } }
     
-    private var _capacity: Int {
+    fileprivate var _capacity: Int {
         get { return _pandapterQ.sync { __capacity } }
         set { _pandapterQ.sync(flags: .barrier) { __capacity = newValue } } }
     
-    private var _center: Int {
+    fileprivate var _center: Int {
         get { return _pandapterQ.sync { __center } }
         set { _pandapterQ.sync(flags: .barrier) { __center = newValue } } }
     
-    private var _daxIqChannel: Int {
+    fileprivate var _daxIqChannel: Int {
         get { return _pandapterQ.sync { __daxIqChannel } }
         set { _pandapterQ.sync(flags: .barrier) { __daxIqChannel = newValue } } }
     
-    private var _daxIqRate: Int {
+    fileprivate var _daxIqRate: Int {
         get { return _pandapterQ.sync { __daxIqRate } }
         set { _pandapterQ.sync(flags: .barrier) { __daxIqRate = newValue } } }
     
-    private var _fps: Int {
+    fileprivate var _fps: Int {
         get { return _pandapterQ.sync { __fps } }
         set { _pandapterQ.sync(flags: .barrier) { __fps = newValue } } }
     
-    private var _loopAEnabled: Bool {
+    fileprivate var _loopAEnabled: Bool {
         get { return _pandapterQ.sync { __loopAEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __loopAEnabled = newValue } } }
     
-    private var _loopBEnabled: Bool {
+    fileprivate var _loopBEnabled: Bool {
         get { return _pandapterQ.sync { __loopBEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __loopBEnabled = newValue } } }
     
-    private var _maxBw: Int {
+    fileprivate var _maxBw: Int {
         get { return _pandapterQ.sync { __maxBw } }
         set { _pandapterQ.sync(flags: .barrier) { __maxBw = newValue } } }
     
-    private var _maxDbm: CGFloat {
+    fileprivate var _maxDbm: CGFloat {
         get { return _pandapterQ.sync { __maxDbm } }
         set { _pandapterQ.sync(flags: .barrier) { __maxDbm = newValue } } }
     
-    private var _minBw: Int {
+    fileprivate var _minBw: Int {
         get { return _pandapterQ.sync { __minBw } }
         set { _pandapterQ.sync(flags: .barrier) { __minBw = newValue } } }
     
-    private var _minDbm: CGFloat {
+    fileprivate var _minDbm: CGFloat {
         get { return _pandapterQ.sync { __minDbm } }
         set { _pandapterQ.sync(flags: .barrier) { __minDbm = newValue } } }
     
-    private var _panDimensions: CGSize {
+    fileprivate var _panDimensions: CGSize {
         get { return _pandapterQ.sync { __panDimensions } }
         set { _pandapterQ.sync(flags: .barrier) { __panDimensions = newValue } } }
     
-    private var _preamp: String {
+    fileprivate var _preamp: String {
         get { return _pandapterQ.sync { __preamp } }
         set { _pandapterQ.sync(flags: .barrier) { __preamp = newValue } } }
     
-    private var _rfGain: Int {
+    fileprivate var _rfGain: Int {
         get { return _pandapterQ.sync { __rfGain } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGain = newValue } } }
     
-    private var _rfGainHigh: Int {
+    fileprivate var _rfGainHigh: Int {
         get { return _pandapterQ.sync { __rfGainHigh } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainHigh = newValue } } }
     
-    private var _rfGainLow: Int {
+    fileprivate var _rfGainLow: Int {
         get { return _pandapterQ.sync { __rfGainLow } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainLow = newValue } } }
     
-    private var _rfGainStep: Int {
+    fileprivate var _rfGainStep: Int {
         get { return _pandapterQ.sync { __rfGainStep } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainStep = newValue } } }
     
-    private var _rfGainValues: String {
+    fileprivate var _rfGainValues: String {
         get { return _pandapterQ.sync { __rfGainValues } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainValues = newValue } } }
     
-    private var _rxAnt: String {
+    fileprivate var _rxAnt: String {
         get { return _pandapterQ.sync { __rxAnt } }
         set { _pandapterQ.sync(flags: .barrier) { __rxAnt = newValue } } }
     
-    private var _waterfallId: String {
+    fileprivate var _waterfallId: String {
         get { return _pandapterQ.sync { __waterfallId } }
         set { _pandapterQ.sync(flags: .barrier) { __waterfallId = newValue } } }
     
-    private var _weightedAverageEnabled: Bool {
+    fileprivate var _weightedAverageEnabled: Bool {
         get { return _pandapterQ.sync { __weightedAverageEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __weightedAverageEnabled = newValue } } }
     
-    private var _wide: Bool {
+    fileprivate var _wide: Bool {
         get { return _pandapterQ.sync { __wide } }
         set { _pandapterQ.sync(flags: .barrier) { __wide = newValue } } }
     
-    private var _wnbEnabled: Bool {
+    fileprivate var _wnbEnabled: Bool {
         get { return _pandapterQ.sync { __wnbEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __wnbEnabled = newValue } } }
     
-    private var _wnbLevel: Int {
+    fileprivate var _wnbLevel: Int {
         get { return _pandapterQ.sync { __wnbLevel } }
         set { _pandapterQ.sync(flags: .barrier) { __wnbLevel = newValue } } }
     
-    private var _wnbUpdating: Bool {
+    fileprivate var _wnbUpdating: Bool {
         get { return _pandapterQ.sync { __wnbUpdating } }
         set { _pandapterQ.sync(flags: .barrier) { __wnbUpdating = newValue } } }
     
-    private var _xvtrLabel: String {
+    fileprivate var _xvtrLabel: String {
         get { return _pandapterQ.sync { __xvtrLabel } }
         set { _pandapterQ.sync(flags: .barrier) { __xvtrLabel = newValue } } }
     

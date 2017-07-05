@@ -26,24 +26,24 @@ final public class TxAudioStream: NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _radio: Radio?                      // The Radio that owns this TxAudioStream
-    private var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TxAudioStreams
-    private var _initialized = false                // True if initialized by Radio hardware
-    private var _txSeq = 0                          // Tx sequence number (modulo 16)
+    fileprivate var _radio: Radio?                      // The Radio that owns this TxAudioStream
+    fileprivate var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TxAudioStreams
+    fileprivate var _initialized = false                // True if initialized by Radio hardware
+    fileprivate var _txSeq = 0                          // Tx sequence number (modulo 16)
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __inUse = false                     // true = in use                                //
-    private var __ip = ""                           // Ip Address                                   //
-    private var __port = 0                          // Port number                                  //
-    private var __transmit = false                  // dax transmitting                             //
-    private var __txGain = 50                       // tx gain of stream                            //
-    private var __txGainScalar: Float = 1.0         // scalar gain value for multiplying            //
+    fileprivate var __inUse = false                     // true = in use                                //
+    fileprivate var __ip = ""                           // Ip Address                                   //
+    fileprivate var __port = 0                          // Port number                                  //
+    fileprivate var __transmit = false                  // dax transmitting                             //
+    fileprivate var __txGain = 50                       // tx gain of stream                            //
+    fileprivate var __txGainScalar: Float = 1.0         // scalar gain value for multiplying            //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // constants
-    private let _log = Log.sharedInstance           // shared Log
+    fileprivate let _log = Log.sharedInstance           // shared Log
         
     /// Initialize an TX Audio Stream
     ///
@@ -63,7 +63,7 @@ final public class TxAudioStream: NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods for sending tx audio to the Radio (hardware)
     
-    private var _vita: Vita?
+    fileprivate var _vita: Vita?
     public func sendTXAudio(left: [Float], right: [Float], samples: Int) -> Bool {
         
         // skip this if we are not the DAX TX Client
@@ -202,27 +202,27 @@ extension TxAudioStream {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _inUse: Bool {
+    fileprivate var _inUse: Bool {
         get { return _txAudioStreamsQ.sync { __inUse } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    private var _ip: String {
+    fileprivate var _ip: String {
         get { return _txAudioStreamsQ.sync { __ip } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    private var _port: Int {
+    fileprivate var _port: Int {
         get { return _txAudioStreamsQ.sync { __port } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    private var _transmit: Bool {
+    fileprivate var _transmit: Bool {
         get { return _txAudioStreamsQ.sync { __transmit } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __transmit = newValue } } }
     
-    private var _txGain: Int {
+    fileprivate var _txGain: Int {
         get { return _txAudioStreamsQ.sync { __txGain } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGain = newValue } } }
     
-    private var _txGainScalar: Float {
+    fileprivate var _txGainScalar: Float {
         get { return _txAudioStreamsQ.sync { __txGainScalar } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
     

@@ -28,20 +28,20 @@ public final class Tnf : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Internal properties
     
-    private var _radio: Radio?                      // The Radio that owns this Tnf
-    private var _tnfQ: DispatchQueue                // GCD queue that guards this object
-    private var _initialized = false                // True if initialized by Radio hardware
+    fileprivate var _radio: Radio?                      // The Radio that owns this Tnf
+    fileprivate var _tnfQ: DispatchQueue                // GCD queue that guards this object
+    fileprivate var _initialized = false                // True if initialized by Radio hardware
 
     // constants
-    private let _log = Log.sharedInstance           // shared Log
-    private let kSetCommand = "tnf set "            // Tnf Set command prefix
+    fileprivate let _log = Log.sharedInstance           // shared Log
+    fileprivate let kSetCommand = "tnf set "            // Tnf Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __depth = Tnf.Depth.normal.rawValue // Depth (Normal, Deep, Very Deep)              //
-    private var __frequency = 0                     // Frequency (Hz)                               //
-    private var __permanent = false                 // True =                                       //
-    private var __width = 0                         // Width (Hz)                                   //
+    fileprivate var __depth = Tnf.Depth.normal.rawValue // Depth (Normal, Deep, Very Deep)              //
+    fileprivate var __frequency = 0                     // Frequency (Hz)                               //
+    fileprivate var __permanent = false                 // True =                                       //
+    fileprivate var __width = 0                         // Width (Hz)                                   //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
@@ -166,19 +166,19 @@ extension Tnf {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _depth: Int {
+    fileprivate var _depth: Int {
         get { return _tnfQ.sync { __depth } }
         set { _tnfQ.sync(flags: .barrier) { __depth = newValue } } }
     
-    private var _frequency: Int {
+    fileprivate var _frequency: Int {
         get { return _tnfQ.sync { __frequency } }
         set { _tnfQ.sync(flags: .barrier) { __frequency = newValue } } }
     
-    private var _permanent: Bool {
+    fileprivate var _permanent: Bool {
         get { return _tnfQ.sync { __permanent } }
         set { _tnfQ.sync(flags: .barrier) { __permanent = newValue } } }
     
-    private var _width: Int {
+    fileprivate var _width: Int {
         get { return _tnfQ.sync { __width } }
         set { _tnfQ.sync(flags: .barrier) { __width = newValue } } }
     

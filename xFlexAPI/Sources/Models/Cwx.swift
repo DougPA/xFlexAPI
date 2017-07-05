@@ -29,31 +29,31 @@ public final class Cwx : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _radio: Radio?                      // The Radio that owns this Cwx
-    private var _cwxQ: DispatchQueue                // GCD queue that guards this object
+    fileprivate var _radio: Radio?                      // The Radio that owns this Cwx
+    fileprivate var _cwxQ: DispatchQueue                // GCD queue that guards this object
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __delay = 0                         // Delay (ms)                                   //
-    private var __qskEnabled = false                // QSK Enabled                                  //
-    private var __speed = 0                         // Speed (wpm)                                  //
+    fileprivate var __delay = 0                         // Delay (ms)                                   //
+    fileprivate var __qskEnabled = false                // QSK Enabled                                  //
+    fileprivate var __speed = 0                         // Speed (wpm)                                  //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
     // constants
-    private let _log = Log.sharedInstance           // shared log
-    private let kMinDelayMs = 0                     // Min delay (ms)
-    private let kMaxDelayMs = 2000                  // Max delay (ms)
-    private let kMinSpeed = 5                       // Min speed (wpm)
-    private let kMaxSpeed = 100                     // Max speed (wpm)
-    private let kMaxNumberOfMacros = 12             // Max number of macros
+    fileprivate let _log = Log.sharedInstance           // shared log
+    fileprivate let kMinDelayMs = 0                     // Min delay (ms)
+    fileprivate let kMaxDelayMs = 2000                  // Max delay (ms)
+    fileprivate let kMinSpeed = 5                       // Min speed (wpm)
+    fileprivate let kMaxSpeed = 100                     // Max speed (wpm)
+    fileprivate let kMaxNumberOfMacros = 12             // Max number of macros
 
-    private let kCwxCmd = "cwx "                    // Command prefixes
-    private let kCwxInsertCmd = "cwx insert "
-    private let kCwxMacroCmd = "cwx macro "
-    private let kCwxSendCmd = "cwx send "
+    fileprivate let kCwxCmd = "cwx "                    // Command prefixes
+    fileprivate let kCwxInsertCmd = "cwx insert "
+    fileprivate let kCwxMacroCmd = "cwx macro "
+    fileprivate let kCwxSendCmd = "cwx send "
     
-    private let kNoError = "0"                      // Response without error
+    fileprivate let kNoError = "0"                      // Response without error
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -354,15 +354,15 @@ extension Cwx {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _delay: Int {
+    fileprivate var _delay: Int {
         get { return _cwxQ.sync { __delay } }
         set { _cwxQ.sync(flags: .barrier) { __delay = newValue } } }
     
-    private var _qskEnabled: Bool {
+    fileprivate var _qskEnabled: Bool {
         get { return _cwxQ.sync { __qskEnabled } }
         set { _cwxQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
     
-    private var _speed: Int {
+    fileprivate var _speed: Int {
         get { return _cwxQ.sync { __speed } }
         set { _cwxQ.sync(flags: .barrier) { __speed = newValue } } }
     

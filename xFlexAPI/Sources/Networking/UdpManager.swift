@@ -43,18 +43,18 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _parameters: RadioParameters            // Struct of Radio parameters
-    private var _udpReceiveQ: DispatchQueue!            // serial GCD Queue for inbound UDP traffic
-    private var _udpSendQ: DispatchQueue!               // serial GCD Queue for outbound UDP traffic
-    private var _delegate: UdpManagerDelegate           // class to receive UDP data
+    fileprivate var _parameters: RadioParameters            // Struct of Radio parameters
+    fileprivate var _udpReceiveQ: DispatchQueue!            // serial GCD Queue for inbound UDP traffic
+    fileprivate var _udpSendQ: DispatchQueue!               // serial GCD Queue for outbound UDP traffic
+    fileprivate var _delegate: UdpManagerDelegate           // class to receive UDP data
 
-    private var _udpSocket: GCDAsyncUdpSocket!          // socket for Vita UDP data
-    private var _udpSendSocket: GCDAsyncUdpSocket?      // socket for sending Vita UDP data
-    private var _streamTimer: DispatchSourceTimer!      // periodic timer for stream activity
+    fileprivate var _udpSocket: GCDAsyncUdpSocket!          // socket for Vita UDP data
+    fileprivate var _udpSendSocket: GCDAsyncUdpSocket?      // socket for sending Vita UDP data
+    fileprivate var _streamTimer: DispatchSourceTimer!      // periodic timer for stream activity
     
     // constants
-    private let kBroadcastAddress = "255.255.255.255"
-    private let kUdpSendPort: UInt16 = 4991
+    fileprivate let kBroadcastAddress = "255.255.255.255"
+    fileprivate let kUdpSendPort: UInt16 = 4991
     
     // ----------------------------------------------------------------------------
     // MARK: - Initialization

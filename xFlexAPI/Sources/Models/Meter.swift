@@ -26,25 +26,25 @@ public class Meter : KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _radio: Radio?                                   // The Radio that owns this Meter
-    private var _initialized = false                             // True if initialized by Radio (hardware)
-    private var _meterQ: DispatchQueue                           // GCD queue that guards this object
+    fileprivate var _radio: Radio?                                   // The Radio that owns this Meter
+    fileprivate var _initialized = false                             // True if initialized by Radio (hardware)
+    fileprivate var _meterQ: DispatchQueue                           // GCD queue that guards this object
 
     // constants
-    private let _log = Log.sharedInstance                        // shared log
+    fileprivate let _log = Log.sharedInstance                        // shared log
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var _description = ""                                // long description                //
-    private var _fps = 0                                         // frames per second               //
-    private var _high: Float = 0.0                               // high limit                      //
-    private var _low: Float = 0.0                                // low limit                       //
-    private var _number = ""                                     // Id of the source                //
-    private var _name = ""                                       // abbreviated description         //
-    private var _peak: Float = 0.0                               // peak value                      //
-    private var _source = ""                                     // source                          //
-    private var _units = ""                                      // value units                     //
-    private var _value: Float = 0.0                              // value                           //
+    fileprivate var _description = ""                                // long description                //
+    fileprivate var _fps = 0                                         // frames per second               //
+    fileprivate var _high: Float = 0.0                               // high limit                      //
+    fileprivate var _low: Float = 0.0                                // low limit                       //
+    fileprivate var _number = ""                                     // Id of the source                //
+    fileprivate var _name = ""                                       // abbreviated description         //
+    fileprivate var _peak: Float = 0.0                               // peak value                      //
+    fileprivate var _source = ""                                     // source                          //
+    fileprivate var _units = ""                                      // value units                     //
+    fileprivate var _value: Float = 0.0                              // value                           //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 

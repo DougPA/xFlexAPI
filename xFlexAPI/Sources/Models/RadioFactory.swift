@@ -26,24 +26,24 @@ public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _notSeenInterval: TimeInterval = 3.0    // Interval that represents a timeout
-    private var _udpSocket: GCDAsyncUdpSocket?          // socket to receive broadcasts
-    private var _timeoutTimer: DispatchSourceTimer!     // timer fired every "checkInterval"
-    private var _availableRadios =                      // Radios identified by IP Address
+    fileprivate var _notSeenInterval: TimeInterval = 3.0    // Interval that represents a timeout
+    fileprivate var _udpSocket: GCDAsyncUdpSocket?          // socket to receive broadcasts
+    fileprivate var _timeoutTimer: DispatchSourceTimer!     // timer fired every "checkInterval"
+    fileprivate var _availableRadios =                      // Radios identified by IP Address
         [IPAddress : RadioParameters]()
 
     // GCD Queues
-    private let _discoveryQ =   DispatchQueue(label: "RadioFactory" + ".discoveryQ")
-    private var _timerQ =       DispatchQueue(label: "RadioFactory" + ".timerQ")
-    private let _radiosQ =      DispatchQueue(label: "RadioFactory" + ".radiosQ", attributes: .concurrent)
+    fileprivate let _discoveryQ =   DispatchQueue(label: "RadioFactory" + ".discoveryQ")
+    fileprivate var _timerQ =       DispatchQueue(label: "RadioFactory" + ".timerQ")
+    fileprivate let _radiosQ =      DispatchQueue(label: "RadioFactory" + ".radiosQ", attributes: .concurrent)
     
     // constants
-    private let _log =      Log.sharedInstance          // shared log
+    fileprivate let _log =      Log.sharedInstance          // shared log
 
     // ----------------------------------------------------------------------------
     // MARK: - Private Getter / Setter with synchronization
     
-    private var availableRadios: [IPAddress : RadioParameters] {
+    fileprivate var availableRadios: [IPAddress : RadioParameters] {
         get { return _radiosQ.sync { _availableRadios } }
         set { _radiosQ.sync(flags: .barrier) { _availableRadios = newValue } } }
     

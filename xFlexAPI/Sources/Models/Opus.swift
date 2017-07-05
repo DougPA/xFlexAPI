@@ -31,36 +31,36 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    private var _radio: Radio?                      // The Radio that owns the Opus stream
-    private var _id: Radio.OpusId                   // The Opus stream id
+    fileprivate var _radio: Radio?                      // The Radio that owns the Opus stream
+    fileprivate var _id: Radio.OpusId                   // The Opus stream id
 
-    private var _initialized = false                // True if initialized by Radio hardware
-    private var _ip = ""                            // IP Address of ???
-    private var _port = 0                           // port number used by Opus
+    fileprivate var _initialized = false                // True if initialized by Radio hardware
+    fileprivate var _ip = ""                            // IP Address of ???
+    fileprivate var _port = 0                           // port number used by Opus
     
-    private var rxSeq: Int?                         // Rx sequence number
-    private var rxByteCount = 0                     // Rx byte count
-    private var rxPacketCount = 0                   // Rx packet count
-    private var rxBytesPerSec = 0                   // Rx rate
-    private var rxLostPacketCount = 0               // Rx lost packet count
+    fileprivate var rxSeq: Int?                         // Rx sequence number
+    fileprivate var rxByteCount = 0                     // Rx byte count
+    fileprivate var rxPacketCount = 0                   // Rx packet count
+    fileprivate var rxBytesPerSec = 0                   // Rx rate
+    fileprivate var rxLostPacketCount = 0               // Rx lost packet count
     
-    private var txSeq = 0                           // Tx sequence number
-    private var txByteCount = 0                     // Tx byte count
-    private var _txPacketSize = 240                  // Tx packet size (bytes)
-    private var txBytesPerSec = 0                   // Tx rate
+    fileprivate var txSeq = 0                           // Tx sequence number
+    fileprivate var txByteCount = 0                     // Tx byte count
+    fileprivate var _txPacketSize = 240                  // Tx packet size (bytes)
+    fileprivate var txBytesPerSec = 0                   // Tx rate
     
     // constants
-    private let _opusQ: DispatchQueue               // Opus synchronization
-    private let _log = Log.sharedInstance           // Shared Log
-    private let kRemoteAudioCmd = "remote_audio "   // Remote Audio command prefix
+    fileprivate let _opusQ: DispatchQueue               // Opus synchronization
+    fileprivate let _log = Log.sharedInstance           // Shared Log
+    fileprivate let kRemoteAudioCmd = "remote_audio "   // Remote Audio command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __remoteRxOn = false                // Opus for receive                             //
-    private var __remoteTxOn = false                // Opus for transmit                            //
-    private var __rxStreamStopped = false           // Rx stream stopped                            //
+    fileprivate var __remoteRxOn = false                // Opus for receive                             //
+    fileprivate var __remoteTxOn = false                // Opus for transmit                            //
+    fileprivate var __rxStreamStopped = false           // Rx stream stopped                            //
                                                                                                     //
-    private var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data                //
+    fileprivate var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data                //
         didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }                     //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -87,7 +87,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ------------------------------------------------------------------------------
     // MARK: - Public methods
     
-    private var _vita: Vita?
+    fileprivate var _vita: Vita?
     /// Send Opus encoded TX audio to the Radio (hardware)
     ///
     /// - Parameters:
@@ -307,15 +307,15 @@ extension Opus {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _remoteRxOn: Bool {
+    fileprivate var _remoteRxOn: Bool {
         get { return _opusQ.sync { __remoteRxOn } }
         set { _opusQ.sync(flags: .barrier) { __remoteRxOn = newValue } } }
     
-    private var _remoteTxOn: Bool {
+    fileprivate var _remoteTxOn: Bool {
         get { return _opusQ.sync { __remoteTxOn } }
         set { _opusQ.sync(flags: .barrier) { __remoteTxOn = newValue } } }
     
-    private var _rxStreamStopped: Bool {
+    fileprivate var _rxStreamStopped: Bool {
         get { return _opusQ.sync { __rxStreamStopped } }
         set { _opusQ.sync(flags: .barrier) { __rxStreamStopped = newValue } } }
     
