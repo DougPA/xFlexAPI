@@ -162,21 +162,24 @@ public class Slice : NSObject, KeyValueParser {
     
     /// Add a Meter to this Slice's Meters collection
     ///
-    /// - parameter meter: a reference to a Meter
+    /// - Parameters:
+    ///   - meter:      a reference to a Meter
     ///
     func addMeter(_ meter: Meter) {
         meters[meter.id] = meter
     }
     /// Remove a Meter from this Slice's Meters collection
     ///
-    /// - parameter meter: a reference to a Meter
+    /// - Parameters:
+    ///   - meter:      a reference to a Meter
     ///
     func removeMeter(_ id: Radio.MeterId) {
         meters[id] = nil
     }
     /// Set the default Filter widths
     ///
-    /// - Parameter mode: demod mode
+    /// - Parameters:
+    ///   - mode:       demod mode
     ///
     func setupDefaultFilters(_ mode: String) {
         
@@ -216,7 +219,8 @@ public class Slice : NSObject, KeyValueParser {
     }
     /// Restrict the Filter High value
     ///
-    /// - Parameter value:  the value
+    /// - Parameters:
+    ///   - value:          the value
     /// - Returns:          adjusted value
     ///
     func filterHighLimits(_ value: Int) -> Int {
@@ -252,7 +256,8 @@ public class Slice : NSObject, KeyValueParser {
     }
     /// Restrict the Filter Low value
     ///
-    /// - Parameter value:  the value
+    /// - Parameters:
+    ///   - value:          the value
     /// - Returns:          adjusted value
     ///
     func filterLowLimits(_ value: Int) -> Int {
@@ -297,7 +302,8 @@ public class Slice : NSObject, KeyValueParser {
     
     /// Parse Slice key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -1250,14 +1256,13 @@ extension xFlexAPI.Slice {
         get { return _wide }
         set { _wide = newValue } }
     
-    
-
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
     public var meters: [String: Meter] {                                               // meters
         get { return _meters } 
         set { _meters = newValue } }
     
-
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Slice messages (only populate values that != case value)
     

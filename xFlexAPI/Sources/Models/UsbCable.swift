@@ -28,7 +28,8 @@ public final class UsbCable : NSObject, KeyValueParser {
     
     /// Parse USB Cable key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -39,11 +40,15 @@ public final class UsbCable : NSObject, KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
+    // listed in alphabetical order
+
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // FIXME: Should any of these send a message to the Radio?
     //          If yes, implement it, if not should they be "get" only?
+    
+    // listed in alphabetical order
     
 
 }

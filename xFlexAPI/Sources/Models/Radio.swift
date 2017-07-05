@@ -333,7 +333,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Initialize a Radio Class
     ///
-    /// - Parameter radioInstance: a RadioParameters struct
+    /// - Parameters:
+    ///   - radioInstance:      a RadioParameters struct
     ///
     public init(radioParameters: RadioParameters, clientName: String, isGui: Bool = true) {
         
@@ -369,18 +370,25 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Remove an object from its collection
     ///
-    /// - Parameter object:     an object
+    /// - Parameters:
+    ///   - object:         an object
     ///
     public func removeObject<T>(_ object: T) {
         
         // cases are in alphabetical order
         switch object {
             
+        case is AudioStream:
+            audioStreams[(object as! AudioStream).id] = nil
+            
         case is Memory:
             memories[(object as! Memory).id] = nil
             
         case is Meter:
             meters[(object as! Meter).id] = nil
+            
+        case is MicAudioStream:
+            micAudioStreams[(object as! MicAudioStream).id] = nil
             
         case is Panadapter:
             panadapters[(object as! Panadapter).id] = nil
@@ -391,17 +399,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case is Tnf:
             tnfs[(object as! Tnf).id] = nil
             
-        case is Waterfall:
-            waterfalls[(object as! Waterfall).id] = nil
-            
-        case is AudioStream:
-            audioStreams[(object as! AudioStream).id] = nil
-            
-        case is MicAudioStream:
-            micAudioStreams[(object as! MicAudioStream).id] = nil
-            
         case is TxAudioStream:
             txAudioStreams[(object as! TxAudioStream).id] = nil
+            
+        case is Waterfall:
+            waterfalls[(object as! Waterfall).id] = nil
             
         default:
             _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
@@ -410,7 +412,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Establish a basic connection to Radio
     ///
-    /// - Parameter selectedRadio:  the Radio to connect to
+    /// - Parameters:
+    ///   - selectedRadio:          the Radio to connect to
     /// - Returns:                  success/failure
     ///
     public func connectSimple(selectedRadio: RadioParameters ) -> Bool {
@@ -477,7 +480,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Send Vita packet to radio
     ///
-    /// - Parameter data:   a Vita-49 packet as Data
+    /// - Parameters:
+    ///   - data:       a Vita-49 packet as Data
     ///
     public func sendVitaData(_ data: Data?) {
         
@@ -700,7 +704,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Called by the Tcp & Udp Manager delegates when a connection state change occurs
     ///
-    /// - parameter state: the new State
+    /// - Parameters:
+    ///   - state:  the new State
     ///
     func setConnectionState(_ state: ConnectionState) {
         
@@ -777,7 +782,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Parse inbound message types (commands). format: <prefix><suffix>
     ///
-    /// - parameter message: a Message String
+    /// - Parameters:
+    ///   - message:    a Message String
     ///
     func parse(_ message: String) {
         
@@ -818,7 +824,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     /// Parse a Message. format: <messageNumber>|<messageText>
     ///
-    /// - parameter commandSuffix: a Command Suffix
+    /// - Parameters:
+    ///   - commandSuffix:      a Command Suffix
     ///
     private func parseMessage(_ commandSuffix: String) {
         
@@ -843,7 +850,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Parse a Reply message. format: <sequenceNumber>|<hexResponse>|<message>[|<debugOutput>]
     ///
-    /// - parameter commandSuffix: a Command Suffix
+    /// - Parameters:
+    ///   - commandSuffix:      a Command Suffix
     ///
     private func parseReply(_ commandSuffix: String) {
         
@@ -880,7 +888,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Parse a Status message. format: <apiHandle>|<message>, where <message> is of the form: <msgType> <otherMessageComponents>
     ///
-    /// - parameter commandSuffix: a Command Suffix
+    /// - Parameters:
+    ///   - commandSuffix:      a Command Suffix
     ///
     private func parseStatus(_ commandSuffix: String) {
         
@@ -3183,7 +3192,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process .tcpPingStarted Notification
     ///
-    /// - Parameter note:   a Notification instance
+    /// - Parameters:
+    ///   - note:       a Notification instance
     ///
     @objc private func tcpPingStarted(_ note: Notification) {
         
@@ -3191,7 +3201,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
     /// Process .tcpPingTimeout Notification
     ///
-    /// - Parameter note:   a Notification instance
+    /// - Parameters:
+    ///   - note:       a Notification instance
     ///
     @objc private func tcpPingTimeout(_ note: Notification) {
         

@@ -82,7 +82,8 @@ public final class Memory : NSObject, KeyValueParser {
             
     /// Restrict the Filter High value
     ///
-    /// - Parameter value:  the value
+    /// - Parameters:
+    ///   - value:          the value
     /// - Returns:          adjusted value
     ///
     func filterHighLimits(_ value: Int) -> Int {
@@ -113,7 +114,8 @@ public final class Memory : NSObject, KeyValueParser {
     }
     /// Restrict the Filter Low value
     ///
-    /// - Parameter value:  the value
+    /// - Parameters:
+    ///   - value:          the value
     /// - Returns:          adjusted value
     ///
     func filterLowLimits(_ value: Int) -> Int {
@@ -144,7 +146,8 @@ public final class Memory : NSObject, KeyValueParser {
     }
     /// Validate the Tone Value
     ///
-    /// - Parameter value:  a Tone Value
+    /// - Parameters:
+    ///   - value:          a Tone Value
     /// - Returns:          true = Valid
     ///
     func toneValueValid( _ value: Int) -> Bool {

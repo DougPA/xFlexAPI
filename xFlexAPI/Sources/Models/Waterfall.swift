@@ -84,7 +84,8 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     
     /// Parse Waterfall key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:  a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -161,7 +162,8 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     
     /// Process the Waterfall Vita struct
     ///
-    /// - parameter vita:   a Vita struct
+    /// - Parameters:
+    ///   - vita:       a Vita struct
     ///
     func vitaHandler(_ vita: Vita) {
         let kByteOffsetToBins = 32              // Bins are located 32 bytes into payload
@@ -239,7 +241,8 @@ public struct WaterfallFrame {
 
     /// Initialize a WaterfallFrame
     ///
-    /// - parameter payload:    pointer to a Vita payload
+    /// - Parameters:
+    ///   - payload:        pointer to a Vita payload
     ///
     public init(payload: UnsafeRawPointer) {
         
@@ -304,6 +307,7 @@ extension Waterfall {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
+    // listed in alphabetical order
     @objc dynamic public var autoBlackEnabled: Bool {
         get { return _autoBlackEnabled }
         set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) auto_black=" + newValue.asNumber()) } } }

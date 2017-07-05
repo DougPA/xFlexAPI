@@ -76,7 +76,8 @@ public final class Xvtr : NSObject, KeyValueParser {
     
     /// Parse Xvtr key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         

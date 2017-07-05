@@ -74,7 +74,8 @@ public enum MessageLevel: Int {
     
     /// Return the MessageLevel of a Flex Command response
     ///
-    /// - Parameter response:   the Flex response as a hex String
+    /// - Parameters:
+    ///   - response:           the Flex response as a hex String
     /// - Returns:              the equivalent xFlexAPI MessageLevel
     ///
     public static func from(_ response: String) -> MessageLevel {

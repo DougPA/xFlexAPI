@@ -79,7 +79,8 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     
     /// Parse Mic Audio Stream key/value pairs
     ///
-    /// - parameter keyValues:  a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:  a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
@@ -236,8 +237,9 @@ public struct MicAudioStreamFrame {
     
     /// Initialize a AudioStreamFrame
     ///
-    /// - parameter payload: pointer to a Vita packet payload
-    /// - parameter numberOfWords: number of 32-bit Words in the payload
+    /// - Parameters:
+    ///   - payload:        pointer to a Vita packet payload
+    ///   - numberOfWords:  number of 32-bit Words in the payload
     ///
     public init(payload: UnsafeRawPointer, numberOfBytes: Int) {
         

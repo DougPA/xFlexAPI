@@ -33,8 +33,9 @@ public extension NotificationCenter {
     
     /// post a Notification by Name
     ///
-    /// - parameter notification: Notification Name
-    /// - parameter object:       associated object
+    /// - Parameters:
+    ///   - notification:       Notification Name
+    ///   - object:             associated object
     ///
     public class func post(_ name: String, object: Any?) {
         
@@ -43,8 +44,9 @@ public extension NotificationCenter {
     }
     /// post a Notification by Type
     ///
-    /// - parameter notification: Notification Type
-    /// - parameter object:       associated object
+    /// - Parameters:
+    ///   - notification:       Notification Type
+    ///   - object:             associated object
     ///
     public class func post(_ notification: NotificationType, object: Any?) {
         
@@ -84,9 +86,9 @@ public extension Sequence {
 
     /// Find an element in an array
     ///
-    /// - parameter match: comparison closure
-    ///
-    /// - returns: the element (or nil)
+    /// - Parameters:
+    ///   - match:      comparison closure
+    /// - Returns:      the element (or nil)
     ///
     func findElement(_ match:(Iterator.Element)->Bool) -> Iterator.Element? {
         
@@ -139,7 +141,8 @@ public extension String {
     }
     /// Replace spaces with a specified value
     ///
-    /// - Parameter value:  the String to replace spaces
+    /// - Parameters:
+    ///   - value:          the String to replace spaces
     /// - Returns:          the adjusted String
     ///
     func replacingSpacesWith(_ value: String) -> String {
@@ -152,7 +155,7 @@ public extension String {
 
 public extension Bool {
 
-    /// Return "1" / "0" for true / fals
+    /// Return "1" / "0" for true / false Booleans
     ///
     /// - Returns:      a String
     ///

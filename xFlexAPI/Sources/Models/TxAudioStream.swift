@@ -229,6 +229,7 @@ extension TxAudioStream {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
+    // listed in alphabetical order
     @objc dynamic public var transmit: Bool {
         get { return _transmit  }
         set {

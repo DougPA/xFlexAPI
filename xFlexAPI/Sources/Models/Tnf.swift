@@ -103,7 +103,8 @@ public final class Tnf : NSObject, KeyValueParser {
     
     /// Parse Tnf key/value pairs
     ///
-    /// - parameter keyValues: a KeyValuesArray
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
     ///
     public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
