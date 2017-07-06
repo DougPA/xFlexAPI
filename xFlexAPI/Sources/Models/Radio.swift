@@ -107,15 +107,16 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate let kTnfClickBandwidth: CGFloat = 0.01                   // * bandwidth = minimum Tnf click width
     fileprivate let kSliceClickBandwidth: CGFloat = 0.01                 // * bandwidth = minimum Slice click width
     
-    fileprivate let kAntListCmd = "ant list"                             // Text of command messages
+    fileprivate let kAntListCmd = Commands.antList.rawValue              // Text of command messages
     fileprivate let kAtuCmd = "atu "
+    fileprivate let kClientCmd = Commands.clientProgram.rawValue
     fileprivate let kCwCmd = "cw "
     fileprivate let kDisplayPanCmd = "display pan "
-    fileprivate let kInfoCmd = "info"
+    fileprivate let kInfoCmd = Commands.info.rawValue
     fileprivate let kInterlockCmd = "interlock "
-    fileprivate let kMeterListCmd = "meter list"
+    fileprivate let kMeterListCmd = Commands.meterList.rawValue
     fileprivate let kMicCmd = "mic "
-    fileprivate let kMicListCmd = "mic list"
+    fileprivate let kMicListCmd = Commands.micList.rawValue
     fileprivate let kMicStreamCreateCmd = "stream create daxmic"
     fileprivate let kMixerCmd = "mixer "
     fileprivate let kPingCmd = "ping"
@@ -130,7 +131,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate let kTnfCommand = "tnf "
     fileprivate let kTransmitCmd = "transmit "
     fileprivate let kTransmitSetCmd = "transmit set "
-    fileprivate let kVersionCmd = "version"
+    fileprivate let kVersionCmd = Commands.version.rawValue
     fileprivate let kXmitCmd = "xmit "
     fileprivate let kXvtrCmd = "xvtr "
     
@@ -2667,7 +2668,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         default:
             
-            if command.hasPrefix(kDisplayPanCmd + "create") {
+            if command.hasPrefix(kClientCmd) {
+                // ignore the reply (it will be non-zero)
+                // The Radio doesn't recognize custom client names
+                
+            } else if command.hasPrefix(kDisplayPanCmd + "create") {
                 
                 // separate the Stream Ids
                 let components = reply.components(separatedBy: ",")
@@ -2960,7 +2965,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 switch command {
                     
                 case .clientProgram:
-                    array.append( (command.rawValue + _clientName, false, nil) )
+                    array.append( (command.rawValue + _clientName, false, replyHandler) )
                     
                 case .meterList:
                     array.append( (command.rawValue, false, replyHandler) )
