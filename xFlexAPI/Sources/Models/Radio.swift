@@ -107,15 +107,16 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let kTnfClickBandwidth: CGFloat = 0.01                   // * bandwidth = minimum Tnf click width
     private let kSliceClickBandwidth: CGFloat = 0.01                 // * bandwidth = minimum Slice click width
     
-    private let kAntListCmd = "ant list"                             // Text of command messages
+    private let kAntListCmd = Commands.antList.rawValue              // Text of command messages
     private let kAtuCmd = "atu "
+    private let kClientCmd = Commands.clientProgram.rawValue
     private let kCwCmd = "cw "
     private let kDisplayPanCmd = "display pan "
-    private let kInfoCmd = "info"
+    private let kInfoCmd = Commands.info.rawValue
     private let kInterlockCmd = "interlock "
-    private let kMeterListCmd = "meter list"
+    private let kMeterListCmd = Commands.meterList.rawValue
     private let kMicCmd = "mic "
-    private let kMicListCmd = "mic list"
+    private let kMicListCmd = Commands.micList.rawValue
     private let kMicStreamCreateCmd = "stream create daxmic"
     private let kMixerCmd = "mixer "
     private let kPingCmd = "ping"
@@ -130,7 +131,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     private let kTnfCommand = "tnf "
     private let kTransmitCmd = "transmit "
     private let kTransmitSetCmd = "transmit set "
-    private let kVersionCmd = "version"
+    private let kVersionCmd = Commands.version.rawValue
     private let kXmitCmd = "xmit "
     private let kXvtrCmd = "xvtr "
     
@@ -2630,8 +2631,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
         
         guard responseValue == kNoError else {
-            // Anything other than 0 is an error, log it and ignore the Reply
-            _log.msg(command + ", non-zero reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
+            // ignore non-zero reply from "client program" command
+            if !command.hasPrefix(kClientCmd) {
+                // Anything other than 0 is an error, log it and ignore the Reply
+                _log.msg(command + ", non-zero reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
+            }
             return
         }
         // which command?
@@ -2960,7 +2964,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 switch command {
                     
                 case .clientProgram:
-                    array.append( (command.rawValue + _clientName, false, nil) )
+                    array.append( (command.rawValue + _clientName, false, replyHandler) )
                     
                 case .meterList:
                     array.append( (command.rawValue, false, replyHandler) )
