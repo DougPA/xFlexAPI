@@ -117,7 +117,7 @@ public final class RadioParameters : Equatable {
             return serialNumber
             
         case "name":
-            return name
+            return self.name
             
         case "callsign":
             return callsign
