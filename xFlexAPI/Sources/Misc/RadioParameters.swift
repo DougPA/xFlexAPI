@@ -100,9 +100,9 @@ public final class RadioParameters : Equatable {
     ///   - id:         a Property Name
     /// - Returns:      String value of the Property
     ///
-    public func valueForName(_ name: String) -> String? {
+    public func valueForName(_ propertyName: String) -> String? {
         
-        switch name {
+        switch propertyName {
             
         case "ipAddress":
             return ipAddress
@@ -117,7 +117,7 @@ public final class RadioParameters : Equatable {
             return serialNumber
             
         case "name":
-            return self.name
+            return name
             
         case "callsign":
             return callsign
