@@ -2631,8 +2631,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func replyHandler(_ command: String, seqNum: String, responseValue: String, reply: String) {
         
         guard responseValue == kNoError else {
-            // Anything other than 0 is an error, log it and ignore the Reply
-            _log.msg(command + ", non-zero reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
+            // ignore non-zero reply from "client program" command
+            if !command.hasPrefix(kClientCmd) {
+                // Anything other than 0 is an error, log it and ignore the Reply
+                _log.msg(command + ", non-zero reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
+            }
             return
         }
         // which command?
@@ -2668,11 +2671,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         default:
             
-            if command.hasPrefix(kClientCmd) {
-                // ignore the reply (it will be non-zero)
-                // The Radio doesn't recognize custom client names
-                
-            } else if command.hasPrefix(kDisplayPanCmd + "create") {
+            if command.hasPrefix(kDisplayPanCmd + "create") {
                 
                 // separate the Stream Ids
                 let components = reply.components(separatedBy: ",")
