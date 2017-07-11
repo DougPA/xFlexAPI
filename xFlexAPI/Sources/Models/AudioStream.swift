@@ -58,7 +58,7 @@ final public class AudioStream: NSObject {
 
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    
+    private let kAudioStreamCmd = "audio stream "
     // see FlexLib C# code
     private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
@@ -96,7 +96,7 @@ final public class AudioStream: NSObject {
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = AudioStreamToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -326,7 +326,7 @@ extension AudioStream {
                 if _rxGain != value {
                     _rxGain = value
                     if _slice != nil {          // DL3LSM
-                        _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
+                        _radio?.send(kAudioStreamCmd + "0x\(id) " + AudioStreamToken.slice.rawValue + " \(_slice!.id) gain \(value)")
                     }
                 }
             }
@@ -387,7 +387,7 @@ extension AudioStream {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for AudioStream messages (only populate values that != case value)
     
-    enum Token: String {
+    internal enum AudioStreamToken: String {
         case daxChannel = "dax"
         case daxClients = "dax_clients"
         case inUse = "in_use"

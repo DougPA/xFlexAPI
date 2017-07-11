@@ -26,7 +26,7 @@ public final class Tnf : NSObject, KeyValueParser {
     public var maxWidth = 6000                          // default maximum Tnf width (Hz)
 
     // ------------------------------------------------------------------------------
-    // MARK: - Internal properties
+    // MARK: - Private properties
     
     private var _radio: Radio?                      // The Radio that owns this Tnf
     private var _tnfQ: DispatchQueue                // GCD queue that guards this object
@@ -34,7 +34,7 @@ public final class Tnf : NSObject, KeyValueParser {
 
     // constants
     private let _log = Log.sharedInstance           // shared Log
-    private let kSetCommand = "tnf set "            // Tnf Set command prefix
+    private let kTnfSetCmd = "tnf set "             // Tnf Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
@@ -112,7 +112,7 @@ public final class Tnf : NSObject, KeyValueParser {
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = TnfToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -188,19 +188,20 @@ extension Tnf {
     // listed in alphabetical order
     @objc dynamic public var depth: Int {
         get { return _depth }
-        set { if _depth != newValue { if depth.within(Depth.normal.rawValue, Depth.veryDeep.rawValue) { _depth = newValue ; _radio!.send(kSetCommand + "\(id) depth=\(newValue)") } } } }
+        set { if _depth != newValue { if depth.within(Depth.normal.rawValue, Depth.veryDeep.rawValue) {
+            _depth = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.depth.rawValue + "=\(newValue)") } } } }
     
     @objc dynamic public var frequency: Int {
         get { return _frequency }
-        set { if _frequency != newValue { _frequency = newValue ; _radio!.send(kSetCommand + "\(id) freq=\(newValue.hzToMhz())") } } }
+        set { if _frequency != newValue { _frequency = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.frequency.rawValue + "=\(newValue.hzToMhz())") } } }
     
     @objc dynamic public var permanent: Bool {
         get { return _permanent }
-        set { if _permanent != newValue { _permanent = newValue ; _radio!.send(kSetCommand + "\(id) permanent=\(newValue.asNumber())") } } }
+        set { if _permanent != newValue { _permanent = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.permanent.rawValue + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var width: Int {
         get { return _width  }
-        set { if _width != newValue { if width.within(minWidth, maxWidth) { _width = newValue ; _radio!.send(kSetCommand + "\(id) width=\(newValue.hzToMhz())") } } } }
+        set { if _width != newValue { if width.within(minWidth, maxWidth) { _width = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.width.rawValue + "=\(newValue.hzToMhz())") } } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -208,7 +209,7 @@ extension Tnf {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Tnf messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum TnfToken : String {
         case depth
         case frequency = "freq"
         case permanent

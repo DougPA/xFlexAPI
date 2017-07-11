@@ -152,7 +152,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = PanadapterToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -422,10 +422,6 @@ extension Panadapter {
         get { return _pandapterQ.sync { __antList } }
         set { _pandapterQ.sync(flags: .barrier) { __antList = newValue } } }
     
-    private var _autoCenterEnabled: Bool {
-        get { return _pandapterQ.sync { __autoCenterEnabled } }
-        set { _pandapterQ.sync(flags: .barrier) { __autoCenterEnabled = newValue } } }
-    
     private var _available: Int {
         get { return _pandapterQ.sync { __available } }
         set { _pandapterQ.sync(flags: .barrier) { __available = newValue } } }
@@ -552,47 +548,49 @@ extension Panadapter {
     // listed in alphabetical order
     @objc dynamic public var average: Int {
         get { return _average }
-        set {if _average != newValue { _average = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) average=\(newValue)") } } }
+        set {if _average != newValue { _average = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.average.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var band: String {
         get { return _band }
-        set { if _band != newValue { _band = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) band=\(newValue)") } } }
+        set { if _band != newValue { _band = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.band.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var bandwidth: Int {
         get { return _bandwidth }
-        set { if _bandwidth != newValue { _bandwidth = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) bandwidth=\(newValue.hzToMhz()) autocenter=\(autoCenterEnabled.asNumber())") } } }
+        set { if _bandwidth != newValue { _bandwidth = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.center.rawValue + "=\(newValue.hzToMhz()) autocenter=1") } } }
+    
+    // FIXME: Where does autoCenter come from?
     
     @objc dynamic public var center: Int {
         get { return _center }
-        set { if _center != newValue { _center = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) center=\(newValue.hzToMhz())") } } }
+        set { if _center != newValue { _center = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.center.rawValue +  "=\(newValue.hzToMhz())") } } }
     
     @objc dynamic public var daxIqChannel: Int {
         get { return _daxIqChannel }
-        set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) daxiq=\(newValue)") } } }
+        set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.daxIqChannel.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var daxIqRate: Int {
         get { return _daxIqRate }
-        set { if _daxIqRate != newValue { _daxIqRate = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) daxiq_rate=\(newValue)") } } }
+        set { if _daxIqRate != newValue { _daxIqRate = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.daxIqRate.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var fps: Int {
         get { return _fps }
-        set { if _fps != newValue { _fps = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) fps=\(newValue)") } } }
+        set { if _fps != newValue { _fps = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.fps.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var loopAEnabled: Bool {
         get { return _loopAEnabled }
-        set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) loopa=\(newValue.asNumber())") } } }
+        set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.loopAEnabled.rawValue + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var loopBEnabled: Bool {
         get { return _loopBEnabled }
-        set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) loopb=\(newValue.asNumber())") } } }
+        set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id)  " + PanadapterToken.loopBEnabled.rawValue + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var maxDbm: CGFloat {
         get { return _maxDbm }
-        set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) max_dbm=\(value)") } } }
+        set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.maxDbm.rawValue + "=\(value)") } } }
     
     @objc dynamic public var minDbm: CGFloat {
         get { return _minDbm }
-        set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) min_dbm=\(value)") } } }
+        set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.minDbm.rawValue + "=\(value)") } } }
     
     @objc dynamic public var panDimensions: CGSize {
         get { return _panDimensions }
@@ -600,23 +598,23 @@ extension Panadapter {
     
     @objc dynamic public var rfGain: Int {
         get { return _rfGain }
-        set { if _rfGain != newValue { _rfGain = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rfgain=\(newValue)") } } }
+        set { if _rfGain != newValue { _rfGain = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.rfGain.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var rxAnt: String {
         get { return _rxAnt }
-        set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) rxant=\(newValue)") } } }
+        set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.rxAnt.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var weightedAverageEnabled: Bool {
         get { return _weightedAverageEnabled }
-        set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) weighted_average=" + newValue.asNumber()) } } }
+        set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.weightedAverageEnabled.rawValue + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var wnbEnabled: Bool {
         get { return _wnbEnabled }
-        set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb=\(newValue.asNumber())") } } }
+        set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.wnbEnabled.rawValue + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var wnbLevel: Int {
         get { return _wnbLevel }
-        set { if _wnbLevel != newValue { _wnbLevel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) wnb_level=\(newValue)") } } }
+        set { if _wnbLevel != newValue { _wnbLevel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.wnbLevel.rawValue + "=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -628,10 +626,6 @@ extension Panadapter {
     @objc dynamic public var antList: [String] {
         get { return _antList }
         set { _antList = newValue } }
-    
-    @objc dynamic public var autoCenterEnabled: Bool {
-        get { return _autoCenterEnabled }
-        set { _autoCenterEnabled = newValue } }
     
     @objc dynamic public var available: Int {
         return _available }
@@ -691,7 +685,7 @@ extension Panadapter {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Panadapter messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum PanadapterToken : String {
         case antList = "ant_list"
         case available
         case average

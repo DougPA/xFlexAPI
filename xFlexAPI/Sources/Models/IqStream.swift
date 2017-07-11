@@ -78,7 +78,7 @@ final public class IqStream: NSObject {
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = IqStreamToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -231,7 +231,7 @@ extension IqStream {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for IqStream messages (only populate values that != case value)
     
-    enum Token: String {
+    internal enum IqStreamToken: String {
         case available
         case capacity
         case daxIqChannel = "daxiq"

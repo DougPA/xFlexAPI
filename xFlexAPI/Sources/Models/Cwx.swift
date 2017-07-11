@@ -34,8 +34,8 @@ public final class Cwx : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __delay = 0                         // Delay (ms)                                   //
-    private var __qskEnabled = false                // QSK Enabled                                  //
+    private var __breakInDelay = 0                  // QSK delay                                    //
+    private var __breakInEnabled = false            // QSK Enabled                                  //
     private var __speed = 0                         // Speed (wpm)                                  //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -292,7 +292,7 @@ public final class Cwx : NSObject, KeyValueParser {
             } else {
                 
                 // Check for Unknown token
-                guard let token = Token(rawValue: kv.key.lowercased()) else {
+                guard let token = CwxToken(rawValue: kv.key.lowercased()) else {
                     
                     // unknown token, log it and ignore the token
                      _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -308,9 +308,9 @@ public final class Cwx : NSObject, KeyValueParser {
                 switch token {
                     
                 case .breakInDelay:
-                    willChangeValue(forKey: "delay")
-                    _delay = iValue
-                    didChangeValue(forKey: "delay")
+                    willChangeValue(forKey: "breakInDelay")
+                    _breakInDelay = iValue
+                    didChangeValue(forKey: "breakInDelay")
                 
                 case .erase:
                     let values = sValue.components(separatedBy: ",")
@@ -322,10 +322,10 @@ public final class Cwx : NSObject, KeyValueParser {
                         eraseSentEventHandler?(start, stop)
                     }
 
-                case .qskEnabled:
-                    willChangeValue(forKey: "qskEnabled")
-                    _qskEnabled = bValue
-                    didChangeValue(forKey: "qskEnabled")
+                case .breakInEnabled:
+                    willChangeValue(forKey: "breakInEnabled")
+                    _breakInEnabled = bValue
+                    didChangeValue(forKey: "breakInEnabled")
                     
                 case .sent:
                     // inform the Event Handler (if any)
@@ -354,13 +354,13 @@ extension Cwx {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _delay: Int {
-        get { return _cwxQ.sync { __delay } }
-        set { _cwxQ.sync(flags: .barrier) { __delay = newValue } } }
+    private var _breakInDelay: Int {
+        get { return _cwxQ.sync { __breakInDelay } }
+        set { _cwxQ.sync(flags: .barrier) { __breakInDelay = newValue } } }
     
-    private var _qskEnabled: Bool {
-        get { return _cwxQ.sync { __qskEnabled } }
-        set { _cwxQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
+    private var _breakInEnabled: Bool {
+        get { return _cwxQ.sync { __breakInEnabled } }
+        set { _cwxQ.sync(flags: .barrier) { __breakInEnabled = newValue } } }
     
     private var _speed: Int {
         get { return _cwxQ.sync { __speed } }
@@ -371,24 +371,24 @@ extension Cwx {
     
     // listed in alphabetical order
     @objc dynamic public var delay: Int {
-        get { return _delay }
-        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ; if _delay != value  { _delay = value ; _radio!.send(kCwxCmd + "delay \(value)") } } } }
+        get { return _breakInDelay }
+        set { if _breakInDelay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _breakInDelay = value ; _radio!.send(kCwxCmd + CwxToken.breakInDelay.rawValue + " \(value)") } } } 
     
-    @objc dynamic public var qskEnabled: Bool {
-        get { return _qskEnabled }
-        set { if _qskEnabled != newValue { _qskEnabled = newValue ; _radio!.send(kCwxCmd + "qsk_enabled \(newValue.asNumber())") } } }
+    @objc dynamic public var breakInEnabled: Bool {
+        get { return _breakInEnabled }
+        set { if _breakInEnabled != newValue { _breakInEnabled = newValue ; _radio!.send(kCwxCmd + CwxToken.breakInEnabled.rawValue + " \(newValue.asNumber())") } } }
     
     @objc dynamic public var speed: Int {
         get { return _speed }
-        set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; _radio!.send(kCwxCmd + "wpm \(value)") } } } }
+        set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; _radio!.send(kCwxCmd + CwxToken.speed.rawValue + " \(value)") } } } }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Cwx messages (only populate values that != case value)
     
-    enum Token : String {
+    public enum CwxToken : String {
         case breakInDelay = "break_in_delay"
+        case breakInEnabled = "qsk_enabled"
         case erase
-        case qskEnabled = "qsk_enabled"
         case sent
         case speed = "wpm"
     }

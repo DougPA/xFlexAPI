@@ -88,7 +88,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = MicAudioStreamToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -334,7 +334,7 @@ extension MicAudioStream {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for MicAudioStream messages (only populate values that != case value)
     
-    enum Token: String {
+    enum MicAudioStreamToken: String {
         case inUse = "in_use"
         case ip
         case port

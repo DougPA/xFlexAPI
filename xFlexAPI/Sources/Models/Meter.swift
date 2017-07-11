@@ -130,7 +130,7 @@ public class Meter : KeyValueParser {
             id = numberAndKey[0] 
             
             // check for unknown Keys
-            guard let token = Token(rawValue: key.lowercased()) else {
+            guard let token = MeterToken(rawValue: key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -239,7 +239,7 @@ extension Meter {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Meter messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum MeterToken : String {
         case desc
         case fps
         case high = "hi"

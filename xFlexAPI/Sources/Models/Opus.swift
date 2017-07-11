@@ -140,7 +140,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
         for kv in keyValues {
             
             // check for unknown Keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = OpusToken(rawValue: kv.key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -325,15 +325,15 @@ extension Opus {
     // listed in alphabetical order
     @objc dynamic public var remoteRxOn: Bool {
         get { return _remoteRxOn }
-        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + "rx_on \(newValue.asNumber())") } } }
+        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteRxOn.rawValue + " \(newValue.asNumber())") } } }
     
     @objc dynamic public var remoteTxOn: Bool {
         get { return _remoteTxOn }
-        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + "tx_on \(newValue.asNumber())") } } }
+        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteTxOn.rawValue + " \(newValue.asNumber())") } } }
     
     @objc dynamic public var rxStreamStopped: Bool {
         get { return _rxStreamStopped }
-        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; _radio!.send(kRemoteAudioCmd + "opus_rx_stream_stopped \(newValue.asNumber())") } } }
+        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.rxStreamStopped.rawValue + " \(newValue.asNumber())") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
@@ -345,7 +345,7 @@ extension Opus {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Opus messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum OpusToken : String {
         case ipAddress = "ip"
         case port
         case remoteRxOn = "rx_on"
