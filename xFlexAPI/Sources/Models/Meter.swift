@@ -187,7 +187,7 @@ public class Meter : KeyValueParser {
 extension Meter {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)

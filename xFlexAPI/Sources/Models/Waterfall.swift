@@ -137,7 +137,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
             
             case .available, .band, .bandwidth, .capacity, .center, .daxIq, .daxIqRate,
                     .loopA, .loopB, .rfGain, .rxAnt, .wide, .xPixels, .xvtr:
-                // held on the corresponding Panadapter object
+                // ignored here
                 break
             }
         }
@@ -305,7 +305,7 @@ extension Waterfall {
         set { _waterfallQ.sync(flags: .barrier) { __panadapterId = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var autoBlackEnabled: Bool {
@@ -352,18 +352,20 @@ extension Waterfall {
     // Mark: - Tokens for Waterfall messages (only populate values that != case value)
     
     internal enum WaterfallToken : String {
+        // on Waterfall
         case autoBlackEnabled = "auto_black"
+        case blackLevel = "black_level"
+        case colorGain = "color_gain"
+        case gradientIndex = "gradient_index"
+        case lineDuration = "line_duration"
+        // unused here
         case available
         case band
         case bandwidth
-        case blackLevel = "black_level"
         case capacity
         case center
-        case colorGain = "color_gain"
         case daxIq = "daxiq"
         case daxIqRate = "daxiq_rate"
-        case gradientIndex = "gradient_index"
-        case lineDuration = "line_duration"
         case loopA = "loopa"
         case loopB = "loopb"
         case panadapterId = "panadapter"

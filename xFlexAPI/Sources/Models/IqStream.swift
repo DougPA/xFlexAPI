@@ -189,7 +189,7 @@ extension IqStream {
         set { _iqStreamsQ.sync(flags: .barrier) { __streaming = newValue } } }
         
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -205,28 +205,22 @@ extension IqStream {
         return _capacity }
     
     @objc dynamic public var daxIqChannel: Int {
-        get { return _daxIqChannel }
-        set { if _daxIqChannel != newValue { _daxIqChannel = newValue } } }
+        return _daxIqChannel }
     
     @objc dynamic public var ip: String {
-        get { return _ip }
-        set { if _ip != newValue { _ip = newValue } } }
+        return _ip }
     
     @objc dynamic public var port: Int {
-        get { return _port  }
-        set { if _port != newValue { _port = newValue } } }
+        return _port  }
     
     @objc dynamic public var pan: Radio.PanadapterId? {
-        get { return _pan }
-        set { if _pan != newValue { _pan = newValue } } }
+        return _pan }
     
     @objc dynamic public var rate: Int {
-        get { return _rate  }
-        set { if _rate != newValue { _rate = newValue } } }
+        return _rate  }
     
     @objc dynamic public var streaming: Bool {
-        get { return _streaming  }
-        set { if _streaming != newValue { _streaming = newValue } } }
+        return _streaming  }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for IqStream messages (only populate values that != case value)

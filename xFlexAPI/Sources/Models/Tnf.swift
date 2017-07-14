@@ -183,7 +183,7 @@ extension Tnf {
         set { _tnfQ.sync(flags: .barrier) { __width = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var depth: Int {

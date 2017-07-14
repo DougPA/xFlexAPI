@@ -388,7 +388,7 @@ extension Memory {
         set { _memoryQ.sync(flags: .barrier) { __toneValue = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var digitalLowerOffset: Int {

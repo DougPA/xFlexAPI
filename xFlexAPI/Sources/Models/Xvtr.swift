@@ -49,7 +49,7 @@ public final class Xvtr : NSObject, KeyValueParser {
     
     // constants
     private let _log = Log.sharedInstance               // shared log
-    fileprivate let kXvtrCommand = "xvtr "              // Xvtr command prefix
+    fileprivate let kXvtrSetCmd = "xvtr set "           // Xvtr command prefix
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -233,44 +233,40 @@ extension Xvtr {
         set { _xvtrQ.sync(flags: .barrier) {__twoMeterInt = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var ifFrequency: Int {
         get { return _ifFrequency }
-        set { if _ifFrequency != newValue { _ifFrequency = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.ifFrequency.rawValue + "=\(newValue)") } } }
+        set { if _ifFrequency != newValue { _ifFrequency = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.ifFrequency.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var loError: Int {
         get { return _loError }
-        set { if _loError != newValue { _loError = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.loError.rawValue + "=\(newValue)") } } }
+        set { if _loError != newValue { _loError = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.loError.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var name: String {
         get { return _name }
-        set { if _name != newValue { _name = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.name.rawValue + "=\(newValue)") } } }
+        set { if _name != newValue { _name = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.name.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var maxPower: Int {
         get { return _maxPower }
-        set { if _maxPower != newValue { _maxPower = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.maxPower.rawValue + "=\(newValue)") } } }
+        set { if _maxPower != newValue { _maxPower = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.maxPower.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var order: Int {
         get { return _order }
-        set { if _order != newValue { _order = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.order.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var preferred: Bool {
-        get { return _preferred }
-        set { if _preferred != newValue { _preferred = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.preferred.rawValue + "=\(newValue)") } } }
+        set { if _order != newValue { _order = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.order.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var rfFrequency: Int {
         get { return _rfFrequency }
-        set { if _rfFrequency != newValue { _rfFrequency = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.rfFrequency.rawValue + "=\(newValue)") } } }
+        set { if _rfFrequency != newValue { _rfFrequency = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.rfFrequency.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var rxGain: Int {
         get { return _rxGain }
-        set { if _rxGain != newValue { _rxGain = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.rxGain.rawValue + "=\(newValue)") } } }
+        set { if _rxGain != newValue { _rxGain = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.rxGain.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var rxOnly: Bool {
         get { return _rxOnly }
-        set { if _rxOnly != newValue { _rxOnly = newValue ; _radio!.send(kXvtrCommand + "\(id) " + XvtrToken.rxOnly.rawValue + "=\(newValue)") } } }
+        set { if _rxOnly != newValue { _rxOnly = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.rxOnly.rawValue + "=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -284,6 +280,9 @@ extension Xvtr {
     
     @objc dynamic public var isValid: Bool {
         return _isValid }
+    
+    @objc dynamic public var preferred: Bool {
+        return _preferred }
     
     @objc dynamic public var twoMeterInt: Int {
         return _twoMeterInt }

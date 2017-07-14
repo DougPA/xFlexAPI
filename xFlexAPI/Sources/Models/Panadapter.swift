@@ -53,14 +53,11 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     //                                                                                              //
     private var __antList = [String]()                      // Available antenna choices            //
     private var __autoCenterEnabled = false                 //                                      //
-    private var __available = 0                             // Capacity available (read only)       //
     private var __average = 0                               // Setting of average (1 -> 100)        //
     private var __band = ""                                 // Band encompassed by this pan         //
     private var __bandwidth = 0                             // Bandwidth in Hz                      //
-    private var __capacity = 0                              // Capacity maximum indicator           //
     private var __center = 0                                // Center in Hz                         //
     private var __daxIqChannel = 0                          // DAX IQ channel number (0=none)       //
-    private var __daxIqRate = 0                             // DAX IQ Rate in bps                   //
     private var __fps = 0                                   // Refresh rate (frames/second)         //
     private var __loopAEnabled = false                      // Enable LOOPA for RXA                 //
     private var __loopBEnabled = false                      // Enable LOOPB for RXB                 //
@@ -131,9 +128,9 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
         }
         // parse out the values
         let rfGainInfo = radio!.valuesArray(reply, delimiter: ",")
-        rfGainLow = rfGainInfo[0].iValue()
-        rfGainHigh = rfGainInfo[1].iValue()
-        rfGainStep = rfGainInfo[2].iValue()
+        _rfGainLow = rfGainInfo[0].iValue()
+        _rfGainHigh = rfGainInfo[1].iValue()
+        _rfGainStep = rfGainInfo[2].iValue()
     }
     
     // ------------------------------------------------------------------------------
@@ -170,11 +167,6 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
                 _antList = kv.value.components(separatedBy: ",")
                 didChangeValue(forKey: "antList")
                 
-            case .available:
-                willChangeValue(forKey: "available")
-                _available = iValue
-                didChangeValue(forKey: "available")
-                
             case .average:
                 willChangeValue(forKey: "average")
                 _average = iValue
@@ -190,11 +182,6 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
                 _bandwidth = kv.value.mhzToHz()
                 didChangeValue(forKey: "bandwidth")
                 
-            case .capacity:
-                willChangeValue(forKey: "capacity")
-                _capacity = iValue
-                didChangeValue(forKey: "capacity")
-                
             case .center:
                 willChangeValue(forKey: "center")
                 _center = kv.value.mhzToHz()
@@ -204,11 +191,6 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
                 willChangeValue(forKey: "daxIqChannel")
                 _daxIqChannel = iValue
                 didChangeValue(forKey: "daxIqChannel")
-                
-            case .daxIqRate:
-                willChangeValue(forKey: "daxIqRate")
-                _daxIqRate = iValue
-                didChangeValue(forKey: "daxIqRate")
                 
             case .fps:
                 willChangeValue(forKey: "fps")
@@ -304,6 +286,10 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
                 willChangeValue(forKey: "panDimensions")
                 _panDimensions.height = CGFloat(fValue)
                 didChangeValue(forKey: "panDimensions")
+                
+            case .available, .capacity, .daxIqRate:
+                // ignored here
+                break
             }
         }
         // is the Panadapter initialized?
@@ -422,10 +408,6 @@ extension Panadapter {
         get { return _pandapterQ.sync { __antList } }
         set { _pandapterQ.sync(flags: .barrier) { __antList = newValue } } }
     
-    private var _available: Int {
-        get { return _pandapterQ.sync { __available } }
-        set { _pandapterQ.sync(flags: .barrier) { __available = newValue } } }
-    
     private var _average: Int {
         get { return _pandapterQ.sync { __average } }
         set { _pandapterQ.sync(flags: .barrier) { __average = newValue } } }
@@ -438,10 +420,6 @@ extension Panadapter {
         get { return _pandapterQ.sync { __bandwidth } }
         set { _pandapterQ.sync(flags: .barrier) { __bandwidth = newValue } } }
     
-    private var _capacity: Int {
-        get { return _pandapterQ.sync { __capacity } }
-        set { _pandapterQ.sync(flags: .barrier) { __capacity = newValue } } }
-    
     private var _center: Int {
         get { return _pandapterQ.sync { __center } }
         set { _pandapterQ.sync(flags: .barrier) { __center = newValue } } }
@@ -449,10 +427,6 @@ extension Panadapter {
     private var _daxIqChannel: Int {
         get { return _pandapterQ.sync { __daxIqChannel } }
         set { _pandapterQ.sync(flags: .barrier) { __daxIqChannel = newValue } } }
-    
-    private var _daxIqRate: Int {
-        get { return _pandapterQ.sync { __daxIqRate } }
-        set { _pandapterQ.sync(flags: .barrier) { __daxIqRate = newValue } } }
     
     private var _fps: Int {
         get { return _pandapterQ.sync { __fps } }
@@ -543,7 +517,7 @@ extension Panadapter {
         set { _pandapterQ.sync(flags: .barrier) { __xvtrLabel = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var average: Int {
@@ -568,10 +542,6 @@ extension Panadapter {
         get { return _daxIqChannel }
         set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.daxIqChannel.rawValue + "=\(newValue)") } } }
     
-    @objc dynamic public var daxIqRate: Int {
-        get { return _daxIqRate }
-        set { if _daxIqRate != newValue { _daxIqRate = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.daxIqRate.rawValue + "=\(newValue)") } } }
-    
     @objc dynamic public var fps: Int {
         get { return _fps }
         set { if _fps != newValue { _fps = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.fps.rawValue + "=\(newValue)") } } }
@@ -594,7 +564,7 @@ extension Panadapter {
     
     @objc dynamic public var panDimensions: CGSize {
         get { return _panDimensions }
-        set { if _panDimensions != newValue { _panDimensions = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) xpixels=\(newValue.width) ypixels=\(newValue.height)") } } }
+        set { if _panDimensions != newValue { _panDimensions = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + "xpixels" + "=\(newValue.width) " + "ypixels" + "=\(newValue.height)") } } }
     
     @objc dynamic public var rfGain: Int {
         get { return _rfGain }
@@ -624,14 +594,7 @@ extension Panadapter {
     
     // listed in alphabetical order
     @objc dynamic public var antList: [String] {
-        get { return _antList }
-        set { _antList = newValue } }
-    
-    @objc dynamic public var available: Int {
-        return _available }
-    
-    @objc dynamic public var capacity: Int {
-        return _capacity }
+        return _antList }
     
     @objc dynamic public var maxBw: Int {
         return _maxBw }
@@ -640,39 +603,31 @@ extension Panadapter {
         return _minBw }
     
     @objc dynamic public var preamp: String {
-        get { return _preamp }
-        set { _preamp = newValue } }
+        return _preamp }
     
     @objc dynamic public var rfGainHigh: Int {
-        get { return _rfGainHigh }
-        set { _rfGainHigh = newValue } }
+        return _rfGainHigh }
     
     @objc dynamic public var rfGainLow: Int {
-        get { return _rfGainLow }
-        set { _rfGainLow = newValue } }
-    
+        return _rfGainLow }
+        
     @objc dynamic public var rfGainStep: Int {
-        get { return _rfGainStep }
-        set { _rfGainStep = newValue } }
+        return _rfGainStep }
     
     @objc dynamic public var rfGainValues: String {
-        get { return _rfGainValues }
-        set { _rfGainValues = newValue } }
+        return _rfGainValues }
     
     @objc dynamic public var waterfallId: String {
         return _waterfallId }
     
     @objc dynamic public var wide: Bool {
-        get { return _wide }
-        set { _wide = newValue } }
+        return _wide }
     
     @objc dynamic public var wnbUpdating: Bool {
-        get { return _wnbUpdating }
-        set { _wnbUpdating = newValue } }
+        return _wnbUpdating }
     
     @objc dynamic public var xvtrLabel: String {
-        get { return _xvtrLabel }
-        set { _xvtrLabel = newValue } }
+        return _xvtrLabel }
     
     
     // ----------------------------------------------------------------------------
@@ -686,15 +641,13 @@ extension Panadapter {
     // Mark: - Tokens for Panadapter messages (only populate values that != case value)
     
     internal enum PanadapterToken : String {
+        // on Panadapter
         case antList = "ant_list"
-        case available
         case average
         case band
         case bandwidth
-        case capacity
         case center
         case daxIqChannel = "daxiq"
-        case daxIqRate = "daxiq_rate"
         case fps
         case loopAEnabled = "loopa"
         case loopBEnabled = "loopb"
@@ -714,6 +667,10 @@ extension Panadapter {
         case xPixels = "x_pixels"
         case xvtrLabel = "xvtr"
         case yPixels = "y_pixels"
+        // unused here
+        case available
+        case capacity
+        case daxIqRate = "daxiq_rate"
     }
 
 }

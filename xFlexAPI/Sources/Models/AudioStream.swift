@@ -315,7 +315,7 @@ extension AudioStream {
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var rxGain: Int {
@@ -326,7 +326,7 @@ extension AudioStream {
                 if _rxGain != value {
                     _rxGain = value
                     if _slice != nil {          // DL3LSM
-                        _radio?.send(kAudioStreamCmd + "0x\(id) " + AudioStreamToken.slice.rawValue + " \(_slice!.id) gain \(value)")
+                        _radio?.send(kAudioStreamCmd + "0x\(id) " + AudioStreamToken.slice.rawValue + " \(_slice!.id) " + "gain" + " \(value)")
                     }
                 }
             }

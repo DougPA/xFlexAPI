@@ -228,7 +228,7 @@ extension TxAudioStream {
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var transmit: Bool {
@@ -236,7 +236,7 @@ extension TxAudioStream {
         set {
             if _transmit != newValue {
                 _transmit = newValue
-                _radio?.send(kDaxCmd + "tx \(_transmit.asNumber())")
+                _radio?.send(kDaxCmd + "tx" + " \(_transmit.asNumber())")
             }
         }
     }

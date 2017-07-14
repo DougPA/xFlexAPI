@@ -196,7 +196,7 @@ extension Equalizer {
         set { _eqQ.sync(flags: .barrier) { __level8000Hz = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var eqEnabled: Bool {

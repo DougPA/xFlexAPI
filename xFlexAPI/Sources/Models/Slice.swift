@@ -966,7 +966,7 @@ extension xFlexAPI.Slice {
         set { _sliceQ.sync(flags: .barrier) { __xitOffset = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var active: Bool {
@@ -1003,15 +1003,15 @@ extension xFlexAPI.Slice {
     
     @objc dynamic public var audioGain: Int {
         get { return _audioGain }
-        set { if _audioGain != newValue { if newValue.within(kMinLevel, kMaxLevel) { _audioGain = newValue ; _radio!.send(kAudioClientCommand + "\(id) " + SliceToken.audioGain.rawValue + "=\(newValue)") } } } }
+        set { if _audioGain != newValue { if newValue.within(kMinLevel, kMaxLevel) { _audioGain = newValue ; _radio!.send(kAudioClientCommand + "\(id) gain" + "=\(newValue)") } } } }
     
     @objc dynamic public var audioMute: Bool {
         get { return _audioMute }
-        set { if _audioMute != newValue { _audioMute = newValue ; _radio!.send(kAudioClientCommand + "\(id) " + SliceToken.audioMute.rawValue + "=\(newValue.asNumber())") } } }
+        set { if _audioMute != newValue { _audioMute = newValue ; _radio!.send(kAudioClientCommand + "\(id) mute" + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var audioPan: Int {
         get { return _audioPan }
-        set { if _audioPan != newValue { _audioPan = newValue ; _radio!.send(kAudioClientCommand + "\(id) " + SliceToken.audioPan.rawValue + "=\(newValue)") } } }
+        set { if _audioPan != newValue { _audioPan = newValue ; _radio!.send(kAudioClientCommand + "\(id) pan" + "=\(newValue)") } } }
     
     @objc dynamic public var daxChannel: Int {
         get { return _daxChannel }
@@ -1063,7 +1063,7 @@ extension xFlexAPI.Slice {
     
     @objc dynamic public var frequency: Int {
         get { return _frequency }
-        set { if !_locked { if _frequency != newValue { _frequency = newValue ; _radio!.send(kSliceTuneCommand + "\(id) \(newValue.hzToMhz())") } } } }
+        set { if !_locked { if _frequency != newValue { _frequency = newValue ; _radio!.send(kSliceTuneCommand + "\(id)" + " \(newValue.hzToMhz())") } } } }
     
     @objc dynamic public var locked: Bool {
         get { return _locked }

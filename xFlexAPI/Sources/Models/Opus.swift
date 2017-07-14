@@ -320,7 +320,7 @@ extension Opus {
         set { _opusQ.sync(flags: .barrier) { __rxStreamStopped = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update - checked
 
     // listed in alphabetical order
     @objc dynamic public var remoteRxOn: Bool {
@@ -331,9 +331,16 @@ extension Opus {
         get { return _remoteTxOn }
         set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteTxOn.rawValue + " \(newValue.asNumber())") } } }
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // FIXME: Should any of these send a message to the Radio?
+    //          If yes, implement it, if not should they be "get" only?
+    
+    // listed in alphabetical order
     @objc dynamic public var rxStreamStopped: Bool {
         get { return _rxStreamStopped }
-        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.rxStreamStopped.rawValue + " \(newValue.asNumber())") } } }
+        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization

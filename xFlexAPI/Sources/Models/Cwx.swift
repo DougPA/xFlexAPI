@@ -34,9 +34,9 @@ public final class Cwx : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __breakInDelay = 0                  // QSK delay                                    //
-    private var __breakInEnabled = false            // QSK Enabled                                  //
-    private var __speed = 0                         // Speed (wpm)                                  //
+    private var __delay = 0                         // QSK delay                                    //
+    private var __qskEnabled = false                // QSK Enabled                                  //
+    private var __wpm = 0                           // Speed (wpm)                                  //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
@@ -307,10 +307,10 @@ public final class Cwx : NSObject, KeyValueParser {
                 // Known tokens, in alphabetical order
                 switch token {
                     
-                case .breakInDelay:
-                    willChangeValue(forKey: "breakInDelay")
-                    _breakInDelay = iValue
-                    didChangeValue(forKey: "breakInDelay")
+                case .delay:
+                    willChangeValue(forKey: "delay")
+                    _delay = iValue
+                    didChangeValue(forKey: "delay")
                 
                 case .erase:
                     let values = sValue.components(separatedBy: ",")
@@ -322,19 +322,19 @@ public final class Cwx : NSObject, KeyValueParser {
                         eraseSentEventHandler?(start, stop)
                     }
 
-                case .breakInEnabled:
-                    willChangeValue(forKey: "breakInEnabled")
-                    _breakInEnabled = bValue
-                    didChangeValue(forKey: "breakInEnabled")
+                case .qskEnabled:
+                    willChangeValue(forKey: "qskEnabled")
+                    _qskEnabled = bValue
+                    didChangeValue(forKey: "qskEnabled")
                     
                 case .sent:
                     // inform the Event Handler (if any)
                     charSentEventHandler?(iValue)
                 
-                case .speed:
-                    willChangeValue(forKey: "speed")
-                    _speed = iValue
-                    didChangeValue(forKey: "speed")
+                case .wpm:
+                    willChangeValue(forKey: "wpm")
+                    _wpm = iValue
+                    didChangeValue(forKey: "wpm")
                 }
             }
         }
@@ -354,43 +354,43 @@ extension Cwx {
     // MARK: - Private properties - with synchronization
     
     // listed in alphabetical order
-    private var _breakInDelay: Int {
-        get { return _cwxQ.sync { __breakInDelay } }
-        set { _cwxQ.sync(flags: .barrier) { __breakInDelay = newValue } } }
+    private var _delay: Int {
+        get { return _cwxQ.sync { __delay } }
+        set { _cwxQ.sync(flags: .barrier) { __delay = newValue } } }
     
-    private var _breakInEnabled: Bool {
-        get { return _cwxQ.sync { __breakInEnabled } }
-        set { _cwxQ.sync(flags: .barrier) { __breakInEnabled = newValue } } }
+    private var _qskEnabled: Bool {
+        get { return _cwxQ.sync { __qskEnabled } }
+        set { _cwxQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
     
-    private var _speed: Int {
-        get { return _cwxQ.sync { __speed } }
-        set { _cwxQ.sync(flags: .barrier) { __speed = newValue } } }
+    private var _wpm: Int {
+        get { return _cwxQ.sync { __wpm } }
+        set { _cwxQ.sync(flags: .barrier) { __wpm = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var delay: Int {
-        get { return _breakInDelay }
-        set { if _breakInDelay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _breakInDelay = value ; _radio!.send(kCwxCmd + CwxToken.breakInDelay.rawValue + " \(value)") } } } 
+        get { return _delay }
+        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _delay = value ; _radio!.send(kCwxCmd + CwxToken.delay.rawValue + " \(value)") } } }
     
-    @objc dynamic public var breakInEnabled: Bool {
-        get { return _breakInEnabled }
-        set { if _breakInEnabled != newValue { _breakInEnabled = newValue ; _radio!.send(kCwxCmd + CwxToken.breakInEnabled.rawValue + " \(newValue.asNumber())") } } }
+    @objc dynamic public var qskEnabled: Bool {
+        get { return _qskEnabled }
+        set { if _qskEnabled != newValue { _qskEnabled = newValue ; _radio!.send(kCwxCmd + CwxToken.qskEnabled.rawValue + " \(newValue.asNumber())") } } }
     
-    @objc dynamic public var speed: Int {
-        get { return _speed }
-        set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; _radio!.send(kCwxCmd + CwxToken.speed.rawValue + " \(value)") } } } }
+    @objc dynamic public var wpm: Int {
+        get { return _wpm }
+        set { if _wpm != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _wpm != value  { _wpm = value ; _radio!.send(kCwxCmd + CwxToken.wpm.rawValue + " \(value)") } } } }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Cwx messages (only populate values that != case value)
     
     public enum CwxToken : String {
-        case breakInDelay = "break_in_delay"
-        case breakInEnabled = "qsk_enabled"
+        case delay
+        case qskEnabled = "qsk_enabled"
         case erase
         case sent
-        case speed = "wpm"
+        case wpm = "wpm"
     }
 
 }

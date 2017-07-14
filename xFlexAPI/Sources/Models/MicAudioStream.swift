@@ -286,6 +286,9 @@ extension MicAudioStream {
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
+    
+    // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // FIXME: Should any of these send a message to the Radio?
