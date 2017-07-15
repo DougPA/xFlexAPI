@@ -106,7 +106,7 @@ extension Radio {
         send(kProfileCmd + "transmit" + " save \"" + name + "\"")
     }
     // Remote Audio (Opus)
-    public func remoteRxAudioRemove(_ value: Bool) {
+    public func remoteRxAudioRequest(_ value: Bool) {
         send(kRemoteAudioCmd + Opus.OpusToken.remoteRxOn.rawValue + " \(value.asNumber())")
     }
     public func remoteTxAudioRequest(_ value: Bool) {

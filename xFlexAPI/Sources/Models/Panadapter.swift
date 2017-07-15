@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-protocol PanadapterStreamHandler {
+public protocol PanadapterStreamHandler {
     
     // method to process Panadapter data stream
     func panadapterStreamHandler(_ frame: PanadapterFrame) -> Void
@@ -633,7 +633,7 @@ extension Panadapter {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
-    var delegate: PanadapterStreamHandler? {
+    public var delegate: PanadapterStreamHandler? {
         get { return _pandapterQ.sync { _delegate } }
         set { _pandapterQ.sync(flags: .barrier) { _delegate = newValue } } }
     

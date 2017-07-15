@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-protocol WaterfallStreamHandler
+public protocol WaterfallStreamHandler
 {
     // method to process Waterfall data stream
     func waterfallStreamHandler(_ dataFrame: WaterfallFrame ) -> Void
@@ -344,7 +344,7 @@ extension Waterfall {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
-    var delegate: WaterfallStreamHandler? {
+    public var delegate: WaterfallStreamHandler? {
         get { return _waterfallQ.sync { _delegate } }
         set { _waterfallQ.sync(flags: .barrier) { _delegate = newValue } } }
 
