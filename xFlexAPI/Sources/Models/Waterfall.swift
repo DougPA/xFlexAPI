@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-public protocol WaterfallStreamHandler
+protocol WaterfallStreamHandler
 {
     // method to process Waterfall data stream
     func waterfallStreamHandler(_ dataFrame: WaterfallFrame ) -> Void
@@ -87,7 +87,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:  a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -344,7 +344,7 @@ extension Waterfall {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
-    public var delegate: WaterfallStreamHandler? {
+    var delegate: WaterfallStreamHandler? {
         get { return _waterfallQ.sync { _delegate } }
         set { _waterfallQ.sync(flags: .barrier) { _delegate = newValue } } }
 

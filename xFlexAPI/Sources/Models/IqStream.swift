@@ -17,7 +17,7 @@ import Foundation
 //
 // ------------------------------------------------------------------------------
 
-final public class IqStream: NSObject {
+public final class IqStream: NSObject {
     
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
@@ -73,7 +73,7 @@ final public class IqStream: NSObject {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {

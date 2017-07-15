@@ -272,7 +272,7 @@ public final class Cwx : NSObject, KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      array of Key/Value tuples
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {

@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-public protocol PanadapterStreamHandler {
+protocol PanadapterStreamHandler {
     
     // method to process Panadapter data stream
     func panadapterStreamHandler(_ frame: PanadapterFrame) -> Void
@@ -143,7 +143,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -633,7 +633,7 @@ extension Panadapter {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
-    public var delegate: PanadapterStreamHandler? {
+    var delegate: PanadapterStreamHandler? {
         get { return _pandapterQ.sync { _delegate } }
         set { _pandapterQ.sync(flags: .barrier) { _delegate = newValue } } }
     

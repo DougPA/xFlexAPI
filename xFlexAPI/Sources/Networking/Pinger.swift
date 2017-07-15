@@ -16,7 +16,7 @@ import Foundation
 //
 // ------------------------------------------------------------------------------
 
-public final class Pinger {
+final class Pinger {
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
@@ -34,7 +34,7 @@ public final class Pinger {
     /// - Parameters:
     ///   - tcpManager:     a TcpManager class instance
     ///
-    public init(tcpManager: TcpManager, pingQ: DispatchQueue) {
+    init(tcpManager: TcpManager, pingQ: DispatchQueue) {
         
         self._tcpManager = tcpManager
         self._pingQ = pingQ
@@ -54,7 +54,7 @@ public final class Pinger {
     
     /// Process the Response to a Ping
     ///
-    public func pingReply(_ command: String, seqNum: String, responseValue: String, reply: String) {
+    func pingReply(_ command: String, seqNum: String, responseValue: String, reply: String) {
         
         _pingQ.async {
             

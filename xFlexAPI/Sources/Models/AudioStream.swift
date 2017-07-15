@@ -26,7 +26,7 @@ public protocol AudioStreamHandler {
 //
 // ------------------------------------------------------------------------------
 
-final public class AudioStream: NSObject {
+public final class AudioStream: NSObject {
     
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
@@ -90,7 +90,7 @@ final public class AudioStream: NSObject {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {

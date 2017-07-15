@@ -26,7 +26,7 @@ public protocol TcpManagerDelegate {
 //
 // ------------------------------------------------------------------------------
 
-public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
+final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
@@ -55,7 +55,7 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     ///   - tcpQ:       a RadioParameters tuple
     ///   - delegate:   a serial Queue for GCDAsyncSocket activity
     ///
-    public init(tcpQ: DispatchQueue, delegate: TcpManagerDelegate) {
+    init(tcpQ: DispatchQueue, delegate: TcpManagerDelegate) {
         
         self._tcpQ = tcpQ
         self._delegate = delegate

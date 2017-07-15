@@ -163,7 +163,7 @@ public final class Memory : NSObject, KeyValueParser {
     // Parse Memory key/value pairs
     //     called by Radio, executes on the parseQ
     //
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {

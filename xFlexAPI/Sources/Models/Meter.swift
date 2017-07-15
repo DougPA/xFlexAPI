@@ -16,7 +16,7 @@ import Foundation
 //
 // ----------------------------------------------------------------------------------
 
-public class Meter : KeyValueParser {
+public final class Meter : KeyValueParser {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
@@ -111,7 +111,7 @@ public class Meter : KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <n.key=value>
         for kv in keyValues {

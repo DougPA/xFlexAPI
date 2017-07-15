@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		912DD89B1F1968E900D95EAC /* RadioCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912DD89A1F1968E900D95EAC /* RadioCommands.swift */; };
 		91B9F7B71ED916B300F7799D /* xFlexAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F7B51ED916B300F7799D /* xFlexAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C31ED9170B00F7799D /* Extensions.swift */; };
 		91B9F7E71ED9170B00F7799D /* Filters.plist in Resources */ = {isa = PBXBuildFile; fileRef = 91B9F7C51ED9170B00F7799D /* Filters.plist */; };
@@ -42,6 +43,7 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		912DD89A1F1968E900D95EAC /* RadioCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioCommands.swift; sourceTree = "<group>"; };
 		91B9F7B21ED916B300F7799D /* xFlexAPI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xFlexAPI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91B9F7B51ED916B300F7799D /* xFlexAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xFlexAPI.h; sourceTree = "<group>"; };
 		91B9F7B61ED916B300F7799D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -89,6 +91,14 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
+		912DD8991F1968D000D95EAC /* Commands */ = {
+			isa = PBXGroup;
+			children = (
+				912DD89A1F1968E900D95EAC /* RadioCommands.swift */,
+			);
+			path = Commands;
+			sourceTree = "<group>";
+		};
 		91B9F7A81ED916B300F7799D = {
 			isa = PBXGroup;
 			children = (
@@ -108,6 +118,7 @@
 		91B9F7B41ED916B300F7799D /* xFlexAPI */ = {
 			isa = PBXGroup;
 			children = (
+				912DD8991F1968D000D95EAC /* Commands */,
 				91B9F7CB1ED9170B00F7799D /* Models */,
 				91B9F7DC1ED9170B00F7799D /* Networking */,
 				91B9F7C21ED9170B00F7799D /* Misc */,
@@ -298,6 +309,7 @@
 				91B9F80E1ED9203300F7799D /* GCDAsyncSocket.m in Sources */,
 				91B9F7FA1ED9170B00F7799D /* Tnf.swift in Sources */,
 				91B9F7E81ED9170B00F7799D /* FlexErrors.swift in Sources */,
+				912DD89B1F1968E900D95EAC /* RadioCommands.swift in Sources */,
 				91B9F7F11ED9170B00F7799D /* Log.swift in Sources */,
 				91B9F7FE1ED9170B00F7799D /* TcpManager.swift in Sources */,
 				91B9F7F61ED9170B00F7799D /* Panadapter.swift in Sources */,

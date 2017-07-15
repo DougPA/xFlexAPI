@@ -22,7 +22,7 @@ public protocol MicAudioStreamHandler {
 //
 // ------------------------------------------------------------------------------
 
-final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
+public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 
     
     public private(set) var id: Radio.DaxStreamId = ""  // The Mic Audio stream id
@@ -82,7 +82,7 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:  a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {

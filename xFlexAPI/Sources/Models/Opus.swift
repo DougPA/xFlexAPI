@@ -134,7 +134,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair
         for kv in keyValues {
@@ -204,7 +204,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - vita:       an Opus Vita struct
     ///
-    public func vitaHandler(_ vita: Vita) {
+    func vitaHandler(_ vita: Vita) {
         
         // is this the first packet?
         if rxSeq == nil { rxSeq = vita.sequence }

@@ -16,7 +16,7 @@ import Foundation
 //
 // ------------------------------------------------------------------------------
 
-public class Slice : NSObject, KeyValueParser {
+public final class Slice : NSObject, KeyValueParser {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
@@ -304,7 +304,7 @@ public class Slice : NSObject, KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
