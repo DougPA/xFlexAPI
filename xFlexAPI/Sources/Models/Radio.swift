@@ -579,7 +579,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     public func createMemory() { send("memory create") }
     public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
     public func createMicAudioStream(callback: ReplyHandler? = nil) -> Bool {
-        return sendWithCheck(kMicStreamCreateCmd)
+        return sendWithCheck(kMicStreamCreateCmd, replyTo: callback)
     }
     public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
     public func requestMicList() { send(kMicListCmd, replyTo: replyHandler) }
