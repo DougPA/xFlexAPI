@@ -15,7 +15,7 @@ import Foundation
 //
 // ------------------------------------------------------------------------------
 
-public protocol UdpManagerDelegate {
+protocol UdpManagerDelegate {
     
     // if any of theses are not needed, implement a stub in the delegate that does nothing
     
@@ -65,7 +65,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     ///   - radioParameters:    a RadioParameters tuple
     ///   - udpReceiveQ:        a serial Q for GCDAsyncUdpSocket activity
     ///
-    public init(radioParameters: RadioParameters, udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
+    init(radioParameters: RadioParameters, udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
         
         _parameters = radioParameters
         _udpReceiveQ = udpReceiveQ

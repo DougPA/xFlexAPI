@@ -22,7 +22,7 @@ public protocol MicAudioStreamHandler {
 //
 // ------------------------------------------------------------------------------
 
-final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
+public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
 
     
     public private(set) var id: Radio.DaxStreamId = ""  // The Mic Audio stream id
@@ -82,13 +82,13 @@ final public class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:  a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = MicAudioStreamToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -286,6 +286,9 @@ extension MicAudioStream {
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
+    
+    // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // FIXME: Should any of these send a message to the Radio?
@@ -334,7 +337,7 @@ extension MicAudioStream {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for MicAudioStream messages (only populate values that != case value)
     
-    enum Token: String {
+    enum MicAudioStreamToken: String {
         case inUse = "in_use"
         case ip
         case port

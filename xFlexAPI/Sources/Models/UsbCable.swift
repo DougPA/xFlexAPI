@@ -31,7 +31,7 @@ public final class UsbCable : NSObject, KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // TODO: add code
         

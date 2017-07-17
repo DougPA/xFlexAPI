@@ -8,7 +8,7 @@
 
 public typealias ReplyHandler = (_ command: String, _ seqNum: String, _ responseValue: String, _ reply: String) -> Void
 public typealias SequenceId = String
-public typealias ReplyTuple = (replyTo: ReplyHandler, command: String)
+public typealias ReplyTuple = (replyTo: ReplyHandler?, command: String)
 
 public protocol TcpManagerDelegate {
     
@@ -26,7 +26,7 @@ public protocol TcpManagerDelegate {
 //
 // ------------------------------------------------------------------------------
 
-public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
+final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
@@ -55,7 +55,7 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     ///   - tcpQ:       a RadioParameters tuple
     ///   - delegate:   a serial Queue for GCDAsyncSocket activity
     ///
-    public init(tcpQ: DispatchQueue, delegate: TcpManagerDelegate) {
+    init(tcpQ: DispatchQueue, delegate: TcpManagerDelegate) {
         
         self._tcpQ = tcpQ
         self._delegate = delegate
@@ -81,11 +81,6 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
         var success = true
         
         seqNum = 0
-        
-//        // get a socket & set it's parameters
-//        _tcpSocket = GCDAsyncSocket(delegate: self, delegateQueue: _tcpQ)
-//        _tcpSocket.isIPv4PreferredOverIPv6 = true
-//        _tcpSocket.isIPv6Enabled = false
         
         do {
             // attempt to connect to the Radio (with timeout)
@@ -121,8 +116,10 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
             // assemble the command
             command =  "C" + "\(diagnostic ? "D" : "")" + "\(self.seqNum)|" + cmd + "\n"
             
-            // optionally, register to be notified
-            if let callback = callback { _delegate.addReplyHandler( String(self.seqNum), replyTuple: (replyTo: callback, command: cmd) ) }
+//            // optionally, register to be notified
+//            if let callback = callback { _delegate.addReplyHandler( String(self.seqNum), replyTuple: (replyTo: callback, command: cmd) ) }
+            // register to be notified
+            _delegate.addReplyHandler( String(self.seqNum), replyTuple: (replyTo: callback, command: cmd) )
             
             // send it, no timeout, tag = segNum
             self._tcpSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: self.seqNum)

@@ -87,13 +87,13 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:  a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = WaterfallToken(rawValue: kv.key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -137,7 +137,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
             
             case .available, .band, .bandwidth, .capacity, .center, .daxIq, .daxIqRate,
                     .loopA, .loopB, .rfGain, .rxAnt, .wide, .xPixels, .xvtr:
-                // held on the corresponding Panadapter object
+                // ignored here
                 break
             }
         }
@@ -305,28 +305,28 @@ extension Waterfall {
         set { _waterfallQ.sync(flags: .barrier) { __panadapterId = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var autoBlackEnabled: Bool {
         get { return _autoBlackEnabled }
-        set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) auto_black=" + newValue.asNumber()) } } }
+        set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.autoBlackEnabled.rawValue + "=\(newValue.asNumber())") } } }
     
     @objc dynamic public var blackLevel: Int {
         get { return _blackLevel }
-        set { if _blackLevel != newValue { _blackLevel = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) black_level=\(newValue)") } } }
+        set { if _blackLevel != newValue { _blackLevel = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.blackLevel.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var colorGain: Int {
         get { return _colorGain }
-        set { if _colorGain != newValue { _colorGain = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) color_gain=\(newValue)") } } }
+        set { if _colorGain != newValue { _colorGain = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.colorGain.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var gradientIndex: Int {
         get { return _gradientIndex }
-        set { if _gradientIndex != newValue { _gradientIndex = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) gradient_index=\(newValue)") } } }
+        set { if _gradientIndex != newValue { _gradientIndex = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.gradientIndex.rawValue + "=\(newValue)") } } }
     
     @objc dynamic public var lineDuration: Int {
         get { return _lineDuration }
-        set { if _lineDuration != newValue { _lineDuration = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) line_duration=\(newValue)") } } }
+        set { if _lineDuration != newValue { _lineDuration = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.lineDuration.rawValue + "=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -351,19 +351,21 @@ extension Waterfall {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Waterfall messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum WaterfallToken : String {
+        // on Waterfall
         case autoBlackEnabled = "auto_black"
+        case blackLevel = "black_level"
+        case colorGain = "color_gain"
+        case gradientIndex = "gradient_index"
+        case lineDuration = "line_duration"
+        // unused here
         case available
         case band
         case bandwidth
-        case blackLevel = "black_level"
         case capacity
         case center
-        case colorGain = "color_gain"
         case daxIq = "daxiq"
         case daxIqRate = "daxiq_rate"
-        case gradientIndex = "gradient_index"
-        case lineDuration = "line_duration"
         case loopA = "loopa"
         case loopB = "loopb"
         case panadapterId = "panadapter"

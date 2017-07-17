@@ -16,7 +16,7 @@ import Foundation
 //
 // ----------------------------------------------------------------------------------
 
-public class Meter : KeyValueParser {
+public final class Meter : KeyValueParser {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
@@ -111,7 +111,7 @@ public class Meter : KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <n.key=value>
         for kv in keyValues {
@@ -130,7 +130,7 @@ public class Meter : KeyValueParser {
             id = numberAndKey[0] 
             
             // check for unknown Keys
-            guard let token = Token(rawValue: key.lowercased()) else {
+            guard let token = MeterToken(rawValue: key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -187,7 +187,7 @@ public class Meter : KeyValueParser {
 extension Meter {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -239,7 +239,7 @@ extension Meter {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Meter messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum MeterToken : String {
         case desc
         case fps
         case high = "hi"

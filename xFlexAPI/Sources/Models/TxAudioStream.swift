@@ -16,7 +16,7 @@ import Cocoa
 //
 // ------------------------------------------------------------------------------
 
-final public class TxAudioStream: NSObject, KeyValueParser {
+public final class TxAudioStream: NSObject, KeyValueParser {
     
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
@@ -136,13 +136,13 @@ final public class TxAudioStream: NSObject, KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = TxAudioStreamToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -227,7 +227,7 @@ extension TxAudioStream {
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var transmit: Bool {
@@ -235,7 +235,7 @@ extension TxAudioStream {
         set {
             if _transmit != newValue {
                 _transmit = newValue
-                _radio?.send("dax tx \(_transmit.asNumber())")
+                _radio?.send(kDaxCmd + "tx" + " \(_transmit.asNumber())")
             }
         }
     }
@@ -282,7 +282,7 @@ extension TxAudioStream {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for TxAudioStream messages (only populate values that != case value)
     
-    enum Token: String {
+    internal enum TxAudioStreamToken: String {
         case daxTx = "dax_tx"
         case inUse = "in_use"
         case ip

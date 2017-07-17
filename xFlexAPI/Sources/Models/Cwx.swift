@@ -272,7 +272,7 @@ public final class Cwx : NSObject, KeyValueParser {
     /// - Parameters:
     ///   - keyValues:      array of Key/Value tuples
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray)  {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
@@ -292,7 +292,7 @@ public final class Cwx : NSObject, KeyValueParser {
             } else {
                 
                 // Check for Unknown token
-                guard let token = Token(rawValue: kv.key.lowercased()) else {
+                guard let token = CwxToken(rawValue: kv.key.lowercased()) else {
                     
                     // unknown token, log it and ignore the token
                      _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -307,7 +307,7 @@ public final class Cwx : NSObject, KeyValueParser {
                 // Known tokens, in alphabetical order
                 switch token {
                     
-                case .breakInDelay:
+                case .delay:
                     willChangeValue(forKey: "delay")
                     _delay = iValue
                     didChangeValue(forKey: "delay")
@@ -331,10 +331,10 @@ public final class Cwx : NSObject, KeyValueParser {
                     // inform the Event Handler (if any)
                     charSentEventHandler?(iValue)
                 
-                case .speed:
-                    willChangeValue(forKey: "speed")
-                    _speed = iValue
-                    didChangeValue(forKey: "speed")
+                case .wpm:
+                    willChangeValue(forKey: "wpm")
+                    _wpm = iValue
+                    didChangeValue(forKey: "wpm")
                 }
             }
         }
@@ -367,30 +367,30 @@ extension Cwx {
         set { _cwxQ.sync(flags: .barrier) { __speed = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var delay: Int {
         get { return _delay }
-        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ; if _delay != value  { _delay = value ; _radio!.send(kCwxCmd + "delay \(value)") } } } }
+        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _delay = value ; _radio!.send(kCwxCmd + CwxToken.delay.rawValue + " \(value)") } } }
     
     @objc dynamic public var qskEnabled: Bool {
         get { return _qskEnabled }
-        set { if _qskEnabled != newValue { _qskEnabled = newValue ; _radio!.send(kCwxCmd + "qsk_enabled \(newValue.asNumber())") } } }
+        set { if _qskEnabled != newValue { _qskEnabled = newValue ; _radio!.send(kCwxCmd + CwxToken.qskEnabled.rawValue + " \(newValue.asNumber())") } } }
     
-    @objc dynamic public var speed: Int {
-        get { return _speed }
-        set { if _speed != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _speed != value  { _speed = value ; _radio!.send(kCwxCmd + "wpm \(value)") } } } }
+    @objc dynamic public var wpm: Int {
+        get { return _wpm }
+        set { if _wpm != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _wpm != value  { _wpm = value ; _radio!.send(kCwxCmd + CwxToken.wpm.rawValue + " \(value)") } } } }
     
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Cwx messages (only populate values that != case value)
     
-    enum Token : String {
-        case breakInDelay = "break_in_delay"
-        case erase
+    public enum CwxToken : String {
+        case delay
         case qskEnabled = "qsk_enabled"
+        case erase
         case sent
-        case speed = "wpm"
+        case wpm = "wpm"
     }
 
 }

@@ -134,13 +134,13 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair
         for kv in keyValues {
             
             // check for unknown Keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = OpusToken(rawValue: kv.key.lowercased()) else {
                 
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
@@ -204,7 +204,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     /// - Parameters:
     ///   - vita:       an Opus Vita struct
     ///
-    public func vitaHandler(_ vita: Vita) {
+    func vitaHandler(_ vita: Vita) {
         
         // is this the first packet?
         if rxSeq == nil { rxSeq = vita.sequence }
@@ -320,20 +320,27 @@ extension Opus {
         set { _opusQ.sync(flags: .barrier) { __rxStreamStopped = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update
+    // MARK: - Public properties - KVO compliant with Radio update - checked
 
     // listed in alphabetical order
     @objc dynamic public var remoteRxOn: Bool {
         get { return _remoteRxOn }
-        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + "rx_on \(newValue.asNumber())") } } }
+        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteRxOn.rawValue + " \(newValue.asNumber())") } } }
     
     @objc dynamic public var remoteTxOn: Bool {
         get { return _remoteTxOn }
-        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + "tx_on \(newValue.asNumber())") } } }
+        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteTxOn.rawValue + " \(newValue.asNumber())") } } }
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+    // FIXME: Should any of these send a message to the Radio?
+    //          If yes, implement it, if not should they be "get" only?
+    
+    // listed in alphabetical order
     @objc dynamic public var rxStreamStopped: Bool {
         get { return _rxStreamStopped }
-        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue ; _radio!.send(kRemoteAudioCmd + "opus_rx_stream_stopped \(newValue.asNumber())") } } }
+        set { if _rxStreamStopped != newValue { _rxStreamStopped = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
@@ -345,7 +352,7 @@ extension Opus {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for Opus messages (only populate values that != case value)
     
-    internal enum Token : String {
+    internal enum OpusToken : String {
         case ipAddress = "ip"
         case port
         case remoteRxOn = "rx_on"

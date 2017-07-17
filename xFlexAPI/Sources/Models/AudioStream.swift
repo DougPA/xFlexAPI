@@ -26,7 +26,7 @@ public protocol AudioStreamHandler {
 //
 // ------------------------------------------------------------------------------
 
-final public class AudioStream: NSObject {
+public final class AudioStream: NSObject {
     
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
@@ -90,13 +90,13 @@ final public class AudioStream: NSObject {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    public func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
+    func parseKeyValues(_ keyValues: Radio.KeyValuesArray) {
         
         // process each key/value pair, <key=value>
         for kv in keyValues {
             
             // check for unknown keys
-            guard let token = Token(rawValue: kv.key.lowercased()) else {
+            guard let token = AudioStreamToken(rawValue: kv.key.lowercased()) else {
                 // unknown Key, log it and ignore the Key
                 _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                 continue
@@ -315,7 +315,7 @@ extension AudioStream {
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // listed in alphabetical order
     @objc dynamic public var rxGain: Int {
@@ -326,7 +326,7 @@ extension AudioStream {
                 if _rxGain != value {
                     _rxGain = value
                     if _slice != nil {          // DL3LSM
-                        _radio?.send("audio stream 0x" + id + " slice " + _slice!.id + " gain \(value)")
+                        _radio?.send(kAudioStreamCmd + "0x\(id) " + AudioStreamToken.slice.rawValue + " \(_slice!.id) " + "gain" + " \(value)")
                     }
                 }
             }
@@ -387,7 +387,7 @@ extension AudioStream {
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for AudioStream messages (only populate values that != case value)
     
-    enum Token: String {
+    internal enum AudioStreamToken: String {
         case daxChannel = "dax"
         case daxClients = "dax_clients"
         case inUse = "in_use"
