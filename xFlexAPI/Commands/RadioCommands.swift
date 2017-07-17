@@ -125,7 +125,7 @@ extension Radio {
     /// - Returns:              Success / Failure
     ///
     public func micAudioStreamCreate(callback: ReplyHandler? = nil) -> Bool {
-        return sendWithCheck(kMicStreamCreateCmd)
+        return sendWithCheck(kMicStreamCreateCmd, replyTo: callback)
     }
     /// Remove a Mic Audio Stream
     ///
