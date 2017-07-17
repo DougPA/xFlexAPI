@@ -48,7 +48,7 @@ public final class Xvtr : NSObject, KeyValueParser {
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // constants
-    private let _log = Log.sharedInstance               // shared log
+    fileprivate let _log = Log.sharedInstance               // shared log
     fileprivate let kXvtrSetCmd = "xvtr set "           // Xvtr command prefix
     
     // ------------------------------------------------------------------------------

@@ -76,7 +76,7 @@
 		91B9F80A1ED9203300F7799D /* GCDAsyncSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncSocket.m; sourceTree = "<group>"; };
 		91B9F80B1ED9203300F7799D /* GCDAsyncUdpSocket.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = GCDAsyncUdpSocket.h; sourceTree = "<group>"; };
 		91B9F80C1ED9203300F7799D /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
-		91C831001EFF4FA100836BE9 /* Xvtr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Xvtr.swift; sourceTree = "<group>"; };
+		91C831001EFF4FA100836BE9 /* Xvtr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Xvtr.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91C831021F001D0500836BE9 /* UsbCable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = UsbCable.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

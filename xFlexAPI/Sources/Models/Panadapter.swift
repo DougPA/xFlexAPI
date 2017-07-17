@@ -51,35 +51,35 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __antList = [String]()                      // Available antenna choices            //
-    private var __autoCenterEnabled = false                 //                                      //
-    private var __average = 0                               // Setting of average (1 -> 100)        //
-    private var __band = ""                                 // Band encompassed by this pan         //
-    private var __bandwidth = 0                             // Bandwidth in Hz                      //
-    private var __center = 0                                // Center in Hz                         //
-    private var __daxIqChannel = 0                          // DAX IQ channel number (0=none)       //
-    private var __fps = 0                                   // Refresh rate (frames/second)         //
-    private var __loopAEnabled = false                      // Enable LOOPA for RXA                 //
-    private var __loopBEnabled = false                      // Enable LOOPB for RXB                 //
-    private var __maxBw = 0                                 // Maximum bandwidth                    //
-    private var __minBw = 0                                 // Minimum bandwidthl                   //
-    private var __maxDbm: CGFloat = 0.0                     // Maximum dBm level                    //
-    private var __minDbm: CGFloat = 0.0                     // Minimum dBm level                    //
-    private var __panDimensions = CGSize(width: 0, height: 0) // frame size                         //
-    private var __preamp = ""                               // Label of preselector selected        //
-    private var __rfGain = 0                                // RF Gain of preamp/attenuator         //
-    private var __rfGainHigh = 0                            // RF Gain high value                   //
-    private var __rfGainLow = 0                             // RF Gain low value                    //
-    private var __rfGainStep = 0                            // RF Gain step value                   //
-    private var __rfGainValues = ""                         // Possible Rf Gain values              //
-    private var __rxAnt = ""                                // Receive antenna name                 //
-    private var __waterfallId = ""                          // Waterfall belowo this Panadapter     //
-    private var __weightedAverageEnabled = false            // Enable weighted averaging            //
-    private var __wide = false                              // Preselector state                    //
-    private var __wnbEnabled = false                        // Wideband noise blanking enabled      //
-    private var __wnbLevel = 0                              // Wideband noise blanking level        //
-    private var __wnbUpdating = false                       // WNB is updating                      //
-    private var __xvtrLabel = ""                            // Label of selected XVTR profile       //
+    fileprivate var __antList = [String]()                      // Available antenna choices            //
+    fileprivate var __autoCenterEnabled = false                 //                                      //
+    fileprivate var __average = 0                               // Setting of average (1 -> 100)        //
+    fileprivate var __band = ""                                 // Band encompassed by this pan         //
+    fileprivate var __bandwidth = 0                             // Bandwidth in Hz                      //
+    fileprivate var __center = 0                                // Center in Hz                         //
+    fileprivate var __daxIqChannel = 0                          // DAX IQ channel number (0=none)       //
+    fileprivate var __fps = 0                                   // Refresh rate (frames/second)         //
+    fileprivate var __loopAEnabled = false                      // Enable LOOPA for RXA                 //
+    fileprivate var __loopBEnabled = false                      // Enable LOOPB for RXB                 //
+    fileprivate var __maxBw = 0                                 // Maximum bandwidth                    //
+    fileprivate var __minBw = 0                                 // Minimum bandwidthl                   //
+    fileprivate var __maxDbm: CGFloat = 0.0                     // Maximum dBm level                    //
+    fileprivate var __minDbm: CGFloat = 0.0                     // Minimum dBm level                    //
+    fileprivate var __panDimensions = CGSize(width: 0, height: 0) // frame size                         //
+    fileprivate var __preamp = ""                               // Label of preselector selected        //
+    fileprivate var __rfGain = 0                                // RF Gain of preamp/attenuator         //
+    fileprivate var __rfGainHigh = 0                            // RF Gain high value                   //
+    fileprivate var __rfGainLow = 0                             // RF Gain low value                    //
+    fileprivate var __rfGainStep = 0                            // RF Gain step value                   //
+    fileprivate var __rfGainValues = ""                         // Possible Rf Gain values              //
+    fileprivate var __rxAnt = ""                                // Receive antenna name                 //
+    fileprivate var __waterfallId = ""                          // Waterfall belowo this Panadapter     //
+    fileprivate var __weightedAverageEnabled = false            // Enable weighted averaging            //
+    fileprivate var __wide = false                              // Preselector state                    //
+    fileprivate var __wnbEnabled = false                        // Wideband noise blanking enabled      //
+    fileprivate var __wnbLevel = 0                              // Wideband noise blanking level        //
+    fileprivate var __wnbUpdating = false                       // WNB is updating                      //
+    fileprivate var __xvtrLabel = ""                            // Label of selected XVTR profile       //
                                                                                                     //
     fileprivate var _delegate: PanadapterStreamHandler?         // Delegate for Panadapter stream       //
     //                                                                                              //
@@ -408,7 +408,7 @@ extension Panadapter {
         get { return _pandapterQ.sync { __antList } }
         set { _pandapterQ.sync(flags: .barrier) { __antList = newValue } } }
     
-    private var _average: Int {
+    fileprivate var _average: Int {
         get { return _pandapterQ.sync { __average } }
         set { _pandapterQ.sync(flags: .barrier) { __average = newValue } } }
     
@@ -420,7 +420,7 @@ extension Panadapter {
         get { return _pandapterQ.sync { __bandwidth } }
         set { _pandapterQ.sync(flags: .barrier) { __bandwidth = newValue } } }
     
-    private var _center: Int {
+    fileprivate var _center: Int {
         get { return _pandapterQ.sync { __center } }
         set { _pandapterQ.sync(flags: .barrier) { __center = newValue } } }
     
@@ -428,7 +428,7 @@ extension Panadapter {
         get { return _pandapterQ.sync { __daxIqChannel } }
         set { _pandapterQ.sync(flags: .barrier) { __daxIqChannel = newValue } } }
     
-    private var _fps: Int {
+    fileprivate var _fps: Int {
         get { return _pandapterQ.sync { __fps } }
         set { _pandapterQ.sync(flags: .barrier) { __fps = newValue } } }
     

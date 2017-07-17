@@ -34,9 +34,9 @@ public final class Cwx : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    private var __delay = 0                         // QSK delay                                    //
-    private var __qskEnabled = false                // QSK Enabled                                  //
-    private var __wpm = 0                           // Speed (wpm)                                  //
+    fileprivate var __delay = 0                         // QSK delay                                    //
+    fileprivate var __qskEnabled = false                // QSK Enabled                                  //
+    fileprivate var __wpm = 0                           // Speed (wpm)                                  //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
@@ -362,7 +362,7 @@ extension Cwx {
         get { return _cwxQ.sync { __qskEnabled } }
         set { _cwxQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
     
-    private var _wpm: Int {
+    fileprivate var _wpm: Int {
         get { return _cwxQ.sync { __wpm } }
         set { _cwxQ.sync(flags: .barrier) { __wpm = newValue } } }
     

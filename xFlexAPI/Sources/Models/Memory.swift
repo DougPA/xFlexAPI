@@ -56,10 +56,10 @@ public final class Memory : NSObject, KeyValueParser {
     fileprivate var _initialized = false                // True if initialized by Radio hardware
     
     // constants
-    private let _log = Log.sharedInstance           // shared log
-    private let kMinLevel = 0                       // control range
-    private let kMaxLevel = 100
-    private let kMemorySetCmd = "memory set "
+    fileprivate let _log = Log.sharedInstance           // shared log
+    fileprivate let kMinLevel = 0                       // control range
+    fileprivate let kMaxLevel = 100
+    fileprivate let kMemorySetCmd = "memory set "
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization

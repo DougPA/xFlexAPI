@@ -33,8 +33,8 @@ public final class Tnf : NSObject, KeyValueParser {
     fileprivate var _initialized = false                // True if initialized by Radio hardware
 
     // constants
-    private let _log = Log.sharedInstance           // shared Log
-    private let kTnfSetCmd = "tnf set "             // Tnf Set command prefix
+    fileprivate let _log = Log.sharedInstance           // shared Log
+    fileprivate let kTnfSetCmd = "tnf set "             // Tnf Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
