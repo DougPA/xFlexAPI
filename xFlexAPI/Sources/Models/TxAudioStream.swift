@@ -43,8 +43,9 @@ public final class TxAudioStream: NSObject, KeyValueParser {
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-        
+    private let _log = Log.sharedInstance           // shared Log
+    private let kDaxCmd = "dax "
+    
     /// Initialize an TX Audio Stream
     ///
     /// - Parameters:

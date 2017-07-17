@@ -34,9 +34,9 @@ public final class Cwx : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __delay = 0                         // Delay (ms)                                   //
-    fileprivate var __qskEnabled = false                // QSK Enabled                                  //
-    fileprivate var __speed = 0                         // Speed (wpm)                                  //
+    private var __delay = 0                         // QSK delay                                    //
+    private var __qskEnabled = false                // QSK Enabled                                  //
+    private var __wpm = 0                           // Speed (wpm)                                  //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
@@ -362,9 +362,9 @@ extension Cwx {
         get { return _cwxQ.sync { __qskEnabled } }
         set { _cwxQ.sync(flags: .barrier) { __qskEnabled = newValue } } }
     
-    fileprivate var _speed: Int {
-        get { return _cwxQ.sync { __speed } }
-        set { _cwxQ.sync(flags: .barrier) { __speed = newValue } } }
+    private var _wpm: Int {
+        get { return _cwxQ.sync { __wpm } }
+        set { _cwxQ.sync(flags: .barrier) { __wpm = newValue } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked

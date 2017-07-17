@@ -37,30 +37,30 @@ public final class AudioStream: NSObject {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _initialized = false                // True if initialized by Radio hardware
-    fileprivate var _radio: Radio?                      // The Radio that owns this Audio stream
-    fileprivate var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
-    fileprivate var _rxSeq: Int?                        // Rx sequence number
+    private var _initialized = false                // True if initialized by Radio hardware
+    private var _radio: Radio?                      // The Radio that owns this Audio stream
+    private var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
+    private var _rxSeq: Int?                        // Rx sequence number
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var __daxChannel = 0                    // Channel in use (1 - 8)                       //
-    fileprivate var __daxClients = 0                    // Number of clients                            //
-    fileprivate var __inUse = false                     // true = in use                                //
-    fileprivate var __ip = ""                           // Ip Address                                   //
-    fileprivate var __port = 0                          // Port number                                  //
-    fileprivate var __rxGain = 50                       // rx gain of stream                            //
-    fileprivate var __slice: xFlexAPI.Slice?            // Source Slice                                 //
+    private var __daxChannel = 0                    // Channel in use (1 - 8)                       //
+    private var __daxClients = 0                    // Number of clients                            //
+    private var __inUse = false                     // true = in use                                //
+    private var __ip = ""                           // Ip Address                                   //
+    private var __port = 0                          // Port number                                  //
+    private var __rxGain = 50                       // rx gain of stream                            //
+    private var __slice: xFlexAPI.Slice?            // Source Slice                                 //
     //                                                                                              //
-    fileprivate var _delegate: AudioStreamHandler?      // Delegate for Audio stream                    //
+    private var _delegate: AudioStreamHandler?      // Delegate for Audio stream                    //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
     // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    
+    private let _log = Log.sharedInstance           // shared Log
+    private let kAudioStreamCmd = "audio stream "
     // see FlexLib C# code
-    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    private let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization

@@ -33,8 +33,8 @@ public final class Equalizer : NSObject, KeyValueParser {
     fileprivate var _eqQ: DispatchQueue                     // GCD queue that guards this object
     
     // constants
-    fileprivate let _log = Log.sharedInstance               // shared log
-    fileprivate let kEqCommand = "eq "                      // Equalizer command prefix
+    private let _log = Log.sharedInstance               // shared log
+    private let kEqCmd = "eq "                          // Equalizer command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
