@@ -60,12 +60,15 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     public let kApiFirmwareSupport = "1.10.16.x"                        // The Radio Firmware version supported by this API
     
-    
     // ----------------------------------------------------------------------------
     // MARK: - Internal properties
     
-    fileprivate var _tcp: TcpManager!                                   // TCP connection class (commands)
-    fileprivate var _udp: UdpManager!                                   // UDP connection class (streams)
+    internal var _tcp: TcpManager!                                      // TCP connection class (commands)
+    internal var _udp: UdpManager!                                      // UDP connection class (streams)
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Private properties
+    
     fileprivate var _pinger: Pinger?                                    // Pinger class
     fileprivate var _isGui = false                                      // true = client is a Gui
     fileprivate var _clientName = ""
@@ -107,7 +110,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate let kTnfClickBandwidth: CGFloat = 0.01                   // * bandwidth = minimum Tnf click width
     fileprivate let kSliceClickBandwidth: CGFloat = 0.01                 // * bandwidth = minimum Slice click width
     
-    internal let kApfCmd = "eq apf "                                    // Text of command messages
+    internal let kApfCmd = "eq apf "                                     // Text of command messages
     internal let kAntListCmd = Command.antList.rawValue
     internal let kAtuCmd = "atu "
     internal let kAtuSetCmd = "atu set "
@@ -288,7 +291,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate var __rfPower = 0                                        // Power level (0 - 100)
     fileprivate var __rttyMark = 0                                       // RTTY mark default
     // S
-    fileprivate var __sbMonitorEnabled = false                           //
+//    fileprivate var __sbMonitorEnabled = false                           //
     fileprivate var __smartSdrMB = ""                                    // Microburst main CPU software version
     fileprivate var __snapTuneEnabled = false                            // Snap tune enable
     fileprivate var __softwareVersion: String = ""                       // (read only)
@@ -460,44 +463,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         return _tcp.connect(radioParameters: selectedRadio)
     }
-    /// Send a command to the Radio (hardware)
-    ///
-    /// - Parameters:
-    ///   - command:        a Command String
-    ///   - callback:       a callback function (if any)
-    ///
-    public func sendWithCheck(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) -> Bool {
-        
-        guard _tcp.isConnected else { return false }
-        
-        // tell the TcpManager to send the command (and optionally setup a callback)
-        send(command, diagnostic: flag, replyTo: callback)
-        
-        return true
-    }
-    /// Send a command to the Radio (hardware)
-    ///
-    /// - Parameters:
-    ///   - command:        a Command String
-    ///   - callback:       a callback function (if any)
-    ///
-    public func send(_ command: String, diagnostic flag: Bool = false, replyTo callback: ReplyHandler? = nil) {
-        
-        // tell the TcpManager to send the command (and optionally setup a callback)
-        let _ = _tcp.send(command, diagnostic: flag, replyTo: callback)
-    }
-    /// Send Vita packet to radio
-    ///
-    /// - Parameters:
-    ///   - data:       a Vita-49 packet as Data
-    ///
-    public func sendVitaData(_ data: Data?) {
-        
-        if let dataToSend = data {
-            
-            _udp.sendData(dataToSend)
-        }
-    }
     /// Disconnect the Radio
     ///
     public func disconnect() {
@@ -560,178 +525,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         replyHandlers[sequenceId] = replyTuple
     }
-//    
-//    // ----------------------------------------------------------------------------
-//    // MARK: - Public methods that send commands to the Radio (hardware)
-//    
-//    // ***** A *****
-//    public func requestAntennaList() { send(kAntListCmd, replyTo: replyHandler) }       // Antenna List
-//    public func atuClear() { send(kAtuCmd + "clear") }
-//    public func atuStart() { send(kAtuCmd + "start") }
-//    public func atuBypass() { send(kAtuCmd + "bypass") }
-//    public func createAudioStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "dax" + "=\(channel)", replyTo: callback)
-//    }
-//    public func removeAudioStream(_ id: String) -> Bool {
-//        return sendWithCheck(kStreamRemoveCmd + "0x\(id)")
-//    }
-//    // ***** I *****
-//    public func createIqStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "daxiq" + "=\(channel)", replyTo: callback)
-//    }
-//    public func requestIqStream(_ channel: String, ip: String, port: Int, callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "daxiq" + "=\(channel) " + "ip" + "=\(ip) " + "port" + "=\(port)", replyTo: callback)
-//    }
-//    public func removeIqStream(_ id: String) { send(kStreamRemoveCmd + "0x\(id)") }
-//    // ***** M *****
-//    public func createMemory() { send(kMemoryCreateCmd) }
-//    public func removeMemory(_ id: MemoryId) { send(kMemoryRemoveCmd + "\(id)") }
-//    public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
-//    public func createMicAudioStream(callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kMicStreamCreateCmd)
-//    }
-//    public func removeMicAudioStream(id: String) { send(kStreamRemoveCmd + "0x\(id)") }
-//    public func requestMicList() { send(kMicListCmd, replyTo: replyHandler) }
-//    // ***** O *****
-//    public func startOffset(_ value: Bool) { _startOffset = value ; if value == false { send(kRadioCmd + "pll_start") } }
-//    // ***** P *****
-//    public func createPanafall(_ dimensions: CGSize) { if availablePanadapters > 0 {
-//        send(kDisplayPanCmd + "create x=\(dimensions.width) y=\(dimensions.height)", replyTo: replyHandler) } }
-//    public func createPanafall(frequency: Int, antenna: String? = nil, dimensions: CGSize? = nil) {
-//        if availablePanadapters > 0 {
-//            
-//            var cmd = kDisplayPanCmd + "create freq" + "=\(frequency.hzToMhz())"
-//            if antenna != nil { cmd += " ant=" + "\(antenna!)" }
-//            if dimensions != nil { cmd += " x" + "=\(dimensions!.width)" + " y" + "=\(dimensions!.height)" }
-//            send(cmd, replyTo: replyHandler)
-//        }
-//    }
-//    public func removePanafall(_ id: PanadapterId) { send(kDisplayPanCmd + " remove 0x\(id)") }
-//    public func profileGlobalDelete(_ name: String) { send(kProfileCmd + ProfileToken.global.rawValue + " delete \"" + name + "\"") }
-//    public func profileGlobalSave(_ name: String) { send(kProfileCmd + ProfileToken.global.rawValue + " save \"" + name + "\"") }
-//    public func profileMicDelete(_ name: String) { send(kProfileCmd + ProfileToken.mic.rawValue + " delete \"" + name + "\"") }
-//    public func profileMicSave(_ name: String) { send(kProfileCmd + ProfileToken.mic.rawValue + " save \"" + name + "\"") }
-//    public func profileTransmitDelete(_ name: String) { send(kProfileCmd + "transmit" + " save \"" + name + "\"") }
-//    public func profileTransmitSave(_ name: String) { send(kProfileCmd + "transmit" + " save \"" + name + "\"") }
-//    // ***** R *****
-//    public func requestRemoteRxAudio(_ value: Bool) { send(kRemoteAudioCmd + Opus.OpusToken.remoteRxOn.rawValue + " \(value.asNumber())") }
-//    public func requestRemoteTxAudio(_ value: Bool) { send(kRemoteAudioCmd + Opus.OpusToken.remoteTxOn.rawValue + "\(value.asNumber())") }
-//    public func requestReboot() { send(kRadioCmd + " reboot") }
-//    // ***** S *****
-//    public func createSlice(frequency: Int, antenna: String, mode: String) { if availableSlices > 0 {
-//        send(kSliceCmd + "create \(frequency.hzToMhz()) \(antenna) \(mode)") } }
-//    public func createSlice(panadapter: Panadapter, frequency: Int = 0) { if availableSlices > 0 {
-//        send(kSliceCmd + "create pan" + "=0x\(panadapter.id) \(frequency == 0 ? "" : "freq" + "=\(frequency.hzToMhz())")") } }
-//    public func removeSlice(_ id: SliceId) { send(kSliceCmd + "remove" + " \(id)") }
-//    public func requestSliceError(_ id: SliceId) { send(kSliceCmd + "get_error" + " \(id)", replyTo: replyHandler) }
-//    public func requestSliceList() { send(kSliceCmd + "list", replyTo: replyHandler) }
-//    // ***** T *****
-//    public func createTnf(frequency: Int, panadapter: Panadapter) { send(kTnfCreateCmd + "freq" + "=\(calcTnfFreq(frequency, panadapter).hzToMhz())") }
-//    public func removeTnf(tnf: Tnf) {
-//        
-//        send(kTnfRemoveCmd + " \(tnf.id)")
-//        
-//        NC.post(.tnfWillBeRemoved, object: tnf as Any?)
-//        
-//        removeObject(tnf)
-//    }
-//    public func setTransmit(_ value: Bool) { send(kXmitCmd + " \(value.asNumber())") }
-//    public func createTxAudioStream(callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: callback)
-//    }
-//    public func removeTxAudioStream(_ id: String) { send(kStreamRemoveCmd + "0x\(id)") }
-//    // ***** U *****
-//    public func requestUptime() { send(kRadioUptimeCmd, replyTo: replyHandler) }
-//    // ***** X ****
-//    public func createXvtr(callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kXvtrCmd + "create", replyTo: callback)
-//    }
-//    public func removeXvtr(_ id: String) { send(kXvtrCmd + "remove" + " \(id)") }
-//    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public methods that send commands to the Radio (hardware)
-    
-//    // ***** A *****
-//    public func requestAntennaList() { send(kAntListCmd, replyTo: replyHandler) }       // Antenna List
-//    public func atuStart() { send(kAtuCmd + "start") }
-//    public func atuBypass() { send(kAtuCmd + "bypass") }
-//    public func createAudioStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "dax=\(channel)", replyTo: callback)
-//    }
-//    public func removeAudioStream(_ id: String) -> Bool {
-//        return sendWithCheck(kStreamRemoveCmd + "0x\(id)")
-//    }
-//    // ***** I *****
-//    public func createIqStream(_ channel: String, callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "daxiq=\(channel)", replyTo: callback)
-//    }
-//    public func requestIqStream(_ channel: String, ip: String, port: Int, callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "daxiq=\(channel) ip=\(ip) port=\(port)", replyTo: callback)
-//    }
-//    public func removeIqStream(_ id: String) { send("stream remove 0x\(id)") }
-//    // ***** M *****
-//    public func createMemory() { send("memory create") }
-//    public func requestMeterList() { send(kMeterListCmd, replyTo: replyHandler) }
-//    public func createMicAudioStream(callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kMicStreamCreateCmd, replyTo: callback)
-//    }
-//    public func removeMicAudioStream(id: String) { send("stream remove 0x\(id)") }
-//    public func requestMicList() { send(kMicListCmd, replyTo: replyHandler) }
-//    // ***** O *****
-//    public func startOffset(_ value: Bool) { startOffset = value ; if value == false { send("radio pll_start") } }
-//    // ***** P *****
-//    public func createPanafall(_ dimensions: CGSize) { if availablePanadapters > 0 {
-//        send(kDisplayPanCmd + "create x=\(dimensions.width) y=\(dimensions.height)", replyTo: replyHandler) } }
-//    public func createPanafall(frequency: Int, antenna: String? = nil, dimensions: CGSize? = nil) {
-//        if availablePanadapters > 0 {
-//            
-//            var cmd = kDisplayPanCmd + "create freq=\(frequency.hzToMhz())"
-//            if antenna != nil { cmd += " ant=\(antenna!)" }
-//            if dimensions != nil { cmd += " x=\(dimensions!.width) y=\(dimensions!.height)" }
-//            send(cmd, replyTo: replyHandler)
-//        }
-//    }
-//    public func removePanafall(_ id: PanadapterId) { send(kDisplayPanCmd + " remove 0x\(id)") }
-//    public func profileGlobalDelete(_ name: String) { send("profile global delete \"" + name + "\"") }
-//    public func profileGlobalSave(_ name: String) { send("profile global save \"" + name + "\"") }
-//    public func profileMicDelete(_ name: String) { send("profile mic delete \"" + name + "\"") }
-//    public func profileMicSave(_ name: String) { send("profile mic save \"" + name + "\"") }
-//    public func profileTransmitDelete(_ name: String) { send("profile transmit save \"" + name + "\"") }
-//    public func profileTransmitSave(_ name: String) { send("profile tx save \"" + name + "\"") }
-//    // ***** R *****
-//    public func requestRemoteRxAudio(_ value: Bool) { send(kRemoteAudioCmd + "rx_on \(value.asNumber())") }
-//    public func requestRemoteTxAudio(_ value: Bool) { send(kRemoteAudioCmd + "tx_on \(value.asNumber())") }
-//    public func requestReboot() { send(kRadioCmd + " reboot") }
-//    // ***** S *****
-//    public func createSlice(frequency: Int, antenna: String, mode: String) { if availableSlices > 0 {
-//        send(kSliceCmd + "create \(frequency.hzToMhz()) \(antenna) \(mode)") } }
-//    public func createSlice(panadapter: Panadapter, frequency: Int = 0) { if availableSlices > 0 {
-//        send(kSliceCmd + "create pan=0x\(panadapter.id) \(frequency == 0 ? "" : "freq=\(frequency.hzToMhz())")") } }
-//    public func removeSlice(_ id: SliceId) { send(kSliceCmd + "remove \(id)") }
-//    public func requestSliceError(_ id: SliceId) { send(kSliceCmd + "get_error \(id)", replyTo: replyHandler) }
-//    public func requestSliceList() { send(kSliceCmd + "list", replyTo: replyHandler) }
-//    // ***** T *****
-//    public func createTnf(frequency: Int, panadapter: Panadapter) { send("tnf create freq=\(calcTnfFreq(frequency, panadapter).hzToMhz())") }
-//    public func removeTnf(tnf: Tnf) {
-//        
-//        send(kTnfCommand + "remove \(tnf.id)")
-//        
-//        NC.post(.tnfWillBeRemoved, object: tnf as Any?)
-//        
-//        removeObject(tnf)
-//    }
-//    public func setTransmit(_ value: Bool) { send(kXmitCmd + " \(value.asNumber())") }
-//    public func createTxAudioStream(callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kStreamCreateCmd + "daxtx", replyTo: callback)
-//    }
-//    public func removeTxAudioStream(_ id: String) { send(kStreamRemoveCmd + "0x\(id)") }
-//    // ***** U *****
-//    public func requestUptime() { send(kRadioUptimeCmd, replyTo: replyHandler) }
-//    // ***** X ****
-//    public func createXvtr(callback: ReplyHandler? = nil) -> Bool {
-//        return sendWithCheck(kXvtrCmd + "create", replyTo: callback)
-//    }
-//    public func removeXvtr(_ id: String) { send(kXvtrCmd + "remove " + id) }
     
     // ----------------------------------------------------------------------------
     // MARK: - Internal methods
@@ -839,16 +632,16 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 self._log.msg("Client connection established", level: .verbose, function: #function, file: #file, line: #line)
                 
                 // send the initial commands
-                if !self._connectSimple { self.sendCommands(self.primaryCommandsArray) }
+                if !self._connectSimple { self.sendCommandList(self.primaryCommandsArray) }
                 
                 // TCP & UDP connections established, inform observers
                 NC.post(.clientDidConnect, object: self.selectedRadio as Any?)
                 
                 // send the subscription commands
-                if !self._connectSimple { self.sendCommands(self.subscriptionCommandsArray) }
+                if !self._connectSimple { self.sendCommandList(self.subscriptionCommandsArray) }
                 
                 // send the secondary commands
-                if !self._connectSimple { self.sendCommands(self.secondaryCommandsArray) }
+                if !self._connectSimple { self.sendCommandList(self.secondaryCommandsArray) }
                 
                 // tell the radio which UDP port number was selected for incoming UDP streams
                 self.send(Command.clientUdpPort.rawValue + "\(self._udp.port)")
@@ -1192,7 +985,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     // FIXME: Should parsers ignore Status message sent to other connection handles?
     
-    /// Prepare to parse an AudioStream status message
+    /// Parse an AudioStream status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -1272,7 +1065,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Prepare to parse a Cwx status message
+    /// Parse a Cwx status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -1282,31 +1075,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the key values to the Cwx for parsing
         cwx.parseKeyValues(keyValues)
     }
-    
-    // FIXME: How to integrate this with the Stream Status?
-    
-    //    /// Prepare to parse a DaxIq status message
-    //    ///
-    //    /// - Parameters:
-    //    ///   - keyValues:      a KeyValuesArray
-    //    ///
-    //    private func parseDaxiq(_ keyValues: KeyValuesArray) {
-    //        // Format: <channel, ""> <"pan", streamId> <"rate", value> <"capacity", value> <"available", value>
-    //
-    //        // get the Dax Channel
-    //        let channel = Int(keyValues[0].key) ?? 0
-    //
-    //        // does the DaxIQ stream exist?
-    //        var iqStream = findIqStreamBy(daxIqChannel: channel)
-    //        if iqStream == nil {
-    //
-    //            // NO, create a new Stream
-    //            iqStream = IqStream(radio: self, id: queue: _iqStreamQ)
-    //        }
-    //        // pass the key values to the IqStream for parsing
-    //        iqStream!.parseKeyValues( Array(keyValues.dropFirst(1)) )
-    //    }
-    /// Prepare to parse a Display status message
+    /// Parse a Display status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -1655,7 +1424,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Prepare to parse a Memory status message
+    /// Parse a Memory status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -1690,7 +1459,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             memory!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
-    /// Prepare to parse a Meter status message
+    /// Parse a Meter status message
     ///
     /// - Parameters:
     ///   - remainder:      remainder of the command String
@@ -1758,7 +1527,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             meters[meterId]!.parseKeyValues( keyValues )
         }
     }
-    /// Prepare to parse a MicAudioStream status message
+    /// Parse a MicAudioStream status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -1791,7 +1560,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             micAudioStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
     }
-    /// Prepare to parse an Opus status message
+    /// Parse an Opus status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -2086,7 +1855,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             NC.post(.radioInitialized, object: self as Any?)
         }
     }
-    /// Prepare to parse a Slice status message
+    /// Parse a Slice status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -2148,7 +1917,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the remaining key values to the IqStream for parsing
         iqStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
-    /// Prepare to parse a Tnf status message
+    /// Parse a Tnf status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -2415,7 +2184,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
     }
-    /// Prepare to parse a TxAudioStream status message
+    /// Parse a TxAudioStream status message
     ///
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
@@ -2658,7 +2427,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         }
         return slice
     }
-    
+    /// <#Description#>
+    ///
+    /// - Parameter channel:    Dax channel number
+    /// - Returns:              a Slice (if any)
+    ///
     public func findSliceBy(daxChannel channel: DaxChannel) -> Slice? {
         var slice: Slice?
         
@@ -2669,7 +2442,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             slice = s
         }
         return slice
-        
     }
     
     // MARK: ----- Tnf -----
@@ -3026,6 +2798,19 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private methods
     
+    /// Send a command list to the Radio
+    ///
+    /// - Parameters:
+    ///   - commands:       an array of CommandTuple
+    ///
+    private func sendCommandList(_ commands: [CommandTuple]) {
+        
+        // send the commands to the Radio (hardware)
+        for cmd in commands {
+            
+            let _ = send(cmd.command, diagnostic: cmd.diagnostic, replyTo: cmd.replyHandler)
+        }
+    }
     ///
     ///     Note: commands will be in default order if one of the .all... values is passed
     ///             otherwise commands will be in the order found in the incoming array
@@ -3097,19 +2882,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
         }
         return array
-    }
-    /// Send command sets to the Radio
-    ///
-    /// - Parameters:
-    ///   - commands:       an array of CommandTuple
-    ///
-    private func sendCommands(_ commands: [CommandTuple]) {
-        
-        // send the commands to the Radio (hardware)
-        for cmd in commands {
-            
-            let _ = _tcp.send(cmd.command, diagnostic: cmd.diagnostic, replyTo: cmd.replyHandler)
-        }
     }
     /// return the folder for App specific files, create it if not found
     ///
@@ -3925,10 +3697,6 @@ extension Radio {
         get { return _radioQ.sync { __rttyMark } }
         set { _radioQ.sync(flags: .barrier) { __rttyMark = newValue } } }
     
-    fileprivate var _sbMonitorEnabled: Bool {
-        get { return _radioQ.sync { __sbMonitorEnabled } }
-        set { _radioQ.sync(flags: .barrier) { __sbMonitorEnabled = newValue } } }
-    
     fileprivate var _smartSdrMB: String {
         get { return _radioQ.sync { __smartSdrMB } }
         set { _radioQ.sync(flags: .barrier) { __smartSdrMB = newValue } } }
@@ -4563,9 +4331,6 @@ extension Radio {
     @objc dynamic public var region: String {
         return _region }
     
-    @objc dynamic public var sbMonitorEnabled: Bool {
-        return _sbMonitorEnabled }
-    
     @objc dynamic public var smartSdrMB: String {
         return _smartSdrMB }
     
@@ -4982,69 +4747,5 @@ extension Radio {
     public typealias ValuesArray = [String]
     public typealias WaterfallId = String
     public typealias XvtrId = String
-    
-    /// Enum for Commands
-    ///
-    ///     Note: The "clientUdpPort" command must be sent AFTER the actual Udp port number has been determined.
-    ///           The default port number may already be in use by another application.
-    ///
-    public enum Command: String {
         
-        // GROUP A: none of this group should be included in one of the command sets
-        case none
-        case clientUdpPort = "client udpport "
-        case allPrimary
-        case allSecondary
-        case allSubscription
-        
-        // GROUP B: members of this group can be included in the command sets
-        case antList = "ant list"
-        case clientProgram = "client program "
-        case clientGui = "client gui"
-        case eqRx = "eq rxsc info"
-        case eqTx = "eq txsc info"
-        case info
-        case meterList = "meter list"
-        case micList = "mic list"
-        case profileGlobal = "profile global info"
-        case profileTx = "profile tx info"
-        case profileMic = "profile mic info"
-        case subAmplifier = "sub amplifier all"
-        case subAudioStream = "sub audio_stream all"
-        case subAtu = "sub atu all"
-        case subCwx = "sub cwx all"
-        case subDax = "sub dax all"
-        case subDaxIq = "sub daxiq all"
-        case subFoundation = "sub foundation all"
-        case subGps = "sub gps all"
-        case subMemories = "sub memories all"
-        case subMeter = "sub meter all"
-        case subPan = "sub pan all"
-        case subRadio = "sub radio all"
-        case subScu = "sub scu all"
-        case subSlice = "sub slice all"
-        case subTx = "sub tx all"
-        case subUsbCable = "sub usb_cable all"
-        case subXvtr = "sub xvtr all"
-        case version
-        
-        // Note: Do not include GROUP A values in these return vales
-        
-        static func allPrimaryCommands() -> [Command] {
-            // in the same order as in the FlexAPI C# code
-            return [.clientProgram, .clientGui]
-        }
-        static func allSecondaryCommands() -> [Command] {
-            // in the same order as in the FlexAPI C# code
-            return [.info, .version, .antList, .micList, .meterList,
-                    .profileGlobal, .profileTx, .profileMic, .eqRx, .eqTx]
-        }
-        static func allSubscriptionCommands() -> [Command] {
-            // in the same order as in the FlexAPI C# code
-            return [.subRadio, .subTx, .subAtu, .subMeter, .subPan, .subSlice, .subGps,
-                    .subAudioStream, .subCwx, .subXvtr, .subMemories, .subDaxIq, .subDax,
-                    .subUsbCable, .subAmplifier, .subFoundation, .subScu]
-        }
-    }
-    
 }
