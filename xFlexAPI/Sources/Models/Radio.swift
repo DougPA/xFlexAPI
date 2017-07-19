@@ -291,7 +291,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate var __rfPower = 0                                        // Power level (0 - 100)
     fileprivate var __rttyMark = 0                                       // RTTY mark default
     // S
-//    fileprivate var __sbMonitorEnabled = false                           //
     fileprivate var __smartSdrMB = ""                                    // Microburst main CPU software version
     fileprivate var __snapTuneEnabled = false                            // Snap tune enable
     fileprivate var __softwareVersion: String = ""                       // (read only)
@@ -3204,7 +3203,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - vitaPacket:     a Vita packet containing Meter data
     ///
-    func meterVitaHandler(_ vitaPacket: Vita) {
+    public func meterVitaHandler(_ vitaPacket: Vita) {
         
         // four bytes per Meter
         let numberOfMeters = Int(vitaPacket.payloadSize / 4)
@@ -3233,7 +3232,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - vitaPacket:     a Vita packet containing Panadapter data
     ///
-    func panadapterVitaHandler(_ vitaPacket: Vita) {
+    public func panadapterVitaHandler(_ vitaPacket: Vita) {
         
         // pass the stream to the appropriate Panadapter
         panadapters[vitaPacket.streamId]?.vitaHandler(vitaPacket)
@@ -3243,7 +3242,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - vitaPacket:     a Vita packet containing Waterfall data
     ///
-    func waterfallVitaHandler(_ vitaPacket: Vita) {
+    public func waterfallVitaHandler(_ vitaPacket: Vita) {
         
         // pass the stream to the appropriate Waterfall
         waterfalls[vitaPacket.streamId]?.vitaHandler(vitaPacket)
@@ -3253,7 +3252,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - vitaPacket:     a Vita packet containing Opus data
     ///
-    func opusVitaHandler(_ vitaPacket: Vita) {
+    public func opusVitaHandler(_ vitaPacket: Vita) {
         
         // Pass the data frame to the Opus delegate
         opusStreams[vitaPacket.streamId]?.vitaHandler( vitaPacket )
@@ -3263,7 +3262,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - vitaPacket:     a Vita packet containing Dax Audiodata
     ///
-    func daxVitaHandler(_ vitaPacket: Vita) {
+    public func daxVitaHandler(_ vitaPacket: Vita) {
         
         // what type of Dax packet?
         if let audioStream = audioStreams[vitaPacket.streamId] {
@@ -3287,7 +3286,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - vitaPacket:     a Vita packet containing DaxIq data
     ///
-    func daxIqVitaHandler(_ vitaPacket: Vita) {
+    public func daxIqVitaHandler(_ vitaPacket: Vita) {
         
         // TODO: Add code
     }

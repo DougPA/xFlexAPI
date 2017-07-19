@@ -16,7 +16,7 @@ import Foundation
 //
 // ------------------------------------------------------------------------------
 
-final class Pinger {
+public final class Pinger {
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
@@ -34,7 +34,7 @@ final class Pinger {
     /// - Parameters:
     ///   - tcpManager:     a TcpManager class instance
     ///
-    init(tcpManager: TcpManager, pingQ: DispatchQueue) {
+    public init(tcpManager: TcpManager, pingQ: DispatchQueue) {
         
         self._tcpManager = tcpManager
         self._pingQ = pingQ
