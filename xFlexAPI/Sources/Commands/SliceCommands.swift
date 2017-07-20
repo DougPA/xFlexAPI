@@ -10,14 +10,14 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Slice Class extensions
-//              - Dynamic public properties
+//              - Dynamic public properties that send commands to the Radio
 //              - Slice message enum
 // --------------------------------------------------------------------------------
 
 extension xFlexAPI.Slice {
         
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var active: Bool {

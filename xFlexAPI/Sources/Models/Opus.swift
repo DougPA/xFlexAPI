@@ -29,9 +29,14 @@ public protocol OpusStreamHandler {
 public final class Opus : NSObject, KeyValueParser, VitaHandler {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - Internal properties
     
     internal var _radio: Radio?                         // The Radio that owns the Opus stream
+    internal let kRemoteAudioCmd = "remote_audio "      // Remote Audio command prefix
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Private properties
+    
     fileprivate var _id: Radio.OpusId                   // The Opus stream id
 
     fileprivate var _initialized = false                // True if initialized by Radio hardware
@@ -49,20 +54,18 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     fileprivate var _txPacketSize = 240                  // Tx packet size (bytes)
     fileprivate var txBytesPerSec = 0                   // Tx rate
     
-    // constants
     fileprivate let _opusQ: DispatchQueue               // Opus synchronization
     fileprivate let _log = Log.sharedInstance           // Shared Log
-    internal let kRemoteAudioCmd = "remote_audio "      // Remote Audio command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __remoteRxOn = false                // Opus for receive                             //
     fileprivate var __remoteTxOn = false                // Opus for transmit                            //
     fileprivate var __rxStreamStopped = false           // Rx stream stopped                            //
-                                                                                                    //
+                                                                                                        //
     fileprivate var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data                //
-        didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }                     //
-    //                                                                                              //
+        didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }                         //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // ----------------------------------------------------------------------------
@@ -297,8 +300,7 @@ public struct OpusFrame {
 // --------------------------------------------------------------------------------
 // MARK: - Opus Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Opus message enum
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension Opus {

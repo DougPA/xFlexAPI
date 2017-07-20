@@ -34,21 +34,23 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     public private(set) var lastTimecode: Int = 0           // Time code of last frame received
     public private(set) var droppedPackets: Int = 0         // Number of dropped (out of sequence) packets
     public private(set) var isBeingRemoved = false          // true when in the process of being removed
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal var _radio: Radio?                             // The Radio that owns this Waterfall
+    internal let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
 
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
     fileprivate var _initialized = false                    // True if initialized by Radio hardware
-    internal var _radio: Radio?                             // The Radio that owns this Waterfall
     fileprivate var _waterfallQ: DispatchQueue              // GCD queue that guards this object
     fileprivate var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream
-
-    // constants
     fileprivate let _log = Log.sharedInstance               // shared log
-    internal let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __autoBlackEnabled = false              // State of auto black                      //
     fileprivate var __autoBlackLevel: UInt32 = 0            //                                          //
     fileprivate var __blackLevel = 0                        // Setting of black level (1 -> 100)        //
@@ -56,7 +58,7 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     fileprivate var __gradientIndex = 0                     // Index of selected color gradient         //
     fileprivate var __lineDuration = 0                      // Line duration (milliseconds)             //
     fileprivate var __panadapterId = ""                     // Panadaptor above this waterfall          //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // ------------------------------------------------------------------------------
@@ -266,6 +268,7 @@ public struct WaterfallFrame {
 // --------------------------------------------------------------------------------
 // MARK: - Waterfall Class extensions
 //              - Synchronized internal properties
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension Waterfall {

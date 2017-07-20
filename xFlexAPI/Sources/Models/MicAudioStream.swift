@@ -23,39 +23,41 @@ public protocol MicAudioStreamHandler {
 // ------------------------------------------------------------------------------
 
 public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
-
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Public properties
     
     public private(set) var id: Radio.DaxStreamId = ""  // The Mic Audio stream id
     public var rxLostPacketCount = 0                    // Rx lost packet count
     
     // ------------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - Internal properties
     
     internal var _radio: Radio?                         // The Radio that owns this MicAudioStream
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Private properties
+    
     fileprivate var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
     fileprivate var _initialized = false                // True if initialized by Radio hardware
     
     fileprivate var rxSeq: Int?                         // Rx sequence number
+    fileprivate let _log = Log.sharedInstance           // shared Log
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __inUse = false                     // true = in use                                //
     fileprivate var __ip = ""                           // Ip Address                                   //
     fileprivate var __port = 0                          // Port number                                  //
     fileprivate var __micGain = 50                      // rx gain of stream                            //
     fileprivate var __micGainScalar: Float = 1.0        // scalar gain value for multiplying            //
-                                                                                                    //
+                                                                                                        //
     fileprivate var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                    //
-    //                                                                                              //
-    // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ----//
-    
-    // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    
-//    fileprivate let kMicStreamCreateCmd = "stream create daxmic"
-    
-    // see FlexLib
-    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
+    //                                                                                                  //
+    // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
+        
+    // ----------------------------------------------------------------------------
+    // MARK: - Initialization
     
     /// Initialize an Mic Audio Stream
     ///
@@ -172,22 +174,9 @@ public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
                 dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
                 dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
             }
-            
-            if (Int(vita.classCode.rawValue) & 0x200) == 0 {
-                // FIXME: should not be necessary
-                // convert the payload data from 2s complement to float
-                // for each sample...
-                for i in 0..<dataFrame.samples {
-                    
-                    dataFrame.leftAudio[i] = Float(dataLeft[i]) * kOneOverZeroDBfs
-                    dataFrame.rightAudio[i] = Float(dataRight[i]) * kOneOverZeroDBfs
-                }
-            } else {
-                // copy the data as is -- it is already floating point
-                memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
-                memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
-                
-            }
+            // copy the data as is -- it is already floating point
+            memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
+            memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
             
             // scale with rx gain
             let scale = self._micGainScalar
@@ -254,33 +243,32 @@ public struct MicAudioStreamFrame {
 // --------------------------------------------------------------------------------
 // MARK: - MicAudioStream Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - AudioStream message enum
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension MicAudioStream {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _inUse: Bool {
+    internal var _inUse: Bool {
         get { return _micAudioStreamsQ.sync { __inUse } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    fileprivate var _ip: String {
+    internal var _ip: String {
         get { return _micAudioStreamsQ.sync { __ip } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    fileprivate var _port: Int {
+    internal var _port: Int {
         get { return _micAudioStreamsQ.sync { __port } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    fileprivate var _micGain: Int {
+    internal var _micGain: Int {
         get { return _micAudioStreamsQ.sync { __micGain } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGain = newValue } } }
     
-    fileprivate var _micGainScalar: Float {
+    internal var _micGainScalar: Float {
         get { return _micAudioStreamsQ.sync { __micGainScalar } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     

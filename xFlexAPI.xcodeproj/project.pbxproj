@@ -16,6 +16,12 @@
 		915817FF1F204B4600FA6382 /* TxAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F61F204B4600FA6382 /* TxAudioStreamCommands.swift */; };
 		915818001F204B4600FA6382 /* WaterfallCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F71F204B4600FA6382 /* WaterfallCommands.swift */; };
 		915818011F204B4600FA6382 /* XvtrCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F81F204B4600FA6382 /* XvtrCommands.swift */; };
+		915818031F20F7A600FA6382 /* MeterCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915818021F20F7A600FA6382 /* MeterCommands.swift */; };
+		915818051F20F9EB00FA6382 /* MemoryCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915818041F20F9EB00FA6382 /* MemoryCommands.swift */; };
+		915818071F20FAEC00FA6382 /* IqStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915818061F20FAEC00FA6382 /* IqStreamCommands.swift */; };
+		915818091F20FB7700FA6382 /* CwxCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915818081F20FB7700FA6382 /* CwxCommands.swift */; };
+		9158180B1F20FD8700FA6382 /* AudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9158180A1F20FD8700FA6382 /* AudioStreamCommands.swift */; };
+		9158180D1F20FFEC00FA6382 /* EqualizerCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 9158180C1F20FFEC00FA6382 /* EqualizerCommands.swift */; };
 		91B9F7B71ED916B300F7799D /* xFlexAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F7B51ED916B300F7799D /* xFlexAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C31ED9170B00F7799D /* Extensions.swift */; };
 		91B9F7E71ED9170B00F7799D /* Filters.plist in Resources */ = {isa = PBXBuildFile; fileRef = 91B9F7C51ED9170B00F7799D /* Filters.plist */; };
@@ -60,6 +66,12 @@
 		915817F61F204B4600FA6382 /* TxAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TxAudioStreamCommands.swift; path = Sources/Commands/TxAudioStreamCommands.swift; sourceTree = "<group>"; };
 		915817F71F204B4600FA6382 /* WaterfallCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WaterfallCommands.swift; path = Sources/Commands/WaterfallCommands.swift; sourceTree = "<group>"; };
 		915817F81F204B4600FA6382 /* XvtrCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XvtrCommands.swift; path = Sources/Commands/XvtrCommands.swift; sourceTree = "<group>"; };
+		915818021F20F7A600FA6382 /* MeterCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MeterCommands.swift; path = Sources/Commands/MeterCommands.swift; sourceTree = "<group>"; };
+		915818041F20F9EB00FA6382 /* MemoryCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MemoryCommands.swift; path = Sources/Commands/MemoryCommands.swift; sourceTree = "<group>"; };
+		915818061F20FAEC00FA6382 /* IqStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = IqStreamCommands.swift; path = Sources/Commands/IqStreamCommands.swift; sourceTree = "<group>"; };
+		915818081F20FB7700FA6382 /* CwxCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = CwxCommands.swift; path = Sources/Commands/CwxCommands.swift; sourceTree = "<group>"; };
+		9158180A1F20FD8700FA6382 /* AudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AudioStreamCommands.swift; path = Sources/Commands/AudioStreamCommands.swift; sourceTree = "<group>"; };
+		9158180C1F20FFEC00FA6382 /* EqualizerCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = EqualizerCommands.swift; path = Sources/Commands/EqualizerCommands.swift; sourceTree = "<group>"; };
 		91B9F7B21ED916B300F7799D /* xFlexAPI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xFlexAPI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91B9F7B51ED916B300F7799D /* xFlexAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xFlexAPI.h; sourceTree = "<group>"; };
 		91B9F7B61ED916B300F7799D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -110,6 +122,12 @@
 		915817EF1F204B2300FA6382 /* Commands */ = {
 			isa = PBXGroup;
 			children = (
+				9158180A1F20FD8700FA6382 /* AudioStreamCommands.swift */,
+				915818081F20FB7700FA6382 /* CwxCommands.swift */,
+				9158180C1F20FFEC00FA6382 /* EqualizerCommands.swift */,
+				915818061F20FAEC00FA6382 /* IqStreamCommands.swift */,
+				915818041F20F9EB00FA6382 /* MemoryCommands.swift */,
+				915818021F20F7A600FA6382 /* MeterCommands.swift */,
 				915817F01F204B4600FA6382 /* MicAudioStreamCommands.swift */,
 				915817F11F204B4600FA6382 /* OpusCommands.swift */,
 				915817F21F204B4600FA6382 /* PanadapterCommands.swift */,
@@ -327,20 +345,24 @@
 				91B9F7FD1ED9170B00F7799D /* Pinger.swift in Sources */,
 				91B9F7F71ED9170B00F7799D /* Radio.swift in Sources */,
 				91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */,
+				915818031F20F7A600FA6382 /* MeterCommands.swift in Sources */,
 				915818001F204B4600FA6382 /* WaterfallCommands.swift in Sources */,
 				91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */,
 				91B9F7FB1ED9170B00F7799D /* TxAudioStream.swift in Sources */,
 				91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */,
 				91B9F7F01ED9170B00F7799D /* IqStream.swift in Sources */,
+				915818071F20FAEC00FA6382 /* IqStreamCommands.swift in Sources */,
 				91B9F7EC1ED9170B00F7799D /* RadioParameters.swift in Sources */,
 				915817FB1F204B4600FA6382 /* PanadapterCommands.swift in Sources */,
 				915817FC1F204B4600FA6382 /* RadioCommands.swift in Sources */,
 				91B9F80E1ED9203300F7799D /* GCDAsyncSocket.m in Sources */,
 				91B9F7FA1ED9170B00F7799D /* Tnf.swift in Sources */,
 				915817FA1F204B4600FA6382 /* OpusCommands.swift in Sources */,
+				915818051F20F9EB00FA6382 /* MemoryCommands.swift in Sources */,
 				91B9F7E81ED9170B00F7799D /* FlexErrors.swift in Sources */,
 				91B9F7F11ED9170B00F7799D /* Log.swift in Sources */,
 				91B9F7FE1ED9170B00F7799D /* TcpManager.swift in Sources */,
+				9158180B1F20FD8700FA6382 /* AudioStreamCommands.swift in Sources */,
 				915817FE1F204B4600FA6382 /* TnfCommands.swift in Sources */,
 				91B9F7F61ED9170B00F7799D /* Panadapter.swift in Sources */,
 				91B9F8001ED9170B00F7799D /* Vita.swift in Sources */,
@@ -353,6 +375,8 @@
 				91B9F7ED1ED9170B00F7799D /* AudioStream.swift in Sources */,
 				91C831031F001D0500836BE9 /* UsbCable.swift in Sources */,
 				91B9F7F51ED9170B00F7799D /* Opus.swift in Sources */,
+				915818091F20FB7700FA6382 /* CwxCommands.swift in Sources */,
+				9158180D1F20FFEC00FA6382 /* EqualizerCommands.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

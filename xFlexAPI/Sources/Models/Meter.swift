@@ -21,30 +21,34 @@ public final class Meter : KeyValueParser {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public private(set) var id = ""                              // Id that uniquely identifies this Meter
+    public private(set) var id = ""                                 // Id that uniquely identifies this Meter
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal var _radio: Radio?                                     // The Radio that owns this Meter
 
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _radio: Radio?                                   // The Radio that owns this Meter
-    fileprivate var _initialized = false                             // True if initialized by Radio (hardware)
-    fileprivate var _meterQ: DispatchQueue                           // GCD queue that guards this object
+    fileprivate var _initialized = false                            // True if initialized by Radio (hardware)
+    fileprivate var _meterQ: DispatchQueue                          // GCD queue that guards this object
 
     // constants
-    fileprivate let _log = Log.sharedInstance                        // shared log
+    fileprivate let _log = Log.sharedInstance                       // shared log
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
-    fileprivate var _description = ""                                // long description                //
-    fileprivate var _fps = 0                                         // frames per second               //
-    fileprivate var _high: Float = 0.0                               // high limit                      //
-    fileprivate var _low: Float = 0.0                                // low limit                       //
-    fileprivate var _number = ""                                     // Id of the source                //
-    fileprivate var _name = ""                                       // abbreviated description         //
-    fileprivate var _peak: Float = 0.0                               // peak value                      //
-    fileprivate var _source = ""                                     // source                          //
-    fileprivate var _units = ""                                      // value units                     //
-    fileprivate var _value: Float = 0.0                              // value                           //
+    fileprivate var _description = ""                               // long description             //
+    fileprivate var _fps = 0                                        // frames per second            //
+    fileprivate var _high: Float = 0.0                              // high limit                   //
+    fileprivate var _low: Float = 0.0                               // low limit                    //
+    fileprivate var _number = ""                                    // Id of the source             //
+    fileprivate var _name = ""                                      // abbreviated description      //
+    fileprivate var _peak: Float = 0.0                              // peak value                   //
+    fileprivate var _source = ""                                    // source                       //
+    fileprivate var _units = ""                                     // value units                  //
+    fileprivate var _value: Float = 0.0                             // value                        //
     //                                                                                              //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
 
@@ -179,15 +183,11 @@ public final class Meter : KeyValueParser {
 
 // --------------------------------------------------------------------------------
 // MARK: - Meter Class extensions
-//              - Synchronized dynamic public properties
-//              - Meter message enum
-//              - Other Meter related enums
+//              - Public properties, no message to Radio
+//              - Meter related enums
 // --------------------------------------------------------------------------------
 
 extension Meter {
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -237,21 +237,7 @@ extension Meter {
         set { _meterQ.sync(flags: .barrier) { _value = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Meter messages 
-    
-    internal enum MeterToken : String {
-        case desc
-        case fps
-        case high = "hi"
-        case low
-        case name = "nam"
-        case number = "num"
-        case source = "src"
-        case units = "unit"
-    }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Other Meter related enums
+    // MARK: - Meter related enums
     
         public enum MeterSource: String {
             case none = ""

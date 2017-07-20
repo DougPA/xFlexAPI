@@ -24,25 +24,27 @@ public final class Tnf : NSObject, KeyValueParser {
     public private(set) var id: Radio.TnfId             // Id that uniquely identifies this Tnf
     public var minWidth = 5                             // default minimum Tnf width (Hz)
     public var maxWidth = 6000                          // default maximum Tnf width (Hz)
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal var _radio: Radio?                         // The Radio that owns this Tnf
+    internal let kTnfSetCmd = "tnf set "                // Tnf Set command prefix
 
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    internal var _radio: Radio?                      // The Radio that owns this Tnf
     fileprivate var _tnfQ: DispatchQueue                // GCD queue that guards this object
     fileprivate var _initialized = false                // True if initialized by Radio hardware
-
-    // constants
     fileprivate let _log = Log.sharedInstance           // shared Log
-    internal let kTnfSetCmd = "tnf set "             // Tnf Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __depth = Tnf.Depth.normal.rawValue // Depth (Normal, Deep, Very Deep)              //
     fileprivate var __frequency = 0                     // Frequency (Hz)                               //
     fileprivate var __permanent = false                 // True =                                       //
     fileprivate var __width = 0                         // Width (Hz)                                   //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // ------------------------------------------------------------------------------
@@ -156,6 +158,7 @@ public final class Tnf : NSObject, KeyValueParser {
 // --------------------------------------------------------------------------------
 // MARK: - Tnf Class extensions
 //              - Synchronized internal properties
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension Tnf {
@@ -182,6 +185,8 @@ extension Tnf {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
+    
+        // ----- None -----
 
 }
 

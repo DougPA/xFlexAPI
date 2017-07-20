@@ -8,6 +8,15 @@
 
 import Foundation
 
+// --------------------------------------------------------------------------------
+// MARK: - Radio Class extensions
+//              - Public methods for sending data to the Radio
+//              - Public enum for Primary, Secondary & Subscription Command lists
+//              - Public methods that send commands to the Radio
+//              - Dynamic public properties that send commands to the Radio
+//              - Radio message enums
+// --------------------------------------------------------------------------------
+
 extension Radio {
     
     // ----------------------------------------------------------------------------
@@ -25,7 +34,7 @@ extension Radio {
         // tell the TcpManager to send the command (and optionally setup a callback)
         let _ = _tcp.send(command, diagnostic: flag, replyTo: callback)
     }
-    /// Send a command to the Radio (hardware), check for isConnected
+    /// Send a command to the Radio (hardware), first check that a Radio is connected
     ///
     /// - Parameters:
     ///   - command:        a Command String
@@ -466,5 +475,604 @@ extension Radio {
     ///
     public func xvtrRemove(_ id: String, callback: ReplyHandler? = nil) {
         send(kXvtrCmd + "remove" + " \(id)", replyTo: callback)
+    }
+
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
+    
+    // listed in alphabetical order
+    @objc dynamic public var accTxEnabled: Bool {
+        get { return _accTxEnabled }
+        set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; send(kInterlockCmd + "acc_tx_enabled" + "=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var accTxDelay: Int {
+        get { return _accTxDelay }
+        set { if _accTxDelay != newValue { _accTxDelay = newValue ; send(kInterlockCmd + "acc_tx_delay" + "=\(newValue)") } } }
+    
+    @objc dynamic public var accTxReqEnabled: Bool {
+        get {  return _accTxReqEnabled }
+        set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; send(kInterlockCmd + InterlockToken.accTxReqEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var accTxReqPolarity: Bool {
+        get {  return _accTxReqPolarity }
+        set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; send(kInterlockCmd + InterlockToken.accTxReqPolarity.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var apfEnabled: Bool {
+        get {  return _apfEnabled }
+        set { if _apfEnabled != newValue { _apfEnabled = newValue ; send(kApfCmd + EqApfToken.mode.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var apfQFactor: Int {
+        get {  return _apfQFactor }
+        set { if _apfQFactor != newValue { _apfQFactor = newValue.bound(kMinApfQ, kMaxApfQ) ; send(kApfCmd + EqApfToken.qFactor.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var apfGain: Int {
+        get {  return _apfGain }
+        set { if _apfGain != newValue { _apfGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kApfCmd + EqApfToken.gain.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var atuMemoriesEnabled: Bool {
+        get {  return _atuMemoriesEnabled }
+        set { if _atuMemoriesEnabled != newValue { _atuMemoriesEnabled = newValue ; send(kAtuSetCmd + AtuToken.memoriesEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var binauralRxEnabled: Bool {
+        get {  return _binauralRxEnabled }
+        set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; send(kRadioSetCmd + RadioToken.binauralRxEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var calFreq: Int {
+        get {  return _calFreq }
+        set { if _calFreq != newValue { _calFreq = newValue ; send(kRadioSetCmd + RadioToken.calFreq.rawValue + "=\(newValue.hzToMhz())") } } }
+    
+    @objc dynamic public var callsign: String {
+        get {  return _callsign }
+        set { if _callsign != newValue { _callsign = newValue ; send(kRadioCmd + RadioToken.callsign.rawValue + " \(newValue)") } } }
+    
+    @objc dynamic public var carrierLevel: Int {
+        get {  return _carrierLevel }
+        set { if _carrierLevel != newValue { _carrierLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "am_carrier" + "=\(newValue)") } } }
+    
+    @objc dynamic public var companderEnabled: Bool {
+        get {  return _companderEnabled }
+        set { if _companderEnabled != newValue { _companderEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.companderEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var companderLevel: Int {
+        get {  return _companderLevel }
+        set { if _companderLevel != newValue { _companderLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.companderLevel.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var currentGlobalProfile: String {
+        get {  return _currentGlobalProfile }
+        set { if _currentGlobalProfile != newValue { _currentGlobalProfile = newValue ; send(kProfileCmd + ProfileToken.global.rawValue + " load \"\(newValue)\"") } } }
+    
+    @objc dynamic public var currentMicProfile: String {
+        get {  return _currentMicProfile }
+        set { if _currentMicProfile != newValue { _currentMicProfile = newValue ; send(kProfileCmd + ProfileToken.mic.rawValue + " load \"\(newValue)\"") } } }
+    
+    @objc dynamic public var currentTxProfile: String {
+        get {  return _currentTxProfile }
+        set { if _currentTxProfile != newValue { _currentTxProfile = newValue  ; send(kProfileCmd + ProfileToken.tx.rawValue + " load \"\(newValue)\"") } } }
+    
+    @objc dynamic public var cwAutoSpaceEnabled: Bool {
+        get {  return _cwAutoSpaceEnabled }
+        set { if _cwAutoSpaceEnabled != newValue { _cwAutoSpaceEnabled = newValue ; send(kCwCmd + "auto_space" + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var cwBreakInDelay: Int {
+        get {  return _cwBreakInDelay }
+        set { if _cwBreakInDelay != newValue { _cwBreakInDelay = newValue.bound(kMinDelay, kMaxDelay) ; send(kCwCmd + TransmitToken.cwBreakInDelay.rawValue + " \(newValue)") } } }
+    
+    @objc dynamic public var cwBreakInEnabled: Bool {
+        get {  return _cwBreakInEnabled }
+        set { if _cwBreakInEnabled != newValue { _cwBreakInEnabled = newValue ; send(kCwCmd + TransmitToken.cwBreakInEnabled.rawValue + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var cwIambicEnabled: Bool {
+        get {  return _cwIambicEnabled }
+        set { if _cwIambicEnabled != newValue { _cwIambicEnabled = newValue ; send(kCwCmd + TransmitToken.cwIambicEnabled.rawValue + " \(newValue.asNumber())")} } }
+    
+    @objc dynamic public var cwIambicMode: Int {
+        get {  return _cwIambicMode }
+        set { if _cwIambicMode != newValue { _cwIambicMode = newValue ; send(kCwCmd + TransmitToken.cwIambicMode.rawValue + " \(newValue)") } } }
+    
+    @objc dynamic public var cwlEnabled: Bool {
+        get {  return _cwlEnabled }
+        set { if _cwlEnabled != newValue { _cwlEnabled = newValue ; send(kCwCmd + TransmitToken.cwlEnabled.rawValue + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var cwPitch: Int {
+        get {  return _cwPitch }
+        set { if _cwPitch != newValue { _cwPitch = newValue.bound(kMinPitch, kMaxPitch) ; send(kCwCmd + TransmitToken.cwPitch.rawValue + " \(newValue)") } } }
+    
+    @objc dynamic public var cwSidetoneEnabled: Bool {
+        get {  return _cwSidetoneEnabled }
+        set { if _cwSidetoneEnabled != newValue { _cwSidetoneEnabled = newValue ; send(kCwCmd + TransmitToken.cwSidetoneEnabled.rawValue + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var cwSpeed: Int {
+        get {  return _cwSpeed }
+        set { if _cwSpeed != newValue { _cwSpeed = newValue.bound(kMinWpm, kMaxWpm) ; send(kCwCmd + TransmitToken.cwSpeed.rawValue + " \(newValue)") } } }
+    
+    @objc dynamic public var cwSwapPaddles: Bool {
+        get {  return _cwSwapPaddles }
+        set { if _cwSwapPaddles != newValue { _cwSwapPaddles = newValue ; send(kCwCmd + TransmitToken.cwSwapPaddles.rawValue + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var cwSyncCwxEnabled: Bool {
+        get {  return _cwSyncCwxEnabled }
+        set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; send (kCwCmd + TransmitToken.cwSyncCwxEnabled.rawValue + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var cwWeight: Int {
+        get {  return _cwWeight }
+        set { if _cwWeight != newValue { _cwWeight = newValue ; send(kCwCmd + "weight" + " \(newValue)") } } }
+    
+    @objc dynamic public var daxEnabled: Bool {
+        get {  return _daxEnabled }
+        set { if _daxEnabled != newValue { _daxEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.daxEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var enforcePrivateIpEnabled: Bool {
+        get {  return _enforcePrivateIpEnabled }
+        set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; send(kRadioCmd + RadioToken.enforcePrivateIpEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var filterCwAutoLevel: Int {
+        get {  return _filterCwAutoLevel }
+        set { if _filterCwAutoLevel != newValue { _filterCwAutoLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.cw.rawValue + " " + RadioToken.autoLevel.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var filterDigitalAutoLevel: Int {
+        get {  return _filterDigitalAutoLevel }
+        set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.digital.rawValue + " " + RadioToken.autoLevel.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var filterVoiceAutoLevel: Int {
+        get {  return _filterVoiceAutoLevel }
+        set { if _filterVoiceAutoLevel != newValue { _filterVoiceAutoLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.voice.rawValue + " " + RadioToken.autoLevel.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var filterCwLevel: Int {
+        get {  return _filterCwLevel }
+        set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.cw.rawValue + " " + RadioToken.level.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var filterDigitalLevel: Int {
+        get {  return _filterDigitalLevel }
+        set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.digital.rawValue + " " + RadioToken.level.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var filterVoiceLevel: Int {
+        get {  return _filterVoiceLevel }
+        set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.voice.rawValue + " " + RadioToken.level.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var freqErrorPpb: Int {
+        get {  return _freqErrorPpb }
+        set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; send(kRadioSetCmd + RadioToken.freqErrorPpb.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var fullDuplexEnabled: Bool {
+        get {  return _fullDuplexEnabled }
+        set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; send(kRadioSetCmd + RadioToken.fullDuplexEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var headphoneGain: Int {
+        get {  return _headphoneGain }
+        set { if _headphoneGain != newValue { _headphoneGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "headphone gain" + " \(newValue)") } } }
+    
+    @objc dynamic public var headphoneMute: Bool {
+        get {  return _headphoneMute }
+        set { if _headphoneMute != newValue { _headphoneMute = newValue; send(kMixerCmd + "headphone mute" + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var hwAlcEnabled: Bool {
+        get {  return _hwAlcEnabled }
+        set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.hwAlcEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var inhibit: Bool {
+        get {  return _inhibit }
+        set { if _inhibit != newValue { _inhibit = newValue ; send(kTransmitSetCmd + TransmitToken.inhibit.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var lineoutGain: Int {
+        get {  return _lineoutGain }
+        set { if _lineoutGain != newValue { _lineoutGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "lineout gain" + " \(newValue)") } } }
+    
+    @objc dynamic public var lineoutMute: Bool {
+        get {  return _lineoutMute }
+        set { if _lineoutMute != newValue { _lineoutMute = newValue ; send(kMixerCmd + "lineout mute" + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var maxPowerLevel: Int {
+        get {  return _maxPowerLevel }
+        set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.maxPowerLevel.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var metInRxEnabled: Bool {
+        get {  return _metInRxEnabled }
+        set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.metInRxEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micAccEnabled: Bool {
+        get {  return _micAccEnabled }
+        set { if _micAccEnabled != newValue { _micAccEnabled = newValue ; send(kMicCmd + "acc" + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micBiasEnabled: Bool {
+        get {  return _micBiasEnabled }
+        set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; send(kMicCmd + "bias" + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micBoostEnabled: Bool {
+        get {  return _micBoostEnabled }
+        set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; send(kMicCmd + "boost" + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var micLevel: Int {
+        get {  return _micLevel }
+        set { if _micLevel != newValue { _micLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "miclevel" + "=\(newValue)") } } }
+    
+    @objc dynamic public var micSelection: String {
+        get {  return _micSelection }
+        set { if _micSelection != newValue { _micSelection = newValue ; send(kMicCmd + "input" + " \(newValue)") } } }
+    
+    @objc dynamic public var nickname: String {
+        get {  return _nickname }
+        set { if _nickname != newValue { _nickname = newValue ; send(kRadioCmd + "name" + " \(newValue)") } } }
+    
+    @objc dynamic public var radioScreenSaver: String {
+        get {  return _radioScreenSaver }
+        set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; send(kRadioCmd + "screensaver" + " \(newValue)") } } }
+    
+    @objc dynamic public var rcaTxReqEnabled: Bool {
+        get {  return _rcaTxReqEnabled}
+        set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; send(kInterlockCmd + InterlockToken.rcaTxReqEnabled.rawValue + "=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var rcaTxReqPolarity: Bool {
+        get {  return _rcaTxReqPolarity }
+        set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; send(kInterlockCmd + InterlockToken.rcaTxReqPolarity.rawValue + "=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var remoteOnEnabled: Bool {
+        get {  return _remoteOnEnabled }
+        set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; send(kRadioSetCmd + RadioToken.remoteOnEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var rfPower: Int {
+        get {  return _rfPower }
+        set { if _rfPower != newValue { _rfPower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.rfPower.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var rttyMark: Int {
+        get {  return _rttyMark }
+        set { if _rttyMark != newValue { _rttyMark = newValue ; send(kRadioSetCmd + RadioToken.rttyMark.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var snapTuneEnabled: Bool {
+        get {  return _snapTuneEnabled }
+        set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; send(kRadioCmd + RadioToken.snapTuneEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var speechProcessorEnabled: Bool {
+        get {  return _speechProcessorEnabled }
+        set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.speechProcessorEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var speechProcessorLevel: Int {
+        get {  return _speechProcessorLevel }
+        set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; send(kTransmitSetCmd + TransmitToken.speechProcessorLevel.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var ssbPeakControlEnabled: Bool {
+        get {  return _ssbPeakControlEnabled }
+        set { if _ssbPeakControlEnabled != newValue { _ssbPeakControlEnabled = newValue ; send(kTransmitSetCmd + "ssb_peak_control" + "=\(newValue.asNumber())")} } }
+    
+    @objc dynamic public var startOffset: Bool {
+        get { return _startOffset }
+        set { if _startOffset != newValue { _startOffset = newValue ; if !_startOffset { send(kRadioCmd + "pll_start") } } } }
+    
+    @objc dynamic public var staticGateway: String {
+        get {  return _staticGateway }
+        set { if _staticGateway != newValue { _staticGateway = newValue ; send(kRadioCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
+    
+    @objc dynamic public var staticIp: String {
+        get {  return _staticIp }
+        set { if _staticIp != newValue { _staticIp = newValue ; send(kRadioCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
+    
+    @objc dynamic public var staticNetmask: String {
+        get {  return _staticNetmask }
+        set { if _staticNetmask != newValue { _staticNetmask = newValue ; send(kRadioCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
+    
+    @objc dynamic public var timeout: Int {
+        get {  return _timeout }
+        set { if _timeout != newValue { _timeout = newValue ; send(kInterlockCmd + InterlockToken.timeout.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var tnfEnabled: Bool {
+        get {  return _tnfEnabled }
+        set { if _tnfEnabled != newValue { _tnfEnabled = newValue ; send(kRadioSetCmd + RadioToken.tnfEnabled.rawValue + "=\(newValue.asString())") } } }
+    
+    @objc dynamic public var tune: Bool {
+        get {  return _tune }
+        set { if _tune != newValue { _tune = newValue ; send(kTransmitCmd + TransmitToken.tune.rawValue + " \(newValue.asNumber())") } } }
+    
+    @objc dynamic public var tunePower: Int {
+        get {  return _tunePower }
+        set { if _tunePower != newValue { _tunePower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.tunePower.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var txFilterHigh: Int {
+        get { return _txFilterHigh }
+        set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; send(kTransmitSetCmd + "filter_high" + "=\(value)") } } }
+    
+    @objc dynamic public var txFilterLow: Int {
+        get { return _txFilterLow }
+        set { if _txFilterLow != newValue { let value = txFilterLowLimits(newValue, txFilterHigh) ; _txFilterLow = value ; send(kTransmitSetCmd + "filter_low" + "=\(value)") } } }
+    
+    @objc dynamic public var txInWaterfallEnabled: Bool {
+        get { return _txInWaterfallEnabled }
+        set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.txInWaterfallEnabled.rawValue + "=\(newValue.asNumber())")} } }
+    
+    @objc dynamic public var txMonitorEnabled: Bool {
+        get {  return _txMonitorEnabled }
+        set { if _txMonitorEnabled != newValue { _txMonitorEnabled = newValue ; send(kTransmitSetCmd + "mon" + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var txMonitorGainCw: Int {
+        get {  return _txMonitorGainCw }
+        set { if _txMonitorGainCw != newValue { _txMonitorGainCw = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorGainCw.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var txMonitorGainSb: Int {
+        get {  return _txMonitorGainSb }
+        set { if _txMonitorGainSb != newValue { _txMonitorGainSb = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorGainSb.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var txMonitorPanCw: Int {
+        get {  return _txMonitorPanCw }
+        set { if _txMonitorPanCw != newValue { _txMonitorPanCw = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorPanCw.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var txMonitorPanSb: Int {
+        get {  return _txMonitorPanSb }
+        set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorPanSb.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var tx1Enabled: Bool {
+        get { return _tx1Enabled }
+        set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; send(kInterlockCmd + InterlockToken.tx1Enabled.rawValue + "=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var tx1Delay: Int {
+        get { return _tx1Delay }
+        set { if _tx1Delay != newValue { _tx1Delay = newValue  ; send(kInterlockCmd + InterlockToken.tx1Delay.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var tx2Enabled: Bool {
+        get { return _tx2Enabled }
+        set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; send(kInterlockCmd + InterlockToken.tx2Enabled.rawValue + "=\(newValue.asLetter())") } } }
+    
+    @objc dynamic public var tx2Delay: Int {
+        get { return _tx2Delay }
+        set { if _tx2Delay != newValue { _tx2Delay = newValue ; send(kInterlockCmd + InterlockToken.tx2Delay.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var tx3Enabled: Bool {
+        get { return _tx3Enabled }
+        set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; send(kInterlockCmd + InterlockToken.tx3Enabled.rawValue + "=\(newValue.asLetter())")} } }
+    
+    @objc dynamic public var tx3Delay: Int {
+        get { return _tx3Delay }
+        set { if _tx3Delay != newValue { _tx3Delay = newValue ; send(kInterlockCmd + InterlockToken.tx3Delay.rawValue + "=\(newValue)")} } }
+    
+    @objc dynamic public var voxEnabled: Bool {
+        get { return _voxEnabled }
+        set { if _voxEnabled != newValue { _voxEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.voxEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
+    @objc dynamic public var voxDelay: Int {
+        get { return _voxDelay }
+        set { if _voxDelay != newValue { _voxDelay = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.voxDelay.rawValue + "=\(newValue)") } } }
+    
+    @objc dynamic public var voxLevel: Int {
+        get { return _voxLevel }
+        set { if _voxLevel != newValue { _voxLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.voxLevel.rawValue + "=\(newValue)") } } }
+
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Token enums in alphabetical order.
+    // ----------------------------------------------------------------------------
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Atu
+    
+    internal enum AtuToken: String {
+        case status
+        case atuEnabled = "atu_enabled"
+        case memoriesEnabled = "memories_enabled"
+        case usingMemories = "using_mem"
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Display
+    
+    internal enum DisplayToken: String {
+        case panadapter = "pan"
+        case waterfall
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Equalizer Apf
+    
+    internal enum EqApfToken: String {
+        case gain
+        case mode
+        case qFactor
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Gps
+    
+    internal enum GpsToken: String {
+        case altitude
+        case frequencyError = "freq_error"
+        case grid
+        case latitude = "lat"
+        case longitude = "lon"
+        case speed
+        case status
+        case time
+        case track
+        case tracked
+        case visible
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Info replies
+    
+    internal enum InfoToken: String {
+        case atuPresent = "atu_present"
+        case callsign
+        case chassisSerial = "chassis_serial"
+        case gateway
+        case gps
+        case ipAddress = "ip"
+        case location
+        case macAddress = "mac"
+        case model
+        case netmask
+        case name
+        case numberOfScus = "num_scu"
+        case numberOfSlices = "num_slice"
+        case numberOfTx = "num_tx"
+        case options
+        case region
+        case screensaver
+        case softwareVersion = "software_ver"
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Interlock
+    
+    internal enum InterlockToken: String {
+        case accTxEnabled = "acc_tx_enabled"
+        case accTxDelay = "acc_tx_delay"
+        case accTxReqEnabled = "acc_txreq_enable"
+        case accTxReqPolarity = "acc_txreq_polarity"
+        case rcaTxReqEnabled = "rca_txreq_enable"
+        case rcaTxReqPolarity = "rca_txreq_polarity"
+        case reason
+        case source
+        case state
+        case timeout
+        case txAllowed = "tx_allowed"
+        case txDelay = "tx_delay"
+        case tx1Enabled = "tx1_enabled"
+        case tx1Delay = "tx1_delay"
+        case tx2Enabled = "tx2_enabled"
+        case tx2Delay = "tx2_delay"
+        case tx3Enabled = "tx3_enabled"
+        case tx3Delay = "tx3_delay"
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Profile
+    
+    public enum ProfileToken: String {
+        case global
+        case mic
+        case tx
+    }
+    internal enum ProfileSubType: String {
+        case current
+        case list
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Radio
+    
+    internal enum RadioToken: String {
+        case autoLevel = "auto_level"
+        case binauralRxEnabled = "binaural_rx"
+        case calFreq = "cal_freq"
+        case callsign
+        case cw = "cw"
+        case digital = "digital"
+        case enforcePrivateIpEnabled = "enforce_private_ip_connections"
+        case filterSharpness = "filter_sharpness"
+        case freqErrorPpb = "freq_error_ppb"
+        case fullDuplexEnabled = "full_duplex_enabled"
+        case gateway
+        case headphoneGain = "headphone_gain"
+        case headphoneMute = "headphone_mute"
+        case ip
+        case level
+        case lineoutGain = "lineout_gain"
+        case lineoutMute = "lineout_mute"
+        case netmask
+        case nickname
+        case panadapters
+        case pllDone = "pll_done"
+        case remoteOnEnabled = "remote_on_enabled"
+        case rttyMark = "rtty_mark_default"
+        case slices
+        case snapTuneEnabled = "snap_tune_enabled"
+        case staticNetParams = "static_net_params"
+        case tnfEnabled = "tnf_enabled"
+        case txInWaterfallEnabled = "show_tx_in_waterfall"
+        case voice = "voice"
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Status
+    
+    internal enum StatusToken : String {
+        case audioStream = "audio_stream"
+        case atu
+        case client
+        case cwx
+        case daxiq
+        case display
+        case eq
+        case file
+        case gps
+        case interlock
+        case memory
+        case meter
+        case micAudioStream = "mic_audio_stream"
+        case mixer
+        case opusStream = "opus_stream"
+        case profile
+        case radio
+        case slice
+        case stream
+        case tnf
+        case transmit
+        case turf
+        case txAudioStream = "tx_audio_stream"
+        case usbCable = "usb_cable"
+        case waveform
+        case xvtr
+    }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Transmit
+    
+    internal enum TransmitToken: String {
+        case amCarrierLevel = "am_carrier_level"
+        case companderEnabled = "compander"
+        case companderLevel = "compander_level"
+        case cwBreakInDelay = "break_in_delay"
+        case cwBreakInEnabled = "break_in"
+        case cwIambicEnabled = "iambic"
+        case cwIambicMode = "iambic_mode"
+        case cwlEnabled = "cwl_enabled"
+        case cwPitch = "pitch"
+        case cwSidetoneEnabled = "sidetone"
+        case cwSpeed = "speed"
+        case cwSwapPaddles = "swap_paddles"
+        case cwSyncCwxEnabled = "synccwx"
+        case daxEnabled = "dax"
+        case frequency = "freq"
+        case hwAlcEnabled = "hwalc_enabled"
+        case inhibit
+        case maxPowerLevel = "max_power_level"
+        case metInRxEnabled = "met_in_rx"
+        case micAccEnabled = "mic_acc"
+        case micBoostEnabled = "mic_boost"
+        case micBiasEnabled = "mic_bias"
+        case micLevel = "mic_level"
+        case micSelection = "mic_selection"
+        case rawIqEnabled = "raw_iq_enable"
+        case rfPower = "rfpower"
+        case speechProcessorEnabled = "speech_processor_enable"
+        case speechProcessorLevel = "speech_processor_level"
+        case txFilterChanges = "tx_filter_changes_allowed"
+        case txFilterHigh = "hi"
+        case txFilterLow = "lo"
+        case txInWaterfallEnabled = "show_tx_in_waterfall"
+        case txMonitorAvailable = "mon_available"
+        case txMonitorEnabled = "sb_monitor"
+        case txMonitorGainCw = "mon_gain_cw"
+        case txMonitorGainSb = "mon_gain_sb"
+        case txMonitorPanCw = "mon_pan_cw"
+        case txMonitorPanSb = "mon_pan_sb"
+        case txRfPowerChanges = "tx_rf_power_changes_allowed"
+        case tune
+        case tunePower = "tunepower"
+        case voxEnabled = "vox_enable"
+        case voxDelay = "vox_delay"
+        case voxLevel = "vox_level"
+    }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - UsbCable
+    
+    internal enum UsbCableToken: String {
+        case none
+        // FIXME: add cases
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Version replies
+    
+    internal enum VersionToken: String {
+        case fpgaMb = "fpga-mb"
+        case psocMbPa100 = "psoc-mbpa100"
+        case psocMbTrx = "psoc-mbtrx"
+        case smartSdrMB = "smartsdr-mb"
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Waveform
+    
+    internal enum WaveformToken: String {
+        case waveformList = "installed_list"
     }
 }

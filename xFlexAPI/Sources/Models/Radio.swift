@@ -65,6 +65,51 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     internal var _tcp: TcpManager!                                      // TCP connection class (commands)
     internal var _udp: UdpManager!                                      // UDP connection class (streams)
+    internal let kApfCmd = "eq apf "                                    // Text of command messages
+    internal let kAntListCmd = Command.antList.rawValue
+    internal let kAtuCmd = "atu "
+    internal let kAtuSetCmd = "atu set "
+    internal let kClientCmd = Command.clientProgram.rawValue
+    internal let kCwCmd = "cw "
+    internal let kDisplayPanCmd = "display pan "
+    internal let kInfoCmd = Command.info.rawValue
+    internal let kInterlockCmd = "interlock "
+    internal let kMemoryCreateCmd = "memory create"
+    internal let kMemoryRemoveCmd = "memory remove "
+    internal let kMeterListCmd = Command.meterList.rawValue
+    internal let kMicCmd = "mic "
+    internal let kMicListCmd = Command.micList.rawValue
+    internal let kMicStreamCreateCmd = "stream create daxmic"
+    internal let kMixerCmd = "mixer "
+    internal let kPingCmd = "ping"
+    internal let kProfileCmd = "profile "
+    internal let kRadioCmd = "radio "
+    internal let kRadioSetCmd = "radio set "
+    internal let kRadioUptimeCmd = "radio uptime"
+    internal let kRemoteAudioCmd = "remote_audio "
+    internal let kSliceCmd = "slice "
+    internal let kSliceListCmd = "slice list"
+    internal let kStreamCreateCmd = "stream create "
+    internal let kStreamRemoveCmd = "stream remove "
+    internal let kTnfCreateCmd = "tnf create "
+    internal let kTnfRemoveCmd = "tnf remove "
+    internal let kTransmitCmd = "transmit "
+    internal let kTransmitSetCmd = "transmit set "
+    internal let kVersionCmd = Command.version.rawValue
+    internal let kXmitCmd = "xmit "
+    internal let kXvtrCmd = "xvtr "
+    
+    internal let kMinLevel = 0                                          // control range
+    internal let kMaxLevel = 100
+    internal let kMinPitch = 100
+    internal let kMaxPitch = 6_000
+    internal let kMinApfQ = 0
+    internal let kMaxApfQ = 33
+    internal let kMinWpm = 5
+    internal let kMaxWpm = 100
+    internal let kMinDelay = 0
+    internal let kMaxDelay = 2_000
+
     
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
@@ -110,50 +155,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate let kTnfClickBandwidth: CGFloat = 0.01                   // * bandwidth = minimum Tnf click width
     fileprivate let kSliceClickBandwidth: CGFloat = 0.01                 // * bandwidth = minimum Slice click width
     
-    internal let kApfCmd = "eq apf "                                     // Text of command messages
-    internal let kAntListCmd = Command.antList.rawValue
-    internal let kAtuCmd = "atu "
-    internal let kAtuSetCmd = "atu set "
-    internal let kClientCmd = Command.clientProgram.rawValue
-    internal let kCwCmd = "cw "
-    internal let kDisplayPanCmd = "display pan "
-    internal let kInfoCmd = Command.info.rawValue
-    internal let kInterlockCmd = "interlock "
-    internal let kMemoryCreateCmd = "memory create"
-    internal let kMemoryRemoveCmd = "memory remove "
-    internal let kMeterListCmd = Command.meterList.rawValue
-    internal let kMicCmd = "mic "
-    internal let kMicListCmd = Command.micList.rawValue
-    internal let kMicStreamCreateCmd = "stream create daxmic"
-    internal let kMixerCmd = "mixer "
-    internal let kPingCmd = "ping"
-    internal let kProfileCmd = "profile "
-    internal let kRadioCmd = "radio "
-    internal let kRadioSetCmd = "radio set "
-    internal let kRadioUptimeCmd = "radio uptime"
-    internal let kRemoteAudioCmd = "remote_audio "
-    internal let kSliceCmd = "slice "
-    internal let kSliceListCmd = "slice list"
-    internal let kStreamCreateCmd = "stream create "
-    internal let kStreamRemoveCmd = "stream remove "
-    internal let kTnfCreateCmd = "tnf create "
-    internal let kTnfRemoveCmd = "tnf remove "
-    internal let kTransmitCmd = "transmit "
-    internal let kTransmitSetCmd = "transmit set "
-    internal let kVersionCmd = Command.version.rawValue
-    internal let kXmitCmd = "xmit "
-    internal let kXvtrCmd = "xvtr "
-    
-    fileprivate let kMinLevel = 0                                        // control range
-    fileprivate let kMaxLevel = 100
-    fileprivate let kMinPitch = 100
-    fileprivate let kMaxPitch = 6_000
-    fileprivate let kMinApfQ = 0
-    fileprivate let kMaxApfQ = 33
-    fileprivate let kMinWpm = 5
-    fileprivate let kMaxWpm = 100
-    fileprivate let kMinDelay = 0
-    fileprivate let kMaxDelay = 2_000
     fileprivate let kNoError = "0"                                       // response without error
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
@@ -3292,921 +3293,563 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     }
 }
 
-
 // --------------------------------------------------------------------------------
 // MARK: - Radio Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Radio message enum
-//              - Other Radio related enums
+//              - Public properties, no message to Radio
+//              - Radio related enums
 //              - Type aliases
 // --------------------------------------------------------------------------------
 
 extension Radio {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _accTxEnabled: Bool {
+    internal var _accTxEnabled: Bool {
         get { return _radioQ.sync { __accTxEnabled } }
         set { _radioQ.sync(flags: .barrier) { __accTxEnabled = newValue } } }
     
-    fileprivate var _accTxDelay: Int {
+    internal var _accTxDelay: Int {
         get { return _radioQ.sync { __accTxDelay } }
         set { _radioQ.sync(flags: .barrier) { __accTxDelay = newValue } } }
     
-    fileprivate var _accTxReqEnabled: Bool {
+    internal var _accTxReqEnabled: Bool {
         get { return _radioQ.sync { __accTxReqEnabled } }
         set { _radioQ.sync(flags: .barrier) { __accTxReqEnabled = newValue } } }
     
-    fileprivate var _accTxReqPolarity: Bool {
+    internal var _accTxReqPolarity: Bool {
         get { return _radioQ.sync { __accTxReqPolarity } }
         set { _radioQ.sync(flags: .barrier) { __accTxReqPolarity = newValue } } }
     
-    fileprivate var _apfEnabled: Bool {
+    internal var _apfEnabled: Bool {
         get { return _radioQ.sync { __apfEnabled } }
         set { _radioQ.sync(flags: .barrier) { __apfEnabled = newValue } } }
     
-    fileprivate var _apfQFactor: Int {
+    internal var _apfQFactor: Int {
         get { return _radioQ.sync { __apfQFactor } }
         set { _radioQ.sync(flags: .barrier) { __apfQFactor = newValue.bound(kMinApfQ, kMaxApfQ) } } }
     
-    fileprivate var _apfGain: Int {
+    internal var _apfGain: Int {
         get { return _radioQ.sync { __apfGain } }
         set { _radioQ.sync(flags: .barrier) { __apfGain = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _atuPresent: Bool {
+    internal var _atuPresent: Bool {
         get { return _radioQ.sync { __atuPresent } }
         set { _radioQ.sync(flags: .barrier) { __atuPresent = newValue } } }
     
-    fileprivate var _atuStatus: String {
+    internal var _atuStatus: String {
         get { return _radioQ.sync { __atuStatus } }
         set { _radioQ.sync(flags: .barrier) { __atuStatus = newValue } } }
     
-    fileprivate var _atuEnabled: Bool {
+    internal var _atuEnabled: Bool {
         get { return _radioQ.sync { __atuEnabled } }
         set { _radioQ.sync(flags: .barrier) { __atuEnabled = newValue } } }
     
-    fileprivate var _atuMemoriesEnabled: Bool {
+    internal var _atuMemoriesEnabled: Bool {
         get { return _radioQ.sync { __atuMemoriesEnabled } }
         set { _radioQ.sync(flags: .barrier) { __atuMemoriesEnabled = newValue } } }
     
-    fileprivate var _atuUsingMemories: Bool {
+    internal var _atuUsingMemories: Bool {
         get { return _radioQ.sync { __atuUsingMemories } }
         set { _radioQ.sync(flags: .barrier) { __atuUsingMemories = newValue } } }
     
-    fileprivate var _availablePanadapters: Int {
+    internal var _availablePanadapters: Int {
         get { return _radioQ.sync { __availablePanadapters } }
         set { _radioQ.sync(flags: .barrier) { __availablePanadapters = newValue } } }
     
-    fileprivate var _availableSlices: Int {
+    internal var _availableSlices: Int {
         get { return _radioQ.sync { __availableSlices } }
         set { _radioQ.sync(flags: .barrier) { __availableSlices = newValue } } }
     
-    fileprivate var _binauralRxEnabled: Bool {
+    internal var _binauralRxEnabled: Bool {
         get { return _radioQ.sync { __binauralRxEnabled } }
         set { _radioQ.sync(flags: .barrier) { __binauralRxEnabled = newValue } } }
     
-    fileprivate var _calFreq: Int {
+    internal var _calFreq: Int {
         get { return _radioQ.sync { __calFreq } }
         set { _radioQ.sync(flags: .barrier) { __calFreq = newValue } } }
     
-    fileprivate var _callsign: String {
+    internal var _callsign: String {
         get { return _radioQ.sync { __callsign } }
         set { _radioQ.sync(flags: .barrier) { __callsign = newValue } } }
     
-    fileprivate var _carrierLevel: Int {
+    internal var _carrierLevel: Int {
         get { return _radioQ.sync { __carrierLevel } }
         set { _radioQ.sync(flags: .barrier) { __carrierLevel = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _chassisSerial: String {
+    internal var _chassisSerial: String {
         get { return _radioQ.sync { __chassisSerial } }
         set { _radioQ.sync(flags: .barrier) { __chassisSerial = newValue } } }
     
-    fileprivate var _companderEnabled: Bool {
+    internal var _companderEnabled: Bool {
         get { return _radioQ.sync { __companderEnabled } }
         set { _radioQ.sync(flags: .barrier) { __companderEnabled = newValue } } }
     
-    fileprivate var _companderLevel: Int {
+    internal var _companderLevel: Int {
         get { return _radioQ.sync { __companderLevel } }
         set { _radioQ.sync(flags: .barrier) { __companderLevel = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _currentGlobalProfile: String {
+    internal var _currentGlobalProfile: String {
         get { return _radioQ.sync { __currentGlobalProfile } }
         set { _radioQ.sync(flags: .barrier) { __currentGlobalProfile = newValue } } }
     
-    fileprivate var _currentMicProfile: String {
+    internal var _currentMicProfile: String {
         get { return _radioQ.sync { __currentMicProfile } }
         set { _radioQ.sync(flags: .barrier) { __currentMicProfile = newValue } } }
     
-    fileprivate var _currentTxProfile: String {
+    internal var _currentTxProfile: String {
         get { return _radioQ.sync { __currentTxProfile } }
         set { _radioQ.sync(flags: .barrier) { __currentTxProfile = newValue } } }
     
-    fileprivate var _cwAutoSpaceEnabled: Bool {
+    internal var _cwAutoSpaceEnabled: Bool {
         get { return _radioQ.sync { __cwAutoSpaceEnabled } }
         set { _radioQ.sync(flags: .barrier) { __cwAutoSpaceEnabled = newValue } } }
     
-    fileprivate var _cwBreakInEnabled: Bool {
+    internal var _cwBreakInEnabled: Bool {
         get { return _radioQ.sync { __cwBreakInEnabled } }
         set { _radioQ.sync(flags: .barrier) { __cwBreakInEnabled = newValue } } }
     
-    fileprivate var _cwBreakInDelay: Int {
+    internal var _cwBreakInDelay: Int {
         get { return _radioQ.sync { __cwBreakInDelay } }
         set { _radioQ.sync(flags: .barrier) { __cwBreakInDelay = newValue.bound(kMinDelay, kMaxDelay) } } }
     
-    fileprivate var _cwIambicEnabled: Bool {
+    internal var _cwIambicEnabled: Bool {
         get { return _radioQ.sync { __cwIambicEnabled } }
         set { _radioQ.sync(flags: .barrier) { __cwIambicEnabled = newValue } } }
     
-    fileprivate var _cwIambicMode: Int {
+    internal var _cwIambicMode: Int {
         get { return _radioQ.sync { __cwIambicMode } }
         set { _radioQ.sync(flags: .barrier) { __cwIambicMode = newValue } } }
     
-    fileprivate var _cwlEnabled: Bool {
+    internal var _cwlEnabled: Bool {
         get { return _radioQ.sync { __cwlEnabled } }
         set { _radioQ.sync(flags: .barrier) { __cwlEnabled = newValue } } }
     
-    fileprivate var _cwPitch: Int {
+    internal var _cwPitch: Int {
         get { return _radioQ.sync { __cwPitch } }
         set { _radioQ.sync(flags: .barrier) { __cwPitch = newValue.bound(kMinPitch, kMaxPitch) } } }
     
-    fileprivate var _cwSidetoneEnabled: Bool {
+    internal var _cwSidetoneEnabled: Bool {
         get { return _radioQ.sync { __cwSidetoneEnabled } }
         set { _radioQ.sync(flags: .barrier) { __cwSidetoneEnabled = newValue } } }
     
-    fileprivate var _cwSwapPaddles: Bool {
+    internal var _cwSwapPaddles: Bool {
         get { return _radioQ.sync { __cwSwapPaddles } }
         set { _radioQ.sync(flags: .barrier) { __cwSwapPaddles = newValue } } }
     
-    fileprivate var _cwSyncCwxEnabled: Bool {
+    internal var _cwSyncCwxEnabled: Bool {
         get { return _radioQ.sync { __cwSyncCwxEnabled } }
         set { _radioQ.sync(flags: .barrier) { __cwSyncCwxEnabled = newValue } } }
     
-    fileprivate var _cwWeight: Int {
+    internal var _cwWeight: Int {
         get { return _radioQ.sync { __cwWeight } }
         set { _radioQ.sync(flags: .barrier) { __cwWeight = newValue } } }
     
-    fileprivate var _cwSpeed: Int {
+    internal var _cwSpeed: Int {
         get { return _radioQ.sync { __cwSpeed } }
         set { _radioQ.sync(flags: .barrier) { __cwSpeed = newValue.bound(kMinWpm, kMaxWpm) } } }
     
-    fileprivate var _daxEnabled: Bool {
+    internal var _daxEnabled: Bool {
         get { return _radioQ.sync { __daxEnabled } }
         set { _radioQ.sync(flags: .barrier) { __daxEnabled = newValue } } }
     
-    fileprivate var _daxIqAvailable: Int {
+    internal var _daxIqAvailable: Int {
         get { return _radioQ.sync { __daxIqAvailable } }
         set { _radioQ.sync(flags: .barrier) { __daxIqAvailable = newValue } } }
     
-    fileprivate var _daxIqCapacity: Int {
+    internal var _daxIqCapacity: Int {
         get { return _radioQ.sync { __daxIqCapacity } }
         set { _radioQ.sync(flags: .barrier) { __daxIqCapacity = newValue } } }
     
-    fileprivate var _enforcePrivateIpEnabled: Bool {
+    internal var _enforcePrivateIpEnabled: Bool {
         get { return _radioQ.sync { __enforcePrivateIpEnabled } }
         set { _radioQ.sync(flags: .barrier) { __enforcePrivateIpEnabled = newValue } } }
     
-    fileprivate var _filterCwAutoLevel: Int {
+    internal var _filterCwAutoLevel: Int {
         get { return _radioQ.sync { __filterCwAutoLevel } }
         set { _radioQ.sync(flags: .barrier) { __filterCwAutoLevel = newValue } } }
     
-    fileprivate var _filterDigitalAutoLevel: Int {
+    internal var _filterDigitalAutoLevel: Int {
         get { return _radioQ.sync { __filterDigitalAutoLevel } }
         set { _radioQ.sync(flags: .barrier) { __filterDigitalAutoLevel = newValue } } }
     
-    fileprivate var _filterVoiceAutoLevel: Int {
+    internal var _filterVoiceAutoLevel: Int {
         get { return _radioQ.sync { __filterVoiceAutoLevel } }
         set { _radioQ.sync(flags: .barrier) { __filterVoiceAutoLevel = newValue } } }
     
-    fileprivate var _filterCwLevel: Int {
+    internal var _filterCwLevel: Int {
         get { return _radioQ.sync { __filterCwLevel } }
         set { _radioQ.sync(flags: .barrier) { __filterCwLevel = newValue } } }
     
-    fileprivate var _filterDigitalLevel: Int {
+    internal var _filterDigitalLevel: Int {
         get { return _radioQ.sync { __filterDigitalLevel } }
         set { _radioQ.sync(flags: .barrier) { __filterDigitalLevel = newValue } } }
     
-    fileprivate var _filterVoiceLevel: Int {
+    internal var _filterVoiceLevel: Int {
         get { return _radioQ.sync { __filterVoiceLevel } }
         set { _radioQ.sync(flags: .barrier) { __filterVoiceLevel = newValue } } }
     
-    fileprivate var _fpgaMbVersion: String {
+    internal var _fpgaMbVersion: String {
         get { return _radioQ.sync { __fpgaMbVersion } }
         set { _radioQ.sync(flags: .barrier) { __fpgaMbVersion = newValue } } }
     
-    fileprivate var _freqErrorPpb: Int {
+    internal var _freqErrorPpb: Int {
         get { return _radioQ.sync { __freqErrorPpb } }
         set { _radioQ.sync(flags: .barrier) { __freqErrorPpb = newValue } } }
     
-    fileprivate var _frequency: Int {
+    internal var _frequency: Int {
         get { return _radioQ.sync { __frequency } }
         set { _radioQ.sync(flags: .barrier) { __frequency = newValue } } }
     
-    fileprivate var _fullDuplexEnabled: Bool {
+    internal var _fullDuplexEnabled: Bool {
         get { return _radioQ.sync { __fullDuplexEnabled } }
         set { _radioQ.sync(flags: .barrier) { __fullDuplexEnabled = newValue } } }
     
-    fileprivate var _gateway: String {
+    internal var _gateway: String {
         get { return _radioQ.sync { __gateway } }
         set { _radioQ.sync(flags: .barrier) { __gateway = newValue } } }
     
-    fileprivate var _headphoneGain: Int {
+    internal var _headphoneGain: Int {
         get { return _radioQ.sync { __headphoneGain } }
         set { _radioQ.sync(flags: .barrier) { __headphoneGain = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _headphoneMute: Bool {
+    internal var _headphoneMute: Bool {
         get { return _radioQ.sync { __headphoneMute } }
         set { _radioQ.sync(flags: .barrier) { __headphoneMute = newValue } } }
     
-    fileprivate var _gpsAltitude: String {
+    internal var _gpsAltitude: String {
         get { return _radioQ.sync { __gpsAltitude } }
         set { _radioQ.sync(flags: .barrier) { __gpsAltitude = newValue } } }
     
-    fileprivate var _gpsFrequencyError: Double {
+    internal var _gpsFrequencyError: Double {
         get { return _radioQ.sync { __gpsFrequencyError } }
         set { _radioQ.sync(flags: .barrier) { __gpsFrequencyError = newValue } } }
     
-    fileprivate var _gpsGrid: String {
+    internal var _gpsGrid: String {
         get { return _radioQ.sync { __gpsGrid } }
         set { _radioQ.sync(flags: .barrier) { __gpsGrid = newValue } } }
     
-    fileprivate var _gpsLatitude: String {
+    internal var _gpsLatitude: String {
         get { return _radioQ.sync { __gpsLatitude } }
         set { _radioQ.sync(flags: .barrier) { __gpsLatitude = newValue } } }
     
-    fileprivate var _gpsLongitude: String {
+    internal var _gpsLongitude: String {
         get { return _radioQ.sync { __gpsLongitude } }
         set { _radioQ.sync(flags: .barrier) { __gpsLongitude = newValue } } }
     
-    fileprivate var _gpsPresent: Bool {
+    internal var _gpsPresent: Bool {
         get { return _radioQ.sync { __gpsPresent } }
         set { _radioQ.sync(flags: .barrier) { __gpsPresent = newValue } } }
     
-    fileprivate var _gpsSpeed: String {
+    internal var _gpsSpeed: String {
         get { return _radioQ.sync { __gpsSpeed } }
         set { _radioQ.sync(flags: .barrier) { __gpsSpeed = newValue } } }
     
-    fileprivate var _gpsStatus: String {
+    internal var _gpsStatus: String {
         get { return _radioQ.sync { __gpsStatus } }
         set { _radioQ.sync(flags: .barrier) { __gpsStatus = newValue } } }
     
-    fileprivate var _gpsTime: String {
+    internal var _gpsTime: String {
         get { return _radioQ.sync { __gpsTime } }
         set { _radioQ.sync(flags: .barrier) { __gpsTime = newValue } } }
     
-    fileprivate var _gpsTrack: Double {
+    internal var _gpsTrack: Double {
         get { return _radioQ.sync { __gpsTrack } }
         set { _radioQ.sync(flags: .barrier) { __gpsTrack = newValue } } }
     
-    fileprivate var _gpsTracked: Bool {
+    internal var _gpsTracked: Bool {
         get { return _radioQ.sync { __gpsTracked } }
         set { _radioQ.sync(flags: .barrier) { __gpsTracked = newValue } } }
     
-    fileprivate var _gpsVisible: Bool {
+    internal var _gpsVisible: Bool {
         get { return _radioQ.sync { __gpsVisible } }
         set { _radioQ.sync(flags: .barrier) { __gpsVisible = newValue } } }
     
-    fileprivate var _hwAlcEnabled: Bool {
+    internal var _hwAlcEnabled: Bool {
         get { return _radioQ.sync { __hwAlcEnabled } }
         set { _radioQ.sync(flags: .barrier) { __hwAlcEnabled = newValue } } }
     
-    fileprivate var _inhibit: Bool {
+    internal var _inhibit: Bool {
         get { return _radioQ.sync { __inhibit } }
         set { _radioQ.sync(flags: .barrier) { __inhibit = newValue } } }
     
-    fileprivate var _ipAddress: String {
+    internal var _ipAddress: String {
         get { return _radioQ.sync { __ipAddress } }
         set { _radioQ.sync(flags: .barrier) { __ipAddress = newValue } } }
     
-    fileprivate var _location: String {
+    internal var _location: String {
         get { return _radioQ.sync { __location } }
         set { _radioQ.sync(flags: .barrier) { __location = newValue } } }
     
-    fileprivate var _macAddress: String {
+    internal var _macAddress: String {
         get { return _radioQ.sync { __macAddress } }
         set { _radioQ.sync(flags: .barrier) { __macAddress = newValue } } }
     
-    fileprivate var _lineoutGain: Int {
+    internal var _lineoutGain: Int {
         get { return _radioQ.sync { __lineoutGain } }
         set { _radioQ.sync(flags: .barrier) { __lineoutGain = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _lineoutMute: Bool {
+    internal var _lineoutMute: Bool {
         get { return _radioQ.sync { __lineoutMute } }
         set { _radioQ.sync(flags: .barrier) { __lineoutMute = newValue } } }
     
-    fileprivate var _maxPowerLevel: Int {
+    internal var _maxPowerLevel: Int {
         get { return _radioQ.sync { __maxPowerLevel } }
         set { _radioQ.sync(flags: .barrier) { __maxPowerLevel = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _metInRxEnabled: Bool {
+    internal var _metInRxEnabled: Bool {
         get { return _radioQ.sync { __metInRxEnabled } }
         set { _radioQ.sync(flags: .barrier) { __metInRxEnabled = newValue } } }
     
-    fileprivate var _micAccEnabled: Bool {
+    internal var _micAccEnabled: Bool {
         get { return _radioQ.sync { __micAccEnabled } }
         set { _radioQ.sync(flags: .barrier) { __micAccEnabled = newValue } } }
     
-    fileprivate var _micBoostEnabled: Bool {
+    internal var _micBoostEnabled: Bool {
         get { return _radioQ.sync { __micBoostEnabled } }
         set { _radioQ.sync(flags: .barrier) { __micBoostEnabled = newValue } } }
     
-    fileprivate var _micBiasEnabled: Bool {
+    internal var _micBiasEnabled: Bool {
         get { return _radioQ.sync { __micBiasEnabled } }
         set { _radioQ.sync(flags: .barrier) { __micBiasEnabled = newValue } } }
     
-    fileprivate var _micLevel: Int {
+    internal var _micLevel: Int {
         get { return _radioQ.sync { __micLevel } }
         set { _radioQ.sync(flags: .barrier) { __micLevel = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _micSelection: String {
+    internal var _micSelection: String {
         get { return _radioQ.sync { __micSelection } }
         set { _radioQ.sync(flags: .barrier) { __micSelection = newValue } } }
     
-    fileprivate var _netmask: String {
+    internal var _netmask: String {
         get { return _radioQ.sync { __netmask } }
         set { _radioQ.sync(flags: .barrier) { __netmask = newValue } } }
     
-    fileprivate var _nickname: String {
+    internal var _nickname: String {
         get { return _radioQ.sync { __nickname } }
         set { _radioQ.sync(flags: .barrier) { __nickname = newValue } } }
     
-    fileprivate var _numberOfScus: Int {
+    internal var _numberOfScus: Int {
         get { return _radioQ.sync { __numberOfScus } }
         set { _radioQ.sync(flags: .barrier) { __numberOfScus = newValue } } }
     
-    fileprivate var _numberOfSlices: Int {
+    internal var _numberOfSlices: Int {
         get { return _radioQ.sync { __numberOfSlices } }
         set { _radioQ.sync(flags: .barrier) { __numberOfSlices = newValue } } }
     
-    fileprivate var _numberOfTx: Int {
+    internal var _numberOfTx: Int {
         get { return _radioQ.sync { __numberOfTx } }
         set { _radioQ.sync(flags: .barrier) { __numberOfTx = newValue } } }
     
-    fileprivate var _psocMbPa100Version: String {
+    internal var _psocMbPa100Version: String {
         get { return _radioQ.sync { __psocMbPa100Version } }
         set { _radioQ.sync(flags: .barrier) { __psocMbPa100Version = newValue } } }
     
-    fileprivate var _psocMbtrxVersion: String {
+    internal var _psocMbtrxVersion: String {
         get { return _radioQ.sync { __psocMbtrxVersion } }
         set { _radioQ.sync(flags: .barrier) { __psocMbtrxVersion = newValue } } }
     
-    fileprivate var _radioModel: String {
+    internal var _radioModel: String {
         get { return _radioQ.sync { __radioModel } }
         set { _radioQ.sync(flags: .barrier) { __radioModel = newValue } } }
     
-    fileprivate var _radioOptions: String {
+    internal var _radioOptions: String {
         get { return _radioQ.sync { __radioOptions } }
         set { _radioQ.sync(flags: .barrier) { __radioOptions = newValue } } }
     
-    fileprivate var _radioScreenSaver: String {
+    internal var _radioScreenSaver: String {
         get { return _radioQ.sync { __radioScreenSaver } }
         set { _radioQ.sync(flags: .barrier) { __radioScreenSaver = newValue } } }
     
-    fileprivate var _rawIqEnabled: Bool {
+    internal var _rawIqEnabled: Bool {
         get { return _radioQ.sync { __rawIqEnabled } }
         set { _radioQ.sync(flags: .barrier) { __rawIqEnabled = newValue } } }
     
-    fileprivate var _rcaTxReqEnabled: Bool {
+    internal var _rcaTxReqEnabled: Bool {
         get { return _radioQ.sync { __rcaTxReqEnabled } }
         set { _radioQ.sync(flags: .barrier) { __rcaTxReqEnabled = newValue } } }
     
-    fileprivate var _rcaTxReqPolarity: Bool {
+    internal var _rcaTxReqPolarity: Bool {
         get { return _radioQ.sync { __rcaTxReqPolarity } }
         set { _radioQ.sync(flags: .barrier) { __rcaTxReqPolarity = newValue } } }
     
-    fileprivate var _reason: String {
+    internal var _reason: String {
         get { return _radioQ.sync { __reason } }
         set { _radioQ.sync(flags: .barrier) { __reason = newValue } } }
     
-    fileprivate var _region: String {
+    internal var _region: String {
         get { return _radioQ.sync { __region } }
         set { _radioQ.sync(flags: .barrier) { __region = newValue } } }
     
-    fileprivate var _remoteOnEnabled: Bool {
+    internal var _remoteOnEnabled: Bool {
         get { return _radioQ.sync { __remoteOnEnabled } }
         set { _radioQ.sync(flags: .barrier) { __remoteOnEnabled = newValue } } }
     
-    fileprivate var _rfPower: Int {
+    internal var _rfPower: Int {
         get { return _radioQ.sync { __rfPower } }
         set { _radioQ.sync(flags: .barrier) { __rfPower = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _rttyMark: Int {
+    internal var _rttyMark: Int {
         get { return _radioQ.sync { __rttyMark } }
         set { _radioQ.sync(flags: .barrier) { __rttyMark = newValue } } }
     
-    fileprivate var _smartSdrMB: String {
+    internal var _smartSdrMB: String {
         get { return _radioQ.sync { __smartSdrMB } }
         set { _radioQ.sync(flags: .barrier) { __smartSdrMB = newValue } } }
     
-    fileprivate var _snapTuneEnabled: Bool {
+    internal var _snapTuneEnabled: Bool {
         get { return _radioQ.sync { __snapTuneEnabled } }
         set { _radioQ.sync(flags: .barrier) { __snapTuneEnabled = newValue } } }
     
-    fileprivate var _softwareVersion: String {
+    internal var _softwareVersion: String {
         get { return _radioQ.sync { __softwareVersion } }
         set { _radioQ.sync(flags: .barrier) { __softwareVersion = newValue } } }
     
-    fileprivate var _source: String {
+    internal var _source: String {
         get { return _radioQ.sync { __source } }
         set { _radioQ.sync(flags: .barrier) { __source = newValue } } }
     
-    fileprivate var _speechProcessorEnabled: Bool {
+    internal var _speechProcessorEnabled: Bool {
         get { return _radioQ.sync { __speechProcessorEnabled } }
         set { _radioQ.sync(flags: .barrier) { __speechProcessorEnabled = newValue } } }
     
-    fileprivate var _speechProcessorLevel: Int {
+    internal var _speechProcessorLevel: Int {
         get { return _radioQ.sync { __speechProcessorLevel } }
         set { _radioQ.sync(flags: .barrier) { __speechProcessorLevel = newValue } } }
     
-    fileprivate var _ssbPeakControlEnabled: Bool {
+    internal var _ssbPeakControlEnabled: Bool {
         get { return _radioQ.sync { __ssbPeakControlEnabled } }
         set { _radioQ.sync(flags: .barrier) { __ssbPeakControlEnabled = newValue } } }
     
-    fileprivate var _startOffset: Bool {
+    internal var _startOffset: Bool {
         get { return _radioQ.sync { __startOffset } }
         set { _radioQ.sync(flags: .barrier) { __startOffset = newValue } } }
     
-    fileprivate var _state: String {
+    internal var _state: String {
         get { return _radioQ.sync { __state } }
         set { _radioQ.sync(flags: .barrier) { __state = newValue } } }
     
-    fileprivate var _staticGateway: String {
+    internal var _staticGateway: String {
         get { return _radioQ.sync { __staticGateway } }
         set { _radioQ.sync(flags: .barrier) { __staticGateway = newValue } } }
     
-    fileprivate var _staticIp: String {
+    internal var _staticIp: String {
         get { return _radioQ.sync { __staticIp } }
         set { _radioQ.sync(flags: .barrier) { __staticIp = newValue } } }
     
-    fileprivate var _staticNetmask: String {
+    internal var _staticNetmask: String {
         get { return _radioQ.sync { __staticNetmask } }
         set { _radioQ.sync(flags: .barrier) { __staticNetmask = newValue } } }
     
-    fileprivate var _timeout: Int {
+    internal var _timeout: Int {
         get { return _radioQ.sync { __timeout } }
         set { _radioQ.sync(flags: .barrier) { __timeout = newValue } } }
     
-    fileprivate var _tnfEnabled: Bool {
+    internal var _tnfEnabled: Bool {
         get { return _radioQ.sync { __tnfEnabled } }
         set { _radioQ.sync(flags: .barrier) { __tnfEnabled = newValue } } }
     
-    fileprivate var _tune: Bool {
+    internal var _tune: Bool {
         get { return _radioQ.sync { __tune } }
         set { _radioQ.sync(flags: .barrier) { __tune = newValue } } }
     
-    fileprivate var _tunePower: Int {
+    internal var _tunePower: Int {
         get { return _radioQ.sync { __tunePower } }
         set { _radioQ.sync(flags: .barrier) { __tunePower = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _txFilterChanges: Bool {
+    internal var _txFilterChanges: Bool {
         get { return _radioQ.sync { __txFilterChanges } }
         set { _radioQ.sync(flags: .barrier) { __txFilterChanges = newValue } } }
     
-    fileprivate var _txFilterHigh: Int {
+    internal var _txFilterHigh: Int {
         get { return _radioQ.sync { __txFilterHigh } }
         set { let value = txFilterHighLimits(txFilterLow, newValue) ; _radioQ.sync(flags: .barrier) { __txFilterHigh = value } } }
     
-    fileprivate var _txFilterLow: Int {
+    internal var _txFilterLow: Int {
         get { return _radioQ.sync { __txFilterLow } }
         set { let value = txFilterLowLimits(newValue, txFilterHigh) ; _radioQ.sync(flags: .barrier) { __txFilterLow = value } } }
     
-    fileprivate var _txInWaterfallEnabled: Bool {
+    internal var _txInWaterfallEnabled: Bool {
         get { return _radioQ.sync { __txInWaterfallEnabled } }
         set { _radioQ.sync(flags: .barrier) { __txInWaterfallEnabled = newValue } } }
     
-    fileprivate var _txRfPowerChanges: Bool {
+    internal var _txRfPowerChanges: Bool {
         get { return _radioQ.sync { __txRfPowerChanges } }
         set { _radioQ.sync(flags: .barrier) { __txRfPowerChanges = newValue } } }
     
-    fileprivate var _txDelay: Int {
+    internal var _txDelay: Int {
         get { return _radioQ.sync { __txDelay } }
         set { _radioQ.sync(flags: .barrier) { __txDelay = newValue } } }
     
-    fileprivate var _txAllowed: Bool {
+    internal var _txAllowed: Bool {
         get { return _radioQ.sync { __txAllowed } }
         set { _radioQ.sync(flags: .barrier) { __txAllowed = newValue } } }
     
-    fileprivate var _txMonitorAvailable: Bool {
+    internal var _txMonitorAvailable: Bool {
         get { return _radioQ.sync { __txMonitorAvailable } }
         set { _radioQ.sync(flags: .barrier) { __txMonitorAvailable = newValue } } }
     
-    fileprivate var _txMonitorEnabled: Bool {
+    internal var _txMonitorEnabled: Bool {
         get { return _radioQ.sync { __txMonitorEnabled } }
         set { _radioQ.sync(flags: .barrier) { __txMonitorEnabled = newValue } } }
     
-    fileprivate var _txMonitorGainCw: Int {
+    internal var _txMonitorGainCw: Int {
         get { return _radioQ.sync { __txMonitorGainCw } }
         set { _radioQ.sync(flags: .barrier) { __txMonitorGainCw = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _txMonitorGainSb: Int {
+    internal var _txMonitorGainSb: Int {
         get { return _radioQ.sync { __txMonitorGainSb } }
         set { _radioQ.sync(flags: .barrier) { __txMonitorGainSb = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _txMonitorPanCw: Int {
+    internal var _txMonitorPanCw: Int {
         get { return _radioQ.sync { __txMonitorPanCw } }
         set { _radioQ.sync(flags: .barrier) { __txMonitorPanCw = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _txMonitorPanSb: Int {
+    internal var _txMonitorPanSb: Int {
         get { return _radioQ.sync { __txMonitorPanSb } }
         set { _radioQ.sync(flags: .barrier) { __txMonitorPanSb = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _tx1Delay: Int {
+    internal var _tx1Delay: Int {
         get { return _radioQ.sync { __tx1Delay } }
         set { _radioQ.sync(flags: .barrier) { __tx1Delay = newValue } } }
     
-    fileprivate var _tx1Enabled: Bool {
+    internal var _tx1Enabled: Bool {
         get { return _radioQ.sync { __tx1Enabled } }
         set { _radioQ.sync(flags: .barrier) { __tx1Enabled = newValue } } }
     
-    fileprivate var _tx2Delay: Int {
+    internal var _tx2Delay: Int {
         get { return _radioQ.sync { __tx2Delay } }
         set { _radioQ.sync(flags: .barrier) { __tx2Delay = newValue } } }
     
-    fileprivate var _tx2Enabled: Bool {
+    internal var _tx2Enabled: Bool {
         get { return _radioQ.sync { __tx2Enabled } }
         set { _radioQ.sync(flags: .barrier) { __tx2Enabled = newValue } } }
     
-    fileprivate var _tx3Delay: Int {
+    internal var _tx3Delay: Int {
         get { return _radioQ.sync { __tx3Delay } }
         set { _radioQ.sync(flags: .barrier) { __tx3Delay = newValue } } }
     
-    fileprivate var _tx3Enabled: Bool {
+    internal var _tx3Enabled: Bool {
         get { return _radioQ.sync { __tx3Enabled } }
         set { _radioQ.sync(flags: .barrier) { __tx3Enabled = newValue } } }
     
-    fileprivate var _voxEnabled: Bool {
+    internal var _voxEnabled: Bool {
         get { return _radioQ.sync { __voxEnabled } }
         set { _radioQ.sync(flags: .barrier) { __voxEnabled = newValue } } }
     
-    fileprivate var _voxDelay: Int {
+    internal var _voxDelay: Int {
         get { return _radioQ.sync { __voxDelay } }
         set { _radioQ.sync(flags: .barrier) { __voxDelay = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _voxLevel: Int {
+    internal var _voxLevel: Int {
         get { return _radioQ.sync { __voxLevel } }
         set { _radioQ.sync(flags: .barrier) { __voxLevel = newValue.bound(kMinLevel, kMaxLevel) } } }
     
-    fileprivate var _waveformList: String {
+    internal var _waveformList: String {
         get { return _radioQ.sync { __waveformList } }
         set { _radioQ.sync(flags: .barrier) { __waveformList = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio)
-    
-    // listed in alphabetical order
-    @objc dynamic public var accTxEnabled: Bool {
-        get { return _accTxEnabled }
-        set { if _accTxEnabled != newValue { _accTxEnabled = newValue ; send(kInterlockCmd + "acc_tx_enabled" + "=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var accTxDelay: Int {
-        get { return _accTxDelay }
-        set { if _accTxDelay != newValue { _accTxDelay = newValue ; send(kInterlockCmd + "acc_tx_delay" + "=\(newValue)") } } }
-    
-    @objc dynamic public var accTxReqEnabled: Bool {
-        get {  return _accTxReqEnabled }
-        set { if _accTxReqEnabled != newValue { _accTxReqEnabled = newValue ; send(kInterlockCmd + InterlockToken.accTxReqEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var accTxReqPolarity: Bool {
-        get {  return _accTxReqPolarity }
-        set { if _accTxReqPolarity != newValue { _accTxReqPolarity = newValue ; send(kInterlockCmd + InterlockToken.accTxReqPolarity.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var apfEnabled: Bool {
-        get {  return _apfEnabled }
-        set { if _apfEnabled != newValue { _apfEnabled = newValue ; send(kApfCmd + EqApfToken.mode.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var apfQFactor: Int {
-        get {  return _apfQFactor }
-        set { if _apfQFactor != newValue { _apfQFactor = newValue.bound(kMinApfQ, kMaxApfQ) ; send(kApfCmd + EqApfToken.qFactor.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var apfGain: Int {
-        get {  return _apfGain }
-        set { if _apfGain != newValue { _apfGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kApfCmd + EqApfToken.gain.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var atuMemoriesEnabled: Bool {
-        get {  return _atuMemoriesEnabled }
-        set { if _atuMemoriesEnabled != newValue { _atuMemoriesEnabled = newValue ; send(kAtuSetCmd + AtuToken.memoriesEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var binauralRxEnabled: Bool {
-        get {  return _binauralRxEnabled }
-        set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; send(kRadioSetCmd + RadioToken.binauralRxEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var calFreq: Int {
-        get {  return _calFreq }
-        set { if _calFreq != newValue { _calFreq = newValue ; send(kRadioSetCmd + RadioToken.calFreq.rawValue + "=\(newValue.hzToMhz())") } } }
-    
-    @objc dynamic public var callsign: String {
-        get {  return _callsign }
-        set { if _callsign != newValue { _callsign = newValue ; send(kRadioCmd + RadioToken.callsign.rawValue + " \(newValue)") } } }
-    
-    @objc dynamic public var carrierLevel: Int {
-        get {  return _carrierLevel }
-        set { if _carrierLevel != newValue { _carrierLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "am_carrier" + "=\(newValue)") } } }
-    
-    @objc dynamic public var companderEnabled: Bool {
-        get {  return _companderEnabled }
-        set { if _companderEnabled != newValue { _companderEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.companderEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var companderLevel: Int {
-        get {  return _companderLevel }
-        set { if _companderLevel != newValue { _companderLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.companderLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var currentGlobalProfile: String {
-        get {  return _currentGlobalProfile }
-        set { if _currentGlobalProfile != newValue { _currentGlobalProfile = newValue ; send(kProfileCmd + ProfileToken.global.rawValue + " load \"\(newValue)\"") } } }
-    
-    @objc dynamic public var currentMicProfile: String {
-        get {  return _currentMicProfile }
-        set { if _currentMicProfile != newValue { _currentMicProfile = newValue ; send(kProfileCmd + ProfileToken.mic.rawValue + " load \"\(newValue)\"") } } }
-    
-    @objc dynamic public var currentTxProfile: String {
-        get {  return _currentTxProfile }
-        set { if _currentTxProfile != newValue { _currentTxProfile = newValue  ; send(kProfileCmd + ProfileToken.tx.rawValue + " load \"\(newValue)\"") } } }
-    
-    @objc dynamic public var cwAutoSpaceEnabled: Bool {
-        get {  return _cwAutoSpaceEnabled }
-        set { if _cwAutoSpaceEnabled != newValue { _cwAutoSpaceEnabled = newValue ; send(kCwCmd + "auto_space" + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var cwBreakInDelay: Int {
-        get {  return _cwBreakInDelay }
-        set { if _cwBreakInDelay != newValue { _cwBreakInDelay = newValue.bound(kMinDelay, kMaxDelay) ; send(kCwCmd + TransmitToken.cwBreakInDelay.rawValue + " \(newValue)") } } }
-    
-    @objc dynamic public var cwBreakInEnabled: Bool {
-        get {  return _cwBreakInEnabled }
-        set { if _cwBreakInEnabled != newValue { _cwBreakInEnabled = newValue ; send(kCwCmd + TransmitToken.cwBreakInEnabled.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var cwIambicEnabled: Bool {
-        get {  return _cwIambicEnabled }
-        set { if _cwIambicEnabled != newValue { _cwIambicEnabled = newValue ; send(kCwCmd + TransmitToken.cwIambicEnabled.rawValue + " \(newValue.asNumber())")} } }
-    
-    @objc dynamic public var cwIambicMode: Int {
-        get {  return _cwIambicMode }
-        set { if _cwIambicMode != newValue { _cwIambicMode = newValue ; send(kCwCmd + TransmitToken.cwIambicMode.rawValue + " \(newValue)") } } }
-    
-    @objc dynamic public var cwlEnabled: Bool {
-        get {  return _cwlEnabled }
-        set { if _cwlEnabled != newValue { _cwlEnabled = newValue ; send(kCwCmd + TransmitToken.cwlEnabled.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var cwPitch: Int {
-        get {  return _cwPitch }
-        set { if _cwPitch != newValue { _cwPitch = newValue.bound(kMinPitch, kMaxPitch) ; send(kCwCmd + TransmitToken.cwPitch.rawValue + " \(newValue)") } } }
-    
-    @objc dynamic public var cwSidetoneEnabled: Bool {
-        get {  return _cwSidetoneEnabled }
-        set { if _cwSidetoneEnabled != newValue { _cwSidetoneEnabled = newValue ; send(kCwCmd + TransmitToken.cwSidetoneEnabled.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var cwSpeed: Int {
-        get {  return _cwSpeed }
-        set { if _cwSpeed != newValue { _cwSpeed = newValue.bound(kMinWpm, kMaxWpm) ; send(kCwCmd + TransmitToken.cwSpeed.rawValue + " \(newValue)") } } }
-    
-    @objc dynamic public var cwSwapPaddles: Bool {
-        get {  return _cwSwapPaddles }
-        set { if _cwSwapPaddles != newValue { _cwSwapPaddles = newValue ; send(kCwCmd + TransmitToken.cwSwapPaddles.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var cwSyncCwxEnabled: Bool {
-        get {  return _cwSyncCwxEnabled }
-        set { if _cwSyncCwxEnabled != newValue { _cwSyncCwxEnabled = newValue ; send (kCwCmd + TransmitToken.cwSyncCwxEnabled.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var cwWeight: Int {
-        get {  return _cwWeight }
-        set { if _cwWeight != newValue { _cwWeight = newValue ; send(kCwCmd + "weight" + " \(newValue)") } } }
-    
-    @objc dynamic public var daxEnabled: Bool {
-        get {  return _daxEnabled }
-        set { if _daxEnabled != newValue { _daxEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.daxEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var enforcePrivateIpEnabled: Bool {
-        get {  return _enforcePrivateIpEnabled }
-        set { if _enforcePrivateIpEnabled != newValue { _enforcePrivateIpEnabled = newValue ; send(kRadioCmd + RadioToken.enforcePrivateIpEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var filterCwAutoLevel: Int {
-        get {  return _filterCwAutoLevel }
-        set { if _filterCwAutoLevel != newValue { _filterCwAutoLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.cw.rawValue + " " + RadioToken.autoLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var filterDigitalAutoLevel: Int {
-        get {  return _filterDigitalAutoLevel }
-        set { if _filterDigitalAutoLevel != newValue { _filterDigitalAutoLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.digital.rawValue + " " + RadioToken.autoLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var filterVoiceAutoLevel: Int {
-        get {  return _filterVoiceAutoLevel }
-        set { if _filterVoiceAutoLevel != newValue { _filterVoiceAutoLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.voice.rawValue + " " + RadioToken.autoLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var filterCwLevel: Int {
-        get {  return _filterCwLevel }
-        set { if _filterCwLevel != newValue { _filterCwLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.cw.rawValue + " " + RadioToken.level.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var filterDigitalLevel: Int {
-        get {  return _filterDigitalLevel }
-        set { if _filterDigitalLevel != newValue { _filterDigitalLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.digital.rawValue + " " + RadioToken.level.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var filterVoiceLevel: Int {
-        get {  return _filterVoiceLevel }
-        set { if _filterVoiceLevel != newValue { _filterVoiceLevel = newValue ; send(kRadioCmd + RadioToken.filterSharpness.rawValue + " " + RadioToken.voice.rawValue + " " + RadioToken.level.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var freqErrorPpb: Int {
-        get {  return _freqErrorPpb }
-        set { if _freqErrorPpb != newValue { _freqErrorPpb = newValue ; send(kRadioSetCmd + RadioToken.freqErrorPpb.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var fullDuplexEnabled: Bool {
-        get {  return _fullDuplexEnabled }
-        set { if _fullDuplexEnabled != newValue { _fullDuplexEnabled = newValue ; send(kRadioSetCmd + RadioToken.fullDuplexEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var headphoneGain: Int {
-        get {  return _headphoneGain }
-        set { if _headphoneGain != newValue { _headphoneGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "headphone gain" + " \(newValue)") } } }
-    
-    @objc dynamic public var headphoneMute: Bool {
-        get {  return _headphoneMute }
-        set { if _headphoneMute != newValue { _headphoneMute = newValue; send(kMixerCmd + "headphone mute" + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var hwAlcEnabled: Bool {
-        get {  return _hwAlcEnabled }
-        set { if _hwAlcEnabled != newValue { _hwAlcEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.hwAlcEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var inhibit: Bool {
-        get {  return _inhibit }
-        set { if _inhibit != newValue { _inhibit = newValue ; send(kTransmitSetCmd + TransmitToken.inhibit.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var lineoutGain: Int {
-        get {  return _lineoutGain }
-        set { if _lineoutGain != newValue { _lineoutGain = newValue.bound(kMinLevel, kMaxLevel) ; send(kMixerCmd + "lineout gain" + " \(newValue)") } } }
-    
-    @objc dynamic public var lineoutMute: Bool {
-        get {  return _lineoutMute }
-        set { if _lineoutMute != newValue { _lineoutMute = newValue ; send(kMixerCmd + "lineout mute" + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var maxPowerLevel: Int {
-        get {  return _maxPowerLevel }
-        set { if _maxPowerLevel != newValue { _maxPowerLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.maxPowerLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var metInRxEnabled: Bool {
-        get {  return _metInRxEnabled }
-        set { if _metInRxEnabled != newValue { _metInRxEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.metInRxEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var micAccEnabled: Bool {
-        get {  return _micAccEnabled }
-        set { if _micAccEnabled != newValue { _micAccEnabled = newValue ; send(kMicCmd + "acc" + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var micBiasEnabled: Bool {
-        get {  return _micBiasEnabled }
-        set { if _micBiasEnabled != newValue { _micBiasEnabled = newValue ; send(kMicCmd + "bias" + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var micBoostEnabled: Bool {
-        get {  return _micBoostEnabled }
-        set { if _micBoostEnabled != newValue { _micBoostEnabled = newValue ; send(kMicCmd + "boost" + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var micLevel: Int {
-        get {  return _micLevel }
-        set { if _micLevel != newValue { _micLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + "miclevel" + "=\(newValue)") } } }
-    
-    @objc dynamic public var micSelection: String {
-        get {  return _micSelection }
-        set { if _micSelection != newValue { _micSelection = newValue ; send(kMicCmd + "input" + " \(newValue)") } } }
-    
-    @objc dynamic public var nickname: String {
-        get {  return _nickname }
-        set { if _nickname != newValue { _nickname = newValue ; send(kRadioCmd + "name" + " \(newValue)") } } }
-    
-    @objc dynamic public var radioScreenSaver: String {
-        get {  return _radioScreenSaver }
-        set { if _radioScreenSaver != newValue { _radioScreenSaver = newValue ; send(kRadioCmd + "screensaver" + " \(newValue)") } } }
-    
-    @objc dynamic public var rcaTxReqEnabled: Bool {
-        get {  return _rcaTxReqEnabled}
-        set { if _rcaTxReqEnabled != newValue { _rcaTxReqEnabled = newValue ; send(kInterlockCmd + InterlockToken.rcaTxReqEnabled.rawValue + "=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var rcaTxReqPolarity: Bool {
-        get {  return _rcaTxReqPolarity }
-        set { if _rcaTxReqPolarity != newValue { _rcaTxReqPolarity = newValue ; send(kInterlockCmd + InterlockToken.rcaTxReqPolarity.rawValue + "=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var remoteOnEnabled: Bool {
-        get {  return _remoteOnEnabled }
-        set { if _remoteOnEnabled != newValue { _remoteOnEnabled = newValue ; send(kRadioSetCmd + RadioToken.remoteOnEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var rfPower: Int {
-        get {  return _rfPower }
-        set { if _rfPower != newValue { _rfPower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.rfPower.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var rttyMark: Int {
-        get {  return _rttyMark }
-        set { if _rttyMark != newValue { _rttyMark = newValue ; send(kRadioSetCmd + RadioToken.rttyMark.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var snapTuneEnabled: Bool {
-        get {  return _snapTuneEnabled }
-        set { if _snapTuneEnabled != newValue { _snapTuneEnabled = newValue ; send(kRadioCmd + RadioToken.snapTuneEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var speechProcessorEnabled: Bool {
-        get {  return _speechProcessorEnabled }
-        set { if _speechProcessorEnabled != newValue { _speechProcessorEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.speechProcessorEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var speechProcessorLevel: Int {
-        get {  return _speechProcessorLevel }
-        set { if _speechProcessorLevel != newValue { _speechProcessorLevel = newValue ; send(kTransmitSetCmd + TransmitToken.speechProcessorLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var ssbPeakControlEnabled: Bool {
-        get {  return _ssbPeakControlEnabled }
-        set { if _ssbPeakControlEnabled != newValue { _ssbPeakControlEnabled = newValue ; send(kTransmitSetCmd + "ssb_peak_control" + "=\(newValue.asNumber())")} } }
-    
-    @objc dynamic public var startOffset: Bool {
-        get { return _startOffset }
-        set { if _startOffset != newValue { _startOffset = newValue ; if !_startOffset { send(kRadioCmd + "pll_start") } } } }
-    
-    @objc dynamic public var staticGateway: String {
-        get {  return _staticGateway }
-        set { if _staticGateway != newValue { _staticGateway = newValue ; send(kRadioCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
-    
-    @objc dynamic public var staticIp: String {
-        get {  return _staticIp }
-        set { if _staticIp != newValue { _staticIp = newValue ; send(kRadioCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
-    
-    @objc dynamic public var staticNetmask: String {
-        get {  return _staticNetmask }
-        set { if _staticNetmask != newValue { _staticNetmask = newValue ; send(kRadioCmd + RadioToken.staticNetParams.rawValue + " " + RadioToken.ip.rawValue + "=\(staticIp) " + RadioToken.gateway.rawValue + "=\(newValue) " + RadioToken.netmask.rawValue + "=\(staticNetmask)") } } }
-    
-    @objc dynamic public var timeout: Int {
-        get {  return _timeout }
-        set { if _timeout != newValue { _timeout = newValue ; send(kInterlockCmd + InterlockToken.timeout.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var tnfEnabled: Bool {
-        get {  return _tnfEnabled }
-        set { if _tnfEnabled != newValue { _tnfEnabled = newValue ; send(kRadioSetCmd + RadioToken.tnfEnabled.rawValue + "=\(newValue.asString())") } } }
-    
-    @objc dynamic public var tune: Bool {
-        get {  return _tune }
-        set { if _tune != newValue { _tune = newValue ; send(kTransmitCmd + TransmitToken.tune.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var tunePower: Int {
-        get {  return _tunePower }
-        set { if _tunePower != newValue { _tunePower = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.tunePower.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var txFilterHigh: Int {
-        get { return _txFilterHigh }
-        set { if _txFilterHigh != newValue { let value = txFilterHighLimits(txFilterLow, newValue) ; _txFilterHigh = value ; send(kTransmitSetCmd + "filter_high" + "=\(value)") } } }
-    
-    @objc dynamic public var txFilterLow: Int {
-        get { return _txFilterLow }
-        set { if _txFilterLow != newValue { let value = txFilterLowLimits(newValue, txFilterHigh) ; _txFilterLow = value ; send(kTransmitSetCmd + "filter_low" + "=\(value)") } } }
-    
-    @objc dynamic public var txInWaterfallEnabled: Bool {
-        get { return _txInWaterfallEnabled }
-        set { if _txInWaterfallEnabled != newValue { _txInWaterfallEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.txInWaterfallEnabled.rawValue + "=\(newValue.asNumber())")} } }
-    
-    @objc dynamic public var txMonitorEnabled: Bool {
-        get {  return _txMonitorEnabled }
-        set { if _txMonitorEnabled != newValue { _txMonitorEnabled = newValue ; send(kTransmitSetCmd + "mon" + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var txMonitorGainCw: Int {
-        get {  return _txMonitorGainCw }
-        set { if _txMonitorGainCw != newValue { _txMonitorGainCw = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorGainCw.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var txMonitorGainSb: Int {
-        get {  return _txMonitorGainSb }
-        set { if _txMonitorGainSb != newValue { _txMonitorGainSb = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorGainSb.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var txMonitorPanCw: Int {
-        get {  return _txMonitorPanCw }
-        set { if _txMonitorPanCw != newValue { _txMonitorPanCw = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorPanCw.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var txMonitorPanSb: Int {
-        get {  return _txMonitorPanSb }
-        set { if _txMonitorPanSb != newValue { _txMonitorPanSb = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.txMonitorPanSb.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var tx1Enabled: Bool {
-        get { return _tx1Enabled }
-        set { if _tx1Enabled != newValue { _tx1Enabled = newValue ; send(kInterlockCmd + InterlockToken.tx1Enabled.rawValue + "=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var tx1Delay: Int {
-        get { return _tx1Delay }
-        set { if _tx1Delay != newValue { _tx1Delay = newValue  ; send(kInterlockCmd + InterlockToken.tx1Delay.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var tx2Enabled: Bool {
-        get { return _tx2Enabled }
-        set { if _tx2Enabled != newValue { _tx2Enabled = newValue ; send(kInterlockCmd + InterlockToken.tx2Enabled.rawValue + "=\(newValue.asLetter())") } } }
-    
-    @objc dynamic public var tx2Delay: Int {
-        get { return _tx2Delay }
-        set { if _tx2Delay != newValue { _tx2Delay = newValue ; send(kInterlockCmd + InterlockToken.tx2Delay.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var tx3Enabled: Bool {
-        get { return _tx3Enabled }
-        set { if _tx3Enabled != newValue { _tx3Enabled = newValue ; send(kInterlockCmd + InterlockToken.tx3Enabled.rawValue + "=\(newValue.asLetter())")} } }
-    
-    @objc dynamic public var tx3Delay: Int {
-        get { return _tx3Delay }
-        set { if _tx3Delay != newValue { _tx3Delay = newValue ; send(kInterlockCmd + InterlockToken.tx3Delay.rawValue + "=\(newValue)")} } }
-    
-    @objc dynamic public var voxEnabled: Bool {
-        get { return _voxEnabled }
-        set { if _voxEnabled != newValue { _voxEnabled = newValue ; send(kTransmitSetCmd + TransmitToken.voxEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var voxDelay: Int {
-        get { return _voxDelay }
-        set { if _voxDelay != newValue { _voxDelay = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.voxDelay.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var voxLevel: Int {
-        get { return _voxLevel }
-        set { if _voxLevel != newValue { _voxLevel = newValue.bound(kMinLevel, kMaxLevel) ; send(kTransmitSetCmd + TransmitToken.voxLevel.rawValue + "=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -4432,258 +4075,9 @@ extension Radio {
     public var _udpPort: UInt16 {
         get { return _radioQ.sync { __udpPort } }
         set { _radioQ.sync(flags: .barrier) { __udpPort = newValue } } }
-    
-    
+        
     // ----------------------------------------------------------------------------
-    // Mark: - Token enums in alphabetical order.
-    //          Only populate values that != case value
-    // ----------------------------------------------------------------------------
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Atu
-    
-    public enum AtuToken: String {
-        case status
-        case atuEnabled = "atu_enabled"
-        case memoriesEnabled = "memories_enabled"
-        case usingMemories = "using_mem"
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Display
-    
-    enum DisplayToken: String {
-        case panadapter = "pan"
-        case waterfall
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Equalizer Apf
-    
-    public enum EqApfToken: String {
-        case gain
-        case mode
-        case qFactor
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Gps
-    
-    enum GpsToken: String {
-        case altitude
-        case frequencyError = "freq_error"
-        case grid
-        case latitude = "lat"
-        case longitude = "lon"
-        case speed
-        case status
-        case time
-        case track
-        case tracked
-        case visible
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Info replies
-    
-    internal enum InfoToken: String {
-        case atuPresent = "atu_present"
-        case callsign
-        case chassisSerial = "chassis_serial"
-        case gateway
-        case gps
-        case ipAddress = "ip"
-        case location
-        case macAddress = "mac"
-        case model
-        case netmask
-        case name
-        case numberOfScus = "num_scu"
-        case numberOfSlices = "num_slice"
-        case numberOfTx = "num_tx"
-        case options
-        case region
-        case screensaver
-        case softwareVersion = "software_ver"
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Interlock
-    
-    public enum InterlockToken: String {
-        case accTxEnabled = "acc_tx_enabled"
-        case accTxDelay = "acc_tx_delay"
-        case accTxReqEnabled = "acc_txreq_enable"
-        case accTxReqPolarity = "acc_txreq_polarity"
-        case rcaTxReqEnabled = "rca_txreq_enable"
-        case rcaTxReqPolarity = "rca_txreq_polarity"
-        case reason
-        case source
-        case state
-        case timeout
-        case txAllowed = "tx_allowed"
-        case txDelay = "tx_delay"
-        case tx1Enabled = "tx1_enabled"
-        case tx1Delay = "tx1_delay"
-        case tx2Enabled = "tx2_enabled"
-        case tx2Delay = "tx2_delay"
-        case tx3Enabled = "tx3_enabled"
-        case tx3Delay = "tx3_delay"
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Profile
-    
-    public enum ProfileToken: String {
-        case global
-        case mic
-        case tx
-    }
-    public enum ProfileSubType: String {
-        case current
-        case list
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Radio
-    
-    public enum RadioToken: String {
-        case autoLevel = "auto_level"
-        case binauralRxEnabled = "binaural_rx"
-        case calFreq = "cal_freq"
-        case callsign
-        case cw = "cw"
-        case digital = "digital"
-        case enforcePrivateIpEnabled = "enforce_private_ip_connections"
-        case filterSharpness = "filter_sharpness"
-        case freqErrorPpb = "freq_error_ppb"
-        case fullDuplexEnabled = "full_duplex_enabled"
-        case gateway
-        case headphoneGain = "headphone_gain"
-        case headphoneMute = "headphone_mute"
-        case ip
-        case level
-        case lineoutGain = "lineout_gain"
-        case lineoutMute = "lineout_mute"
-        case netmask
-        case nickname
-        case panadapters
-        case pllDone = "pll_done"
-        case remoteOnEnabled = "remote_on_enabled"
-        case rttyMark = "rtty_mark_default"
-        case slices
-        case snapTuneEnabled = "snap_tune_enabled"
-        case staticNetParams = "static_net_params"
-        case tnfEnabled = "tnf_enabled"
-        case txInWaterfallEnabled = "show_tx_in_waterfall"
-        case voice = "voice"
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Status
-    
-    enum StatusToken : String {
-        case audioStream = "audio_stream"
-        case atu
-        case client
-        case cwx
-        case daxiq
-        case display
-        case eq
-        case file
-        case gps
-        case interlock
-        case memory
-        case meter
-        case micAudioStream = "mic_audio_stream"
-        case mixer
-        case opusStream = "opus_stream"
-        case profile
-        case radio
-        case slice
-        case stream
-        case tnf
-        case transmit
-        case turf
-        case txAudioStream = "tx_audio_stream"
-        case usbCable = "usb_cable"
-        case waveform
-        case xvtr
-    }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Transmit
-    
-    public enum TransmitToken: String {
-        case amCarrierLevel = "am_carrier_level"
-        case companderEnabled = "compander"
-        case companderLevel = "compander_level"
-        case cwBreakInDelay = "break_in_delay"
-        case cwBreakInEnabled = "break_in"
-        case cwIambicEnabled = "iambic"
-        case cwIambicMode = "iambic_mode"
-        case cwlEnabled = "cwl_enabled"
-        case cwPitch = "pitch"
-        case cwSidetoneEnabled = "sidetone"
-        case cwSpeed = "speed"
-        case cwSwapPaddles = "swap_paddles"
-        case cwSyncCwxEnabled = "synccwx"
-        case daxEnabled = "dax"
-        case frequency = "freq"
-        case hwAlcEnabled = "hwalc_enabled"
-        case inhibit
-        case maxPowerLevel = "max_power_level"
-        case metInRxEnabled = "met_in_rx"
-        case micAccEnabled = "mic_acc"
-        case micBoostEnabled = "mic_boost"
-        case micBiasEnabled = "mic_bias"
-        case micLevel = "mic_level"
-        case micSelection = "mic_selection"
-        case rawIqEnabled = "raw_iq_enable"
-        case rfPower = "rfpower"
-        case speechProcessorEnabled = "speech_processor_enable"
-        case speechProcessorLevel = "speech_processor_level"
-        case txFilterChanges = "tx_filter_changes_allowed"
-        case txFilterHigh = "hi"
-        case txFilterLow = "lo"
-        case txInWaterfallEnabled = "show_tx_in_waterfall"
-        case txMonitorAvailable = "mon_available"
-        case txMonitorEnabled = "sb_monitor"
-        case txMonitorGainCw = "mon_gain_cw"
-        case txMonitorGainSb = "mon_gain_sb"
-        case txMonitorPanCw = "mon_pan_cw"
-        case txMonitorPanSb = "mon_pan_sb"
-        case txRfPowerChanges = "tx_rf_power_changes_allowed"
-        case tune
-        case tunePower = "tunepower"
-        case voxEnabled = "vox_enable"
-        case voxDelay = "vox_delay"
-        case voxLevel = "vox_level"
-    }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - UsbCable
-    
-    enum UsbCableToken: String {
-        case none
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Version replies
-    
-    enum VersionToken: String {
-        case fpgaMb = "fpga-mb"
-        case psocMbPa100 = "psoc-mbpa100"
-        case psocMbTrx = "psoc-mbtrx"
-        case smartSdrMB = "smartsdr-mb"
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Waveform
-    
-    enum WaveformToken: String {
-        case waveformList = "installed_list"
-    }
-    // ----------------------------------------------------------------------------
-    // Mark: - Xvtr
-    
-    enum XvtrToken: String {
-        case none
-    }
-    
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Other Radio related enums
+    // MARK: - Radio related enums
     
     public enum ConnectionState: Equatable {
         case clientConnected

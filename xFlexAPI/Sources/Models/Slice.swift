@@ -24,35 +24,37 @@ public final class Slice : NSObject, KeyValueParser {
     public private(set) var id = ""                         // Id that uniquely identifies this Slice
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties
+    // MARK: - Internal properties
     
     internal var _radio: Radio?                             // The Radio that owns this Slice
-    fileprivate var _sliceQ: DispatchQueue                  // GCD queue that guards this object
-    fileprivate var _initialized = false                    // True if initialized by Radio (hardware)
-    internal var _diversityIsAllowed: Bool
-        { return _radio?.selectedRadio?.model == "FLEX-6700" || _radio?.selectedRadio?.model == "FLEX-6700R" }
-
-    // constants
-    fileprivate let _log = Log.sharedInstance               // shared Log
     internal let kAudioClientCommand = "audio client 0 slice "   // command prefixes
     internal let kFilterCommand = "filt "
     internal let kSliceCommand = "slice "
     internal let kSliceSetCommand = "slice set "
     internal let kSliceTuneCommand = "slice tune "
-    internal let kMinLevel = 0                           // control range
+    internal let kMinLevel = 0                              // control range
     internal let kMaxLevel = 100
-    internal let kMinOffset = -99_999                    // frequency offset range
+    internal let kMinOffset = -99_999                       // frequency offset range
     internal let kMaxOffset = 99_999
-    internal let kNoError = "0"                          // response without error
-    internal let kTuneStepList =                         // tuning steps
+    internal let kNoError = "0"                             // response without error
+    internal let kTuneStepList =                            // tuning steps
         [1, 10, 50, 100, 500, 1_000, 2_000, 3_000]
+    internal var _diversityIsAllowed: Bool
+        { return _radio?.selectedRadio?.model == "FLEX-6700" || _radio?.selectedRadio?.model == "FLEX-6700R" }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Private properties
+    
+    fileprivate var _sliceQ: DispatchQueue                  // GCD queue that guards this object
+    fileprivate var _initialized = false                    // True if initialized by Radio (hardware)
+    fileprivate let _log = Log.sharedInstance               // shared Log
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var _meters = [String: Meter]()         // Dictionary of Meters (on this Slice)         //
-                                                                                                    //
+                                                                                                        //
     fileprivate var __daxClients = 0                    // DAX clients for this slice                   //
-                                                                                                    //
+                                                                                                        //
     fileprivate var __active = false                    //                                              //
     fileprivate var __agcMode = AgcMode.off.rawValue    //                                              //
     fileprivate var __agcOffLevel = 0                   // Slice AGC Off level                          //
@@ -120,7 +122,7 @@ public final class Slice : NSObject, KeyValueParser {
     fileprivate var __wnbLevel = 0                      // Wideband noise blanking level                //
     fileprivate var __xitEnabled = false                // XIT enable                                   //
     fileprivate var __xitOffset = 0                     // XIT offset value                             //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // ----------------------------------------------------------------------------
@@ -678,9 +680,8 @@ public final class Slice : NSObject, KeyValueParser {
 // --------------------------------------------------------------------------------
 // MARK: - Slice Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Slice message enum
-//              - Other Slice related enums
+//              - Public properties, no message to Radio
+//              - Slice related enums
 // --------------------------------------------------------------------------------
 
 extension xFlexAPI.Slice {

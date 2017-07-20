@@ -24,14 +24,20 @@ public final class Xvtr : NSObject, KeyValueParser {
     public private(set) var id: String = ""                 // Id that uniquely identifies this Xvtr
     
     // ----------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal var _radio: Radio?                             // The Radio that owns this Xvtr
+    internal let kXvtrSetCmd = "xvtr set "                  // Xvtr command prefix
+    
+    // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
     fileprivate var _initialized = false                    // True if initialized by Radio hardware
-    internal var _radio: Radio?                          // The Radio that owns this Xvtr
     fileprivate var _xvtrQ: DispatchQueue                   // GCD queue that guards this object
+    fileprivate let _log = Log.sharedInstance               // shared log
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __name = ""                             // Xvtr Name                                //
     fileprivate var __ifFrequency = 0                       // If Frequency                             //
     fileprivate var __inUse = false                         //                                          //
@@ -44,12 +50,8 @@ public final class Xvtr : NSObject, KeyValueParser {
     fileprivate var __rxGain = 0                            //                                          //
     fileprivate var __rxOnly = false                        //                                          //
     fileprivate var __twoMeterInt = 0                       //                                          //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    
-    // constants
-    fileprivate let _log = Log.sharedInstance               // shared log
-    internal let kXvtrSetCmd = "xvtr set "                  // Xvtr command prefix
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -174,6 +176,7 @@ public final class Xvtr : NSObject, KeyValueParser {
 // --------------------------------------------------------------------------------
 // MARK: - Xvtr Class extensions
 //              - Synchronized internal properties
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension Xvtr {

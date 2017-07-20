@@ -1,20 +1,20 @@
 //
-//  MicAudioStreamCommands.swift
+//  MeterCommands.swift
 //  xFlexAPI
 //
-//  Created by Douglas Adams on 7/19/17.
+//  Created by Douglas Adams on 7/20/17.
 //  Copyright © 2017 Douglas Adams. All rights reserved.
 //
 
 import Foundation
 
 // --------------------------------------------------------------------------------
-// MARK: - MicAudioStream Class extensions
+// MARK: - Meter Class extensions
 //              - Dynamic public properties that send commands to the Radio
-//              - MicAudioStream message enum
+//              - Meter message enum
 // --------------------------------------------------------------------------------
 
-extension MicAudioStream {
+extension Meter {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
@@ -22,12 +22,16 @@ extension MicAudioStream {
         // ----- NONE -----
     
     // ----------------------------------------------------------------------------
-    // MARK: - Tokens for MicAudioStream messages
+    // MARK: - Tokens for Meter messages
     
-    internal enum MicAudioStreamToken: String {
-        case inUse = "in_use"
-        case ip
-        case port
+    internal enum MeterToken : String {
+        case desc
+        case fps
+        case high = "hi"
+        case low
+        case name = "nam"
+        case number = "num"
+        case source = "src"
+        case units = "unit"
     }
-    
 }

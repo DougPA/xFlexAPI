@@ -10,7 +10,7 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Tnf Class extensions
-//              - Dynamic public properties
+//              - Dynamic public properties that send commands to the Radio
 //              - Tnf message enum
 // --------------------------------------------------------------------------------
 

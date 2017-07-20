@@ -23,28 +23,33 @@ public final class TxAudioStream: NSObject, KeyValueParser {
     
     public private(set) var id: Radio.DaxStreamId = ""  // Stream Id
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal var _radio: Radio?                         // The Radio that owns this TxAudioStream
+    internal let kDaxCmd = "dax "
+    
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    internal var _radio: Radio?                         // The Radio that owns this TxAudioStream
     fileprivate var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TxAudioStreams
     fileprivate var _initialized = false                // True if initialized by Radio hardware
     fileprivate var _txSeq = 0                          // Tx sequence number (modulo 16)
+    fileprivate let _log = Log.sharedInstance           // shared Log
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __inUse = false                     // true = in use                                //
     fileprivate var __ip = ""                           // Ip Address                                   //
     fileprivate var __port = 0                          // Port number                                  //
     fileprivate var __transmit = false                  // dax transmitting                             //
     fileprivate var __txGain = 50                       // tx gain of stream                            //
     fileprivate var __txGainScalar: Float = 1.0         // scalar gain value for multiplying            //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    
-    // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    internal let kDaxCmd = "dax "
+        
+    // ----------------------------------------------------------------------------
+    // MARK: - Initialization
     
     /// Initialize an TX Audio Stream
     ///
@@ -193,8 +198,7 @@ public final class TxAudioStream: NSObject, KeyValueParser {
 // --------------------------------------------------------------------------------
 // MARK: - MicAudioStream Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - AudioStream message enum
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension TxAudioStream {

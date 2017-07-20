@@ -10,14 +10,20 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Panadapter Class extensions
-//              - Dynamic public properties
+//              - Public methods that send commands to the Radio
+//              - Dynamic public properties that send commands to the Radio
 //              - Panadapter message enum
 // --------------------------------------------------------------------------------
 
 extension Panadapter {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
+    // MARK: - Public methods that send commands to the Radio (hardware)
+    
+    public func requestRfGainInfo() { radio!.send(kDisplayPanCmd + "rf_gain_info " + "0x\(id)", replyTo: replyHandler) }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
     @objc dynamic public var average: Int {

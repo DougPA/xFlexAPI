@@ -10,7 +10,7 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Waterfall Class extensions
-//              - Dynamic public properties
+//              - Dynamic public properties that send commands to the Radio
 //              - Waterfall message enum
 // --------------------------------------------------------------------------------
 

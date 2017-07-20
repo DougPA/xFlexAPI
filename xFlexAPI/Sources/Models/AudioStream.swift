@@ -35,15 +35,21 @@ public final class AudioStream: NSObject {
     public private(set) var id: Radio.DaxStreamId = ""  // The Audio stream id
     
     // ------------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal var _radio: Radio?                         // The Radio that owns this Audio stream
+    internal let kAudioStreamCmd = "audio stream "
+    
+    // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
     fileprivate var _initialized = false                // True if initialized by Radio hardware
-    fileprivate var _radio: Radio?                      // The Radio that owns this Audio stream
     fileprivate var _audioStreamsQ: DispatchQueue!      // GCD queue that guards Audio Streams
     fileprivate var _rxSeq: Int?                        // Rx sequence number
+    fileprivate let _log = Log.sharedInstance           // shared Log
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __daxChannel = 0                    // Channel in use (1 - 8)                       //
     fileprivate var __daxClients = 0                    // Number of clients                            //
     fileprivate var __inUse = false                     // true = in use                                //
@@ -51,16 +57,10 @@ public final class AudioStream: NSObject {
     fileprivate var __port = 0                          // Port number                                  //
     fileprivate var __rxGain = 50                       // rx gain of stream                            //
     fileprivate var __slice: xFlexAPI.Slice?            // Source Slice                                 //
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var _delegate: AudioStreamHandler?      // Delegate for Audio stream                    //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-
-    // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
-    fileprivate let kAudioStreamCmd = "audio stream "
-    // see FlexLib C# code
-    fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -201,22 +201,9 @@ public final class AudioStream: NSObject {
                 dataLeft[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+0).pointee)
                 dataRight[i] = CFSwapInt32BigToHost(wordsPtr.advanced(by: 2*i+1).pointee)
             }
-            
-            if (Int(vita.classCode.rawValue) & 0x200) == 0 {
-                // FIXME: should not be necessary
-                // convert the payload data from 2s complement to float
-                // for each sample...
-                for i in 0..<dataFrame.samples {
-                    
-                    dataFrame.leftAudio[i] = Float(dataLeft[i]) * kOneOverZeroDBfs
-                    dataFrame.rightAudio[i] = Float(dataRight[i]) * kOneOverZeroDBfs
-                }
-            } else {
-                
-                // copy the data as is -- it is already floating point
-                memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
-                memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
-            }
+            // copy the data as is -- it is already floating point
+            memcpy(&(dataFrame.leftAudio), &dataLeft, dataFrame.samples * 4)
+            memcpy(&(dataFrame.rightAudio), &dataRight, dataFrame.samples * 4)
             
             // Pass the data frame to this AudioSream's delegate
             delegate.audioStreamHandler(dataFrame)
@@ -276,62 +263,42 @@ public struct AudioStreamFrame {
 // --------------------------------------------------------------------------------
 // MARK: - AudioStream Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - AudioStream message enum
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension AudioStream {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _daxChannel: Int {
+    internal var _daxChannel: Int {
         get { return _audioStreamsQ.sync { __daxChannel } }
         set { _audioStreamsQ.sync(flags: .barrier) { __daxChannel = newValue } } }
     
-    fileprivate var _daxClients: Int {
+    internal var _daxClients: Int {
         get { return _audioStreamsQ.sync { __daxClients } }
         set { _audioStreamsQ.sync(flags: .barrier) { __daxClients = newValue } } }
     
-    fileprivate var _inUse: Bool {
+    internal var _inUse: Bool {
         get { return _audioStreamsQ.sync { __inUse } }
         set { _audioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    fileprivate var _ip: String {
+    internal var _ip: String {
         get { return _audioStreamsQ.sync { __ip } }
         set { _audioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    fileprivate var _port: Int {
+    internal var _port: Int {
         get { return _audioStreamsQ.sync { __port } }
         set { _audioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    fileprivate var _rxGain: Int {
+    internal var _rxGain: Int {
         get { return _audioStreamsQ.sync { __rxGain } }
         set { _audioStreamsQ.sync(flags: .barrier) { __rxGain = newValue } } }
     
-    fileprivate var _slice: xFlexAPI.Slice? {
+    internal var _slice: xFlexAPI.Slice? {
         get { return _audioStreamsQ.sync { __slice } }
         set { _audioStreamsQ.sync(flags: .barrier) { __slice = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // listed in alphabetical order
-    @objc dynamic public var rxGain: Int {
-        get { return _rxGain  }
-        set {
-            if _rxGain != newValue {
-                let value = newValue.bound(0, 100)
-                if _rxGain != value {
-                    _rxGain = value
-                    if _slice != nil {          // DL3LSM
-                        _radio?.send(kAudioStreamCmd + "0x\(id) " + AudioStreamToken.slice.rawValue + " \(_slice!.id) " + "gain" + " \(value)")
-                    }
-                }
-            }
-        }
-    }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -383,16 +350,4 @@ extension AudioStream {
     public var delegate: AudioStreamHandler? {
         get { return _audioStreamsQ.sync { _delegate } }
         set { _audioStreamsQ.sync(flags: .barrier) { _delegate = newValue } } }
-        
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for AudioStream messages 
-    
-    internal enum AudioStreamToken: String {
-        case daxChannel = "dax"
-        case daxClients = "dax_clients"
-        case inUse = "in_use"
-        case ip
-        case port
-        case slice
-    }
 }

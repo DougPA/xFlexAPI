@@ -1,33 +1,38 @@
 //
-//  MicAudioStreamCommands.swift
+//  IqStreamCommands.swift
 //  xFlexAPI
 //
-//  Created by Douglas Adams on 7/19/17.
+//  Created by Douglas Adams on 7/20/17.
 //  Copyright © 2017 Douglas Adams. All rights reserved.
 //
 
 import Foundation
 
 // --------------------------------------------------------------------------------
-// MARK: - MicAudioStream Class extensions
+// MARK: - IqStream Class extensions
 //              - Dynamic public properties that send commands to the Radio
-//              - MicAudioStream message enum
+//              - IqStream message enum
 // --------------------------------------------------------------------------------
 
-extension MicAudioStream {
+extension IqStream {
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
         // ----- NONE -----
-    
+        
     // ----------------------------------------------------------------------------
-    // MARK: - Tokens for MicAudioStream messages
+    // Mark: - Tokens for IqStream messages
     
-    internal enum MicAudioStreamToken: String {
-        case inUse = "in_use"
+    internal enum IqStreamToken: String {
+        case available
+        case capacity
+        case daxIqChannel = "daxiq"
         case ip
+        case pan
         case port
+        case rate
+        case streaming
     }
-    
+
 }

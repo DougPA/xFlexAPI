@@ -22,18 +22,23 @@ public final class IqStream: NSObject {
     // ------------------------------------------------------------------------------
     // MARK: - Public properties
     
-    public private(set) var id = ""                 // Stream Id
+    public private(set) var id = ""                     // Stream Id
     
     // ------------------------------------------------------------------------------
     // MARK: - Internal properties
     
-    fileprivate var _radio: Radio!                      // The Radio that owns this Tnf
+    internal var _radio: Radio!                         // The Radio that owns this Tnf
+    
+    // ------------------------------------------------------------------------------
+    // MARK: - Private properties
+    
     fileprivate var _iqStreamsQ: DispatchQueue          // GCD queue that guards IqStreams
     fileprivate var _initialized = false                // True if initialized by Radio hardware
     fileprivate var _shouldBeRemoved = false            // True if being removed
+    fileprivate let _log = Log.sharedInstance           // shared Log
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __available = 0                     // Number of available IQ Streams               //
     fileprivate var __capacity = 0                      // Total Number of  IQ Streams                  //
     fileprivate var __daxIqChannel = 0                  // Channel in use (1 - 8)                       //
@@ -42,11 +47,11 @@ public final class IqStream: NSObject {
     fileprivate var __port = 0                          // Port number                                  //
     fileprivate var __rate = 0                          // Stream rate                                  //
     fileprivate var __streaming = false                 // Stream state                                 //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION -----
-    
-    // constants
-    fileprivate let _log = Log.sharedInstance           // shared Log
+        
+    // ----------------------------------------------------------------------------
+    // MARK: - Initialization
     
     /// Initialize an IQ Stream
     ///
@@ -146,50 +151,46 @@ public final class IqStream: NSObject {
 // --------------------------------------------------------------------------------
 // MARK: - IqStream Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - AudioStream message enum
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension IqStream {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _available: Int {
+    internal var _available: Int {
         get { return _iqStreamsQ.sync { __available } }
         set { _iqStreamsQ.sync(flags: .barrier) { __available = newValue } } }
     
-    fileprivate var _capacity: Int {
+    internal var _capacity: Int {
         get { return _iqStreamsQ.sync { __capacity } }
         set { _iqStreamsQ.sync(flags: .barrier) { __capacity = newValue } } }
     
-    fileprivate var _daxIqChannel: Int {
+    internal var _daxIqChannel: Int {
         get { return _iqStreamsQ.sync { __daxIqChannel } }
         set { _iqStreamsQ.sync(flags: .barrier) { __daxIqChannel = newValue } } }
     
-    fileprivate var _ip: String {
+    internal var _ip: String {
         get { return _iqStreamsQ.sync { __ip } }
         set { _iqStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    fileprivate var _port: Int {
+    internal var _port: Int {
         get { return _iqStreamsQ.sync { __port } }
         set { _iqStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    fileprivate var _pan: Radio.PanadapterId? {
+    internal var _pan: Radio.PanadapterId? {
         get { return _iqStreamsQ.sync { __pan } }
         set { _iqStreamsQ.sync(flags: .barrier) { __pan = newValue } } }
     
-    fileprivate var _rate: Int {
+    internal var _rate: Int {
         get { return _iqStreamsQ.sync { __rate } }
         set { _iqStreamsQ.sync(flags: .barrier) { __rate = newValue } } }
     
-    fileprivate var _streaming: Bool {
+    internal var _streaming: Bool {
         get { return _iqStreamsQ.sync { __streaming } }
         set { _iqStreamsQ.sync(flags: .barrier) { __streaming = newValue } } }
-        
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -221,18 +222,4 @@ extension IqStream {
     
     @objc dynamic public var streaming: Bool {
         return _streaming  }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for IqStream messages 
-    
-    internal enum IqStreamToken: String {
-        case available
-        case capacity
-        case daxIqChannel = "daxiq"
-        case ip
-        case pan
-        case port
-        case rate
-        case streaming
-    }
 }

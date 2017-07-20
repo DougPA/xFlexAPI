@@ -37,6 +37,14 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     public private(set) var droppedPackets: Int = 0         // Number of dropped (out of sequence) packets
     
     // ----------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    internal let kDisplayPanafallSetCmd = "display panafall set " // Panafall "set" command prefix
+    internal let kDisplayPanCmd = "display pan "                // Pan command prefix
+    internal let kMinLevel = 0                                  // control range
+    internal let kMaxLevel = 100
+    
+    // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
     fileprivate var _pandapterQ: DispatchQueue                  // GCD queue that guards this object
@@ -44,13 +52,10 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     
     // constants
     fileprivate let _log = Log.sharedInstance                   // shared Log
-    internal let kDisplayPanafallSetCmd = "display panafall set " // Panafall "set" command prefix
-    internal let kMinLevel = 0                               // control range
-    internal let kMaxLevel = 100
     fileprivate let kNoError = "0"                              // response without error
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
-    //                                                                                              //
+    //                                                                                                  //
     fileprivate var __antList = [String]()                      // Available antenna choices            //
     fileprivate var __autoCenterEnabled = false                 //                                      //
     fileprivate var __average = 0                               // Setting of average (1 -> 100)        //
@@ -80,9 +85,9 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     fileprivate var __wnbLevel = 0                              // Wideband noise blanking level        //
     fileprivate var __wnbUpdating = false                       // WNB is updating                      //
     fileprivate var __xvtrLabel = ""                            // Label of selected XVTR profile       //
-                                                                                                    //
+                                                                                                        //
     fileprivate var _delegate: PanadapterStreamHandler?         // Delegate for Panadapter stream       //
-    //                                                                                              //
+    //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
     // ------------------------------------------------------------------------------
@@ -103,11 +108,6 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
         
         super.init()
     }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public methods that send commands to the Radio (hardware)
-    
-    public func requestRfGainInfo() { radio!.send("display pan rf_gain_info 0x\(id)", replyTo: replyHandler) }
     
     // ----------------------------------------------------------------------------
     // MARK: - Panadapter Reply Handler
@@ -395,8 +395,7 @@ public struct PanadapterFrame {
 // --------------------------------------------------------------------------------
 // MARK: - Panadapter Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Panadapter message enum
+//              - Public properties, no message to Radio
 // --------------------------------------------------------------------------------
 
 extension Panadapter {

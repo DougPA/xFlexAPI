@@ -19,6 +19,14 @@ import Foundation
 public final class UsbCable : NSObject, KeyValueParser {
     
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Internal properties
+    
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Initialization
+    
+    
     // TODO: add code
     
     
