@@ -31,7 +31,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _radio: Radio?                      // The Radio that owns the Opus stream
+    internal var _radio: Radio?                         // The Radio that owns the Opus stream
     fileprivate var _id: Radio.OpusId                   // The Opus stream id
 
     fileprivate var _initialized = false                // True if initialized by Radio hardware
@@ -52,7 +52,7 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     // constants
     fileprivate let _opusQ: DispatchQueue               // Opus synchronization
     fileprivate let _log = Log.sharedInstance           // Shared Log
-    fileprivate let kRemoteAudioCmd = "remote_audio "   // Remote Audio command prefix
+    internal let kRemoteAudioCmd = "remote_audio "      // Remote Audio command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
@@ -304,33 +304,21 @@ public struct OpusFrame {
 extension Opus {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _remoteRxOn: Bool {
+    internal var _remoteRxOn: Bool {
         get { return _opusQ.sync { __remoteRxOn } }
         set { _opusQ.sync(flags: .barrier) { __remoteRxOn = newValue } } }
     
-    fileprivate var _remoteTxOn: Bool {
+    internal var _remoteTxOn: Bool {
         get { return _opusQ.sync { __remoteTxOn } }
         set { _opusQ.sync(flags: .barrier) { __remoteTxOn = newValue } } }
     
     fileprivate var _rxStreamStopped: Bool {
         get { return _opusQ.sync { __rxStreamStopped } }
         set { _opusQ.sync(flags: .barrier) { __rxStreamStopped = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update - checked
 
-    // listed in alphabetical order
-    @objc dynamic public var remoteRxOn: Bool {
-        get { return _remoteRxOn }
-        set { if _remoteRxOn != newValue { _remoteRxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteRxOn.rawValue + " \(newValue.asNumber())") } } }
-    
-    @objc dynamic public var remoteTxOn: Bool {
-        get { return _remoteTxOn }
-        set { if _remoteTxOn != newValue { _remoteTxOn = newValue ; _radio!.send(kRemoteAudioCmd + OpusToken.remoteTxOn.rawValue + " \(newValue.asNumber())") } } }
-    
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
@@ -348,17 +336,6 @@ extension Opus {
     public var delegate: OpusStreamHandler? {
         get { return _opusQ.sync { _delegate } }
         set { _opusQ.sync(flags: .barrier) { _delegate = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Opus messages (only populate values that != case value)
-    
-    internal enum OpusToken : String {
-        case ipAddress = "ip"
-        case port
-        case remoteRxOn = "rx_on"
-        case remoteTxOn = "tx_on"
-        case rxStreamStopped = "opus_rx_stream_stopped"
-    }
     
 }
 

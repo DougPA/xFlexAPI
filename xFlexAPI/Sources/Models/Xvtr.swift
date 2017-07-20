@@ -27,7 +27,7 @@ public final class Xvtr : NSObject, KeyValueParser {
     // MARK: - Private properties
     
     fileprivate var _initialized = false                    // True if initialized by Radio hardware
-    fileprivate var _radio: Radio?                          // The Radio that owns this Xvtr
+    internal var _radio: Radio?                          // The Radio that owns this Xvtr
     fileprivate var _xvtrQ: DispatchQueue                   // GCD queue that guards this object
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -49,7 +49,7 @@ public final class Xvtr : NSObject, KeyValueParser {
     
     // constants
     fileprivate let _log = Log.sharedInstance               // shared log
-    fileprivate let kXvtrSetCmd = "xvtr set "           // Xvtr command prefix
+    internal let kXvtrSetCmd = "xvtr set "                  // Xvtr command prefix
     
     // ------------------------------------------------------------------------------
     // MARK: - Initialization
@@ -174,99 +174,61 @@ public final class Xvtr : NSObject, KeyValueParser {
 // --------------------------------------------------------------------------------
 // MARK: - Xvtr Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Xvtr message enum
 // --------------------------------------------------------------------------------
 
 extension Xvtr {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _ifFrequency: Int {
+    internal var _ifFrequency: Int {
         get { return _xvtrQ.sync { __ifFrequency } }
         set { _xvtrQ.sync(flags: .barrier) {__ifFrequency = newValue } } }
     
-    fileprivate var _inUse: Bool {
+    internal var _inUse: Bool {
         get { return _xvtrQ.sync { __inUse } }
         set { _xvtrQ.sync(flags: .barrier) {__inUse = newValue } } }
     
-    fileprivate var _isValid: Bool {
+    internal var _isValid: Bool {
         get { return _xvtrQ.sync { __isValid } }
         set { _xvtrQ.sync(flags: .barrier) {__isValid = newValue } } }
     
-    fileprivate var _loError: Int {
+    internal var _loError: Int {
         get { return _xvtrQ.sync { __loError } }
         set { _xvtrQ.sync(flags: .barrier) {__loError = newValue } } }
     
-    fileprivate var _name: String {
+    internal var _name: String {
         get { return _xvtrQ.sync { __name } }
         set { _xvtrQ.sync(flags: .barrier) {__name = newValue } } }
     
-    fileprivate var _maxPower: Int {
+    internal var _maxPower: Int {
         get { return _xvtrQ.sync { __maxPower } }
         set { _xvtrQ.sync(flags: .barrier) {__maxPower = newValue } } }
     
-    fileprivate var _order: Int {
+    internal var _order: Int {
         get { return _xvtrQ.sync { __order } }
         set { _xvtrQ.sync(flags: .barrier) {__order = newValue } } }
     
-    fileprivate var _preferred: Bool {
+    internal var _preferred: Bool {
         get { return _xvtrQ.sync { __preferred } }
         set { _xvtrQ.sync(flags: .barrier) {__preferred = newValue } } }
     
-    fileprivate var _rfFrequency: Int {
+    internal var _rfFrequency: Int {
         get { return _xvtrQ.sync { __rfFrequency } }
         set { _xvtrQ.sync(flags: .barrier) {__rfFrequency = newValue } } }
     
-    fileprivate var _rxGain: Int {
+    internal var _rxGain: Int {
         get { return _xvtrQ.sync { __rxGain } }
         set { _xvtrQ.sync(flags: .barrier) {__rxGain = newValue } } }
     
-    fileprivate var _rxOnly: Bool {
+    internal var _rxOnly: Bool {
         get { return _xvtrQ.sync { __rxOnly } }
         set { _xvtrQ.sync(flags: .barrier) {__rxOnly = newValue } } }
     
-    fileprivate var _twoMeterInt: Int {
+    internal var _twoMeterInt: Int {
         get { return _xvtrQ.sync { __twoMeterInt } }
         set { _xvtrQ.sync(flags: .barrier) {__twoMeterInt = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // listed in alphabetical order
-    @objc dynamic public var ifFrequency: Int {
-        get { return _ifFrequency }
-        set { if _ifFrequency != newValue { _ifFrequency = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.ifFrequency.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var loError: Int {
-        get { return _loError }
-        set { if _loError != newValue { _loError = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.loError.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var name: String {
-        get { return _name }
-        set { if _name != newValue { _name = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.name.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var maxPower: Int {
-        get { return _maxPower }
-        set { if _maxPower != newValue { _maxPower = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.maxPower.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var order: Int {
-        get { return _order }
-        set { if _order != newValue { _order = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.order.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var rfFrequency: Int {
-        get { return _rfFrequency }
-        set { if _rfFrequency != newValue { _rfFrequency = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.rfFrequency.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var rxGain: Int {
-        get { return _rxGain }
-        set { if _rxGain != newValue { _rxGain = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.rxGain.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var rxOnly: Bool {
-        get { return _rxOnly }
-        set { if _rxOnly != newValue { _rxOnly = newValue ; _radio!.send(kXvtrSetCmd + "\(id) " + XvtrToken.rxOnly.rawValue + "=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -286,24 +248,5 @@ extension Xvtr {
     
     @objc dynamic public var twoMeterInt: Int {
         return _twoMeterInt }
-    
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Waterfall messages (only populate values that != case value)
-    
-    internal enum XvtrToken : String {
-        case name
-        case ifFrequency = "if_freq"
-        case inUse = "in_use"
-        case isValid = "is_valid"
-        case loError = "lo_error"
-        case maxPower = "max_power"
-        case order
-        case preferred
-        case rfFrequency = "rf_freq"
-        case rxGain = "rx_gain"
-        case rxOnly = "rx_only"
-        case twoMeterInt = "two_meter_int"
-    }
     
 }

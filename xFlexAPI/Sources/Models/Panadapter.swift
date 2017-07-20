@@ -44,9 +44,9 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     
     // constants
     fileprivate let _log = Log.sharedInstance                   // shared Log
-    fileprivate let kDisplayPanafallSetCmd = "display panafall set " // Panafall "set" command prefix
-    fileprivate let kMinLevel = 0                               // control range
-    fileprivate let kMaxLevel = 100
+    internal let kDisplayPanafallSetCmd = "display panafall set " // Panafall "set" command prefix
+    internal let kMinLevel = 0                               // control range
+    internal let kMaxLevel = 100
     fileprivate let kNoError = "0"                              // response without error
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -402,189 +402,119 @@ public struct PanadapterFrame {
 extension Panadapter {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
 
-    fileprivate var _antList: [String] {
+    internal var _antList: [String] {
         get { return _pandapterQ.sync { __antList } }
         set { _pandapterQ.sync(flags: .barrier) { __antList = newValue } } }
     
-    fileprivate var _average: Int {
+    internal var _average: Int {
         get { return _pandapterQ.sync { __average } }
         set { _pandapterQ.sync(flags: .barrier) { __average = newValue } } }
     
-    fileprivate var _band: String {
+    internal var _band: String {
         get { return _pandapterQ.sync { __band } }
         set { _pandapterQ.sync(flags: .barrier) { __band = newValue } } }
     
-    fileprivate var _bandwidth: Int {
+    internal var _bandwidth: Int {
         get { return _pandapterQ.sync { __bandwidth } }
         set { _pandapterQ.sync(flags: .barrier) { __bandwidth = newValue } } }
     
-    fileprivate var _center: Int {
+    internal var _center: Int {
         get { return _pandapterQ.sync { __center } }
         set { _pandapterQ.sync(flags: .barrier) { __center = newValue } } }
     
-    fileprivate var _daxIqChannel: Int {
+    internal var _daxIqChannel: Int {
         get { return _pandapterQ.sync { __daxIqChannel } }
         set { _pandapterQ.sync(flags: .barrier) { __daxIqChannel = newValue } } }
     
-    fileprivate var _fps: Int {
+    internal var _fps: Int {
         get { return _pandapterQ.sync { __fps } }
         set { _pandapterQ.sync(flags: .barrier) { __fps = newValue } } }
     
-    fileprivate var _loopAEnabled: Bool {
+    internal var _loopAEnabled: Bool {
         get { return _pandapterQ.sync { __loopAEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __loopAEnabled = newValue } } }
     
-    fileprivate var _loopBEnabled: Bool {
+    internal var _loopBEnabled: Bool {
         get { return _pandapterQ.sync { __loopBEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __loopBEnabled = newValue } } }
     
-    fileprivate var _maxBw: Int {
+    internal var _maxBw: Int {
         get { return _pandapterQ.sync { __maxBw } }
         set { _pandapterQ.sync(flags: .barrier) { __maxBw = newValue } } }
     
-    fileprivate var _maxDbm: CGFloat {
+    internal var _maxDbm: CGFloat {
         get { return _pandapterQ.sync { __maxDbm } }
         set { _pandapterQ.sync(flags: .barrier) { __maxDbm = newValue } } }
     
-    fileprivate var _minBw: Int {
+    internal var _minBw: Int {
         get { return _pandapterQ.sync { __minBw } }
         set { _pandapterQ.sync(flags: .barrier) { __minBw = newValue } } }
     
-    fileprivate var _minDbm: CGFloat {
+    internal var _minDbm: CGFloat {
         get { return _pandapterQ.sync { __minDbm } }
         set { _pandapterQ.sync(flags: .barrier) { __minDbm = newValue } } }
     
-    fileprivate var _panDimensions: CGSize {
+    internal var _panDimensions: CGSize {
         get { return _pandapterQ.sync { __panDimensions } }
         set { _pandapterQ.sync(flags: .barrier) { __panDimensions = newValue } } }
     
-    fileprivate var _preamp: String {
+    internal var _preamp: String {
         get { return _pandapterQ.sync { __preamp } }
         set { _pandapterQ.sync(flags: .barrier) { __preamp = newValue } } }
     
-    fileprivate var _rfGain: Int {
+    internal var _rfGain: Int {
         get { return _pandapterQ.sync { __rfGain } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGain = newValue } } }
     
-    fileprivate var _rfGainHigh: Int {
+    internal var _rfGainHigh: Int {
         get { return _pandapterQ.sync { __rfGainHigh } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainHigh = newValue } } }
     
-    fileprivate var _rfGainLow: Int {
+    internal var _rfGainLow: Int {
         get { return _pandapterQ.sync { __rfGainLow } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainLow = newValue } } }
     
-    fileprivate var _rfGainStep: Int {
+    internal var _rfGainStep: Int {
         get { return _pandapterQ.sync { __rfGainStep } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainStep = newValue } } }
     
-    fileprivate var _rfGainValues: String {
+    internal var _rfGainValues: String {
         get { return _pandapterQ.sync { __rfGainValues } }
         set { _pandapterQ.sync(flags: .barrier) { __rfGainValues = newValue } } }
     
-    fileprivate var _rxAnt: String {
+    internal var _rxAnt: String {
         get { return _pandapterQ.sync { __rxAnt } }
         set { _pandapterQ.sync(flags: .barrier) { __rxAnt = newValue } } }
     
-    fileprivate var _waterfallId: String {
+    internal var _waterfallId: String {
         get { return _pandapterQ.sync { __waterfallId } }
         set { _pandapterQ.sync(flags: .barrier) { __waterfallId = newValue } } }
     
-    fileprivate var _weightedAverageEnabled: Bool {
+    internal var _weightedAverageEnabled: Bool {
         get { return _pandapterQ.sync { __weightedAverageEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __weightedAverageEnabled = newValue } } }
     
-    fileprivate var _wide: Bool {
+    internal var _wide: Bool {
         get { return _pandapterQ.sync { __wide } }
         set { _pandapterQ.sync(flags: .barrier) { __wide = newValue } } }
     
-    fileprivate var _wnbEnabled: Bool {
+    internal var _wnbEnabled: Bool {
         get { return _pandapterQ.sync { __wnbEnabled } }
         set { _pandapterQ.sync(flags: .barrier) { __wnbEnabled = newValue } } }
     
-    fileprivate var _wnbLevel: Int {
+    internal var _wnbLevel: Int {
         get { return _pandapterQ.sync { __wnbLevel } }
         set { _pandapterQ.sync(flags: .barrier) { __wnbLevel = newValue } } }
     
-    fileprivate var _wnbUpdating: Bool {
+    internal var _wnbUpdating: Bool {
         get { return _pandapterQ.sync { __wnbUpdating } }
         set { _pandapterQ.sync(flags: .barrier) { __wnbUpdating = newValue } } }
     
-    fileprivate var _xvtrLabel: String {
+    internal var _xvtrLabel: String {
         get { return _pandapterQ.sync { __xvtrLabel } }
         set { _pandapterQ.sync(flags: .barrier) { __xvtrLabel = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // listed in alphabetical order
-    @objc dynamic public var average: Int {
-        get { return _average }
-        set {if _average != newValue { _average = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.average.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var band: String {
-        get { return _band }
-        set { if _band != newValue { _band = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.band.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var bandwidth: Int {
-        get { return _bandwidth }
-        set { if _bandwidth != newValue { _bandwidth = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.center.rawValue + "=\(newValue.hzToMhz()) autocenter=1") } } }
-    
-    // FIXME: Where does autoCenter come from?
-    
-    @objc dynamic public var center: Int {
-        get { return _center }
-        set { if _center != newValue { _center = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.center.rawValue +  "=\(newValue.hzToMhz())") } } }
-    
-    @objc dynamic public var daxIqChannel: Int {
-        get { return _daxIqChannel }
-        set { if _daxIqChannel != newValue { _daxIqChannel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.daxIqChannel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var fps: Int {
-        get { return _fps }
-        set { if _fps != newValue { _fps = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.fps.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var loopAEnabled: Bool {
-        get { return _loopAEnabled }
-        set { if _loopAEnabled != newValue { _loopAEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.loopAEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var loopBEnabled: Bool {
-        get { return _loopBEnabled }
-        set { if _loopBEnabled != newValue { _loopBEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id)  " + PanadapterToken.loopBEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var maxDbm: CGFloat {
-        get { return _maxDbm }
-        set { let value = newValue > 20.0 ? 20.0 : newValue ; if _maxDbm != value { _maxDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.maxDbm.rawValue + "=\(value)") } } }
-    
-    @objc dynamic public var minDbm: CGFloat {
-        get { return _minDbm }
-        set { let value  = newValue < -180.0 ? -180.0 : newValue ; if _minDbm != value { _minDbm = value ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.minDbm.rawValue + "=\(value)") } } }
-    
-    @objc dynamic public var panDimensions: CGSize {
-        get { return _panDimensions }
-        set { if _panDimensions != newValue { _panDimensions = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + "xpixels" + "=\(newValue.width) " + "ypixels" + "=\(newValue.height)") } } }
-    
-    @objc dynamic public var rfGain: Int {
-        get { return _rfGain }
-        set { if _rfGain != newValue { _rfGain = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.rfGain.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var rxAnt: String {
-        get { return _rxAnt }
-        set { if _rxAnt != newValue { _rxAnt = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.rxAnt.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var weightedAverageEnabled: Bool {
-        get { return _weightedAverageEnabled }
-        set { if _weightedAverageEnabled != newValue { _weightedAverageEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.weightedAverageEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var wnbEnabled: Bool {
-        get { return _wnbEnabled }
-        set { if _wnbEnabled != newValue { _wnbEnabled = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.wnbEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var wnbLevel: Int {
-        get { return _wnbLevel }
-        set { if _wnbLevel != newValue { _wnbLevel = newValue ; radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + PanadapterToken.wnbLevel.rawValue + "=\(newValue)") } } }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
@@ -636,41 +566,5 @@ extension Panadapter {
     public var delegate: PanadapterStreamHandler? {
         get { return _pandapterQ.sync { _delegate } }
         set { _pandapterQ.sync(flags: .barrier) { _delegate = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Panadapter messages (only populate values that != case value)
-    
-    internal enum PanadapterToken : String {
-        // on Panadapter
-        case antList = "ant_list"
-        case average
-        case band
-        case bandwidth
-        case center
-        case daxIqChannel = "daxiq"
-        case fps
-        case loopAEnabled = "loopa"
-        case loopBEnabled = "loopb"
-        case maxBw = "max_bw"
-        case maxDbm = "max_dbm"
-        case minBw = "min_bw"
-        case minDbm = "min_dbm"
-        case preamp = "pre"
-        case rfGain = "rfgain"
-        case rxAnt = "rxant"
-        case waterfallId = "waterfall"
-        case weightedAverageEnabled = "weighted_average"
-        case wide
-        case wnbEnabled = "wnb"
-        case wnbLevel = "wnb_level"
-        case wnbUpdating = "wnb_updating"
-        case xPixels = "x_pixels"
-        case xvtrLabel = "xvtr"
-        case yPixels = "y_pixels"
-        // unused here
-        case available
-        case capacity
-        case daxIqRate = "daxiq_rate"
-    }
 
 }

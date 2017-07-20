@@ -383,7 +383,7 @@ extension Cwx {
         set { if _wpm != newValue { let value = newValue.bound(kMinSpeed, kMaxSpeed) ; if _wpm != value  { _wpm = value ; _radio!.send(kCwxCmd + CwxToken.wpm.rawValue + " \(value)") } } } }
     
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Cwx messages (only populate values that != case value)
+    // Mark: - Tokens for Cwx messages 
     
     public enum CwxToken : String {
         case delay

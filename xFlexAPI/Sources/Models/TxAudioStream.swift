@@ -26,7 +26,7 @@ public final class TxAudioStream: NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _radio: Radio?                      // The Radio that owns this TxAudioStream
+    internal var _radio: Radio?                         // The Radio that owns this TxAudioStream
     fileprivate var _txAudioStreamsQ: DispatchQueue     // GCD queue that guards TxAudioStreams
     fileprivate var _initialized = false                // True if initialized by Radio hardware
     fileprivate var _txSeq = 0                          // Tx sequence number (modulo 16)
@@ -44,7 +44,7 @@ public final class TxAudioStream: NSObject, KeyValueParser {
     
     // constants
     fileprivate let _log = Log.sharedInstance           // shared Log
-    fileprivate let kDaxCmd = "dax "
+    internal let kDaxCmd = "dax "
     
     /// Initialize an TX Audio Stream
     ///
@@ -200,47 +200,33 @@ public final class TxAudioStream: NSObject, KeyValueParser {
 extension TxAudioStream {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _inUse: Bool {
+    internal var _inUse: Bool {
         get { return _txAudioStreamsQ.sync { __inUse } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __inUse = newValue } } }
     
-    fileprivate var _ip: String {
+    internal var _ip: String {
         get { return _txAudioStreamsQ.sync { __ip } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __ip = newValue } } }
     
-    fileprivate var _port: Int {
+    internal var _port: Int {
         get { return _txAudioStreamsQ.sync { __port } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __port = newValue } } }
     
-    fileprivate var _transmit: Bool {
+    internal var _transmit: Bool {
         get { return _txAudioStreamsQ.sync { __transmit } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __transmit = newValue } } }
     
-    fileprivate var _txGain: Int {
+    internal var _txGain: Int {
         get { return _txAudioStreamsQ.sync { __txGain } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGain = newValue } } }
     
-    fileprivate var _txGainScalar: Float {
+    internal var _txGainScalar: Float {
         get { return _txAudioStreamsQ.sync { __txGainScalar } }
         set { _txAudioStreamsQ.sync(flags: .barrier) { __txGainScalar = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // listed in alphabetical order
-    @objc dynamic public var transmit: Bool {
-        get { return _transmit  }
-        set {
-            if _transmit != newValue {
-                _transmit = newValue
-                _radio?.send(kDaxCmd + "tx" + " \(_transmit.asNumber())")
-            }
-        }
-    }
-    
+
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
@@ -278,16 +264,6 @@ extension TxAudioStream {
                 }
             }
         }
-    }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for TxAudioStream messages (only populate values that != case value)
-    
-    internal enum TxAudioStreamToken: String {
-        case daxTx = "dax_tx"
-        case inUse = "in_use"
-        case ip
-        case port
     }
 }
 

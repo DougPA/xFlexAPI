@@ -7,7 +7,15 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		912DD89B1F1968E900D95EAC /* RadioCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 912DD89A1F1968E900D95EAC /* RadioCommands.swift */; };
+		915817F91F204B4600FA6382 /* MicAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F01F204B4600FA6382 /* MicAudioStreamCommands.swift */; };
+		915817FA1F204B4600FA6382 /* OpusCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F11F204B4600FA6382 /* OpusCommands.swift */; };
+		915817FB1F204B4600FA6382 /* PanadapterCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F21F204B4600FA6382 /* PanadapterCommands.swift */; };
+		915817FC1F204B4600FA6382 /* RadioCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F31F204B4600FA6382 /* RadioCommands.swift */; };
+		915817FD1F204B4600FA6382 /* SliceCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F41F204B4600FA6382 /* SliceCommands.swift */; };
+		915817FE1F204B4600FA6382 /* TnfCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F51F204B4600FA6382 /* TnfCommands.swift */; };
+		915817FF1F204B4600FA6382 /* TxAudioStreamCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F61F204B4600FA6382 /* TxAudioStreamCommands.swift */; };
+		915818001F204B4600FA6382 /* WaterfallCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F71F204B4600FA6382 /* WaterfallCommands.swift */; };
+		915818011F204B4600FA6382 /* XvtrCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 915817F81F204B4600FA6382 /* XvtrCommands.swift */; };
 		91B9F7B71ED916B300F7799D /* xFlexAPI.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F7B51ED916B300F7799D /* xFlexAPI.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7C31ED9170B00F7799D /* Extensions.swift */; };
 		91B9F7E71ED9170B00F7799D /* Filters.plist in Resources */ = {isa = PBXBuildFile; fileRef = 91B9F7C51ED9170B00F7799D /* Filters.plist */; };
@@ -43,7 +51,15 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		912DD89A1F1968E900D95EAC /* RadioCommands.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RadioCommands.swift; sourceTree = "<group>"; };
+		915817F01F204B4600FA6382 /* MicAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = MicAudioStreamCommands.swift; path = Sources/Commands/MicAudioStreamCommands.swift; sourceTree = "<group>"; };
+		915817F11F204B4600FA6382 /* OpusCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = OpusCommands.swift; path = Sources/Commands/OpusCommands.swift; sourceTree = "<group>"; };
+		915817F21F204B4600FA6382 /* PanadapterCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = PanadapterCommands.swift; path = Sources/Commands/PanadapterCommands.swift; sourceTree = "<group>"; };
+		915817F31F204B4600FA6382 /* RadioCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = RadioCommands.swift; path = Sources/Commands/RadioCommands.swift; sourceTree = "<group>"; };
+		915817F41F204B4600FA6382 /* SliceCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SliceCommands.swift; path = Sources/Commands/SliceCommands.swift; sourceTree = "<group>"; };
+		915817F51F204B4600FA6382 /* TnfCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TnfCommands.swift; path = Sources/Commands/TnfCommands.swift; sourceTree = "<group>"; };
+		915817F61F204B4600FA6382 /* TxAudioStreamCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = TxAudioStreamCommands.swift; path = Sources/Commands/TxAudioStreamCommands.swift; sourceTree = "<group>"; };
+		915817F71F204B4600FA6382 /* WaterfallCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WaterfallCommands.swift; path = Sources/Commands/WaterfallCommands.swift; sourceTree = "<group>"; };
+		915817F81F204B4600FA6382 /* XvtrCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = XvtrCommands.swift; path = Sources/Commands/XvtrCommands.swift; sourceTree = "<group>"; };
 		91B9F7B21ED916B300F7799D /* xFlexAPI.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = xFlexAPI.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		91B9F7B51ED916B300F7799D /* xFlexAPI.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = xFlexAPI.h; sourceTree = "<group>"; };
 		91B9F7B61ED916B300F7799D /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
@@ -91,12 +107,20 @@
 /* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
-		912DD8991F1968D000D95EAC /* Commands */ = {
+		915817EF1F204B2300FA6382 /* Commands */ = {
 			isa = PBXGroup;
 			children = (
-				912DD89A1F1968E900D95EAC /* RadioCommands.swift */,
+				915817F01F204B4600FA6382 /* MicAudioStreamCommands.swift */,
+				915817F11F204B4600FA6382 /* OpusCommands.swift */,
+				915817F21F204B4600FA6382 /* PanadapterCommands.swift */,
+				915817F31F204B4600FA6382 /* RadioCommands.swift */,
+				915817F41F204B4600FA6382 /* SliceCommands.swift */,
+				915817F51F204B4600FA6382 /* TnfCommands.swift */,
+				915817F61F204B4600FA6382 /* TxAudioStreamCommands.swift */,
+				915817F71F204B4600FA6382 /* WaterfallCommands.swift */,
+				915817F81F204B4600FA6382 /* XvtrCommands.swift */,
 			);
-			path = Commands;
+			name = Commands;
 			sourceTree = "<group>";
 		};
 		91B9F7A81ED916B300F7799D = {
@@ -118,7 +142,7 @@
 		91B9F7B41ED916B300F7799D /* xFlexAPI */ = {
 			isa = PBXGroup;
 			children = (
-				912DD8991F1968D000D95EAC /* Commands */,
+				915817EF1F204B2300FA6382 /* Commands */,
 				91B9F7CB1ED9170B00F7799D /* Models */,
 				91B9F7DC1ED9170B00F7799D /* Networking */,
 				91B9F7C21ED9170B00F7799D /* Misc */,
@@ -298,24 +322,32 @@
 				91B9F7FC1ED9170B00F7799D /* Waterfall.swift in Sources */,
 				91B9F7F31ED9170B00F7799D /* Meter.swift in Sources */,
 				91B9F7F21ED9170B00F7799D /* Memory.swift in Sources */,
+				915817FF1F204B4600FA6382 /* TxAudioStreamCommands.swift in Sources */,
+				915818011F204B4600FA6382 /* XvtrCommands.swift in Sources */,
 				91B9F7FD1ED9170B00F7799D /* Pinger.swift in Sources */,
 				91B9F7F71ED9170B00F7799D /* Radio.swift in Sources */,
 				91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */,
+				915818001F204B4600FA6382 /* WaterfallCommands.swift in Sources */,
 				91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */,
 				91B9F7FB1ED9170B00F7799D /* TxAudioStream.swift in Sources */,
 				91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */,
 				91B9F7F01ED9170B00F7799D /* IqStream.swift in Sources */,
 				91B9F7EC1ED9170B00F7799D /* RadioParameters.swift in Sources */,
+				915817FB1F204B4600FA6382 /* PanadapterCommands.swift in Sources */,
+				915817FC1F204B4600FA6382 /* RadioCommands.swift in Sources */,
 				91B9F80E1ED9203300F7799D /* GCDAsyncSocket.m in Sources */,
 				91B9F7FA1ED9170B00F7799D /* Tnf.swift in Sources */,
+				915817FA1F204B4600FA6382 /* OpusCommands.swift in Sources */,
 				91B9F7E81ED9170B00F7799D /* FlexErrors.swift in Sources */,
-				912DD89B1F1968E900D95EAC /* RadioCommands.swift in Sources */,
 				91B9F7F11ED9170B00F7799D /* Log.swift in Sources */,
 				91B9F7FE1ED9170B00F7799D /* TcpManager.swift in Sources */,
+				915817FE1F204B4600FA6382 /* TnfCommands.swift in Sources */,
 				91B9F7F61ED9170B00F7799D /* Panadapter.swift in Sources */,
 				91B9F8001ED9170B00F7799D /* Vita.swift in Sources */,
+				915817F91F204B4600FA6382 /* MicAudioStreamCommands.swift in Sources */,
 				91B9F7F81ED9170B00F7799D /* RadioFactory.swift in Sources */,
 				91B9F7F41ED9170B00F7799D /* MicAudioStream.swift in Sources */,
+				915817FD1F204B4600FA6382 /* SliceCommands.swift in Sources */,
 				91B9F7EB1ED9170B00F7799D /* Notification.swift in Sources */,
 				91B9F7FF1ED9170B00F7799D /* UdpManager.swift in Sources */,
 				91B9F7ED1ED9170B00F7799D /* AudioStream.swift in Sources */,

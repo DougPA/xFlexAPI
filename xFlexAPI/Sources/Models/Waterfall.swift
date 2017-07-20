@@ -39,13 +39,13 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     // MARK: - Private properties
     
     fileprivate var _initialized = false                    // True if initialized by Radio hardware
-    fileprivate var _radio: Radio?                          // The Radio that owns this Waterfall
+    internal var _radio: Radio?                             // The Radio that owns this Waterfall
     fileprivate var _waterfallQ: DispatchQueue              // GCD queue that guards this object
     fileprivate var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream
 
     // constants
     fileprivate let _log = Log.sharedInstance               // shared log
-    fileprivate let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
+    internal let kDisplayPanafallSetCmd = "display panafall set " // Panafall Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
@@ -266,68 +266,42 @@ public struct WaterfallFrame {
 // --------------------------------------------------------------------------------
 // MARK: - Waterfall Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Waterfall message enum
 // --------------------------------------------------------------------------------
 
 extension Waterfall {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _autoBlackEnabled: Bool {
+    internal var _autoBlackEnabled: Bool {
         get { return _waterfallQ.sync { __autoBlackEnabled } }
         set { _waterfallQ.sync(flags: .barrier) {__autoBlackEnabled = newValue } } }
     
-    fileprivate var _autoBlackLevel: UInt32 {
+    internal var _autoBlackLevel: UInt32 {
         get { return _waterfallQ.sync { __autoBlackLevel } }
         set { _waterfallQ.sync(flags: .barrier) { __autoBlackLevel = newValue } } }
     
-    fileprivate var _blackLevel: Int {
+    internal var _blackLevel: Int {
         get { return _waterfallQ.sync { __blackLevel } }
         set { _waterfallQ.sync(flags: .barrier) {__blackLevel = newValue } } }
     
-    fileprivate var _colorGain: Int {
+    internal var _colorGain: Int {
         get { return _waterfallQ.sync { __colorGain } }
         set { _waterfallQ.sync(flags: .barrier) {__colorGain = newValue } } }
     
-    fileprivate var _gradientIndex: Int {
+    internal var _gradientIndex: Int {
         get { return _waterfallQ.sync { __gradientIndex } }
         set { _waterfallQ.sync(flags: .barrier) {__gradientIndex = newValue } } }
     
-    fileprivate var _lineDuration: Int {
+    internal var _lineDuration: Int {
         get { return _waterfallQ.sync { __lineDuration } }
         set { _waterfallQ.sync(flags: .barrier) {__lineDuration = newValue } } }
     
-    fileprivate var _panadapterId: String {
+    internal var _panadapterId: String {
         get { return _waterfallQ.sync { __panadapterId } }
         set { _waterfallQ.sync(flags: .barrier) { __panadapterId = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // listed in alphabetical order
-    @objc dynamic public var autoBlackEnabled: Bool {
-        get { return _autoBlackEnabled }
-        set { if _autoBlackEnabled != newValue { _autoBlackEnabled = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.autoBlackEnabled.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var blackLevel: Int {
-        get { return _blackLevel }
-        set { if _blackLevel != newValue { _blackLevel = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.blackLevel.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var colorGain: Int {
-        get { return _colorGain }
-        set { if _colorGain != newValue { _colorGain = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.colorGain.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var gradientIndex: Int {
-        get { return _gradientIndex }
-        set { if _gradientIndex != newValue { _gradientIndex = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.gradientIndex.rawValue + "=\(newValue)") } } }
-    
-    @objc dynamic public var lineDuration: Int {
-        get { return _lineDuration }
-        set { if _lineDuration != newValue { _lineDuration = newValue ; _radio!.send(kDisplayPanafallSetCmd + "0x\(id) " + WaterfallToken.lineDuration.rawValue + "=\(newValue)") } } }
-    
+
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
@@ -347,33 +321,5 @@ extension Waterfall {
     public var delegate: WaterfallStreamHandler? {
         get { return _waterfallQ.sync { _delegate } }
         set { _waterfallQ.sync(flags: .barrier) { _delegate = newValue } } }
-
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Waterfall messages (only populate values that != case value)
-    
-    internal enum WaterfallToken : String {
-        // on Waterfall
-        case autoBlackEnabled = "auto_black"
-        case blackLevel = "black_level"
-        case colorGain = "color_gain"
-        case gradientIndex = "gradient_index"
-        case lineDuration = "line_duration"
-        // unused here
-        case available
-        case band
-        case bandwidth
-        case capacity
-        case center
-        case daxIq = "daxiq"
-        case daxIqRate = "daxiq_rate"
-        case loopA = "loopa"
-        case loopB = "loopb"
-        case panadapterId = "panadapter"
-        case rfGain = "rfgain"
-        case rxAnt = "rxant"
-        case wide
-        case xPixels = "x_pixels"
-        case xvtr
-    }
 
 }

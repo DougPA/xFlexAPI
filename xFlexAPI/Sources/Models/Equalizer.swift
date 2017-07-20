@@ -239,7 +239,7 @@ extension Equalizer {
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Equalizer messages (only populate values that != case value)
+    // Mark: - Tokens for Equalizer messages 
     
     internal enum EqualizerToken : String {
         case level63Hz = "63hz"

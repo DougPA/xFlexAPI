@@ -28,13 +28,13 @@ public final class Tnf : NSObject, KeyValueParser {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _radio: Radio?                      // The Radio that owns this Tnf
+    internal var _radio: Radio?                      // The Radio that owns this Tnf
     fileprivate var _tnfQ: DispatchQueue                // GCD queue that guards this object
     fileprivate var _initialized = false                // True if initialized by Radio hardware
 
     // constants
     fileprivate let _log = Log.sharedInstance           // shared Log
-    fileprivate let kTnfSetCmd = "tnf set "             // Tnf Set command prefix
+    internal let kTnfSetCmd = "tnf set "             // Tnf Set command prefix
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                              //
@@ -156,71 +156,32 @@ public final class Tnf : NSObject, KeyValueParser {
 // --------------------------------------------------------------------------------
 // MARK: - Tnf Class extensions
 //              - Synchronized internal properties
-//              - Dynamic public properties
-//              - Tnf message enum
 // --------------------------------------------------------------------------------
 
 extension Tnf {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Private properties - with synchronization
+    // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    fileprivate var _depth: Int {
+    internal var _depth: Int {
         get { return _tnfQ.sync { __depth } }
         set { _tnfQ.sync(flags: .barrier) { __depth = newValue } } }
     
-    fileprivate var _frequency: Int {
+    internal var _frequency: Int {
         get { return _tnfQ.sync { __frequency } }
         set { _tnfQ.sync(flags: .barrier) { __frequency = newValue } } }
     
-    fileprivate var _permanent: Bool {
+    internal var _permanent: Bool {
         get { return _tnfQ.sync { __permanent } }
         set { _tnfQ.sync(flags: .barrier) { __permanent = newValue } } }
     
-    fileprivate var _width: Int {
+    internal var _width: Int {
         get { return _tnfQ.sync { __width } }
         set { _tnfQ.sync(flags: .barrier) { __width = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // listed in alphabetical order
-    @objc dynamic public var depth: Int {
-        get { return _depth }
-        set { if _depth != newValue { if depth.within(Depth.normal.rawValue, Depth.veryDeep.rawValue) {
-            _depth = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.depth.rawValue + "=\(newValue)") } } } }
-    
-    @objc dynamic public var frequency: Int {
-        get { return _frequency }
-        set { if _frequency != newValue { _frequency = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.frequency.rawValue + "=\(newValue.hzToMhz())") } } }
-    
-    @objc dynamic public var permanent: Bool {
-        get { return _permanent }
-        set { if _permanent != newValue { _permanent = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.permanent.rawValue + "=\(newValue.asNumber())") } } }
-    
-    @objc dynamic public var width: Int {
-        get { return _width  }
-        set { if _width != newValue { if width.within(minWidth, maxWidth) { _width = newValue ; _radio!.send(kTnfSetCmd + "\(id) " + TnfToken.width.rawValue + "=\(newValue.hzToMhz())") } } } }
-    
-    // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Tnf messages (only populate values that != case value)
-    
-    internal enum TnfToken : String {
-        case depth
-        case frequency = "freq"
-        case permanent
-        case width
-    }
-    
-    public enum Depth : Int {
-        case normal = 1
-        case deep = 2
-        case veryDeep = 3
-    }
 
 }
 

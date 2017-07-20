@@ -385,7 +385,7 @@ extension AudioStream {
         set { _audioStreamsQ.sync(flags: .barrier) { _delegate = newValue } } }
         
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for AudioStream messages (only populate values that != case value)
+    // Mark: - Tokens for AudioStream messages 
     
     internal enum AudioStreamToken: String {
         case daxChannel = "dax"

@@ -237,7 +237,7 @@ extension Meter {
         set { _meterQ.sync(flags: .barrier) { _value = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Meter messages (only populate values that != case value)
+    // Mark: - Tokens for Meter messages 
     
     internal enum MeterToken : String {
         case desc

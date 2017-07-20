@@ -223,7 +223,7 @@ extension IqStream {
         return _streaming  }
     
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for IqStream messages (only populate values that != case value)
+    // Mark: - Tokens for IqStream messages 
     
     internal enum IqStreamToken: String {
         case available

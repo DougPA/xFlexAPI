@@ -31,8 +31,7 @@ public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     // ------------------------------------------------------------------------------
     // MARK: - Private properties
     
-    
-    fileprivate var _radio: Radio?                      // The Radio that owns this MicAudioStream
+    internal var _radio: Radio?                         // The Radio that owns this MicAudioStream
     fileprivate var _micAudioStreamsQ: DispatchQueue    // GCD queue that guards MicAudioStreams
     fileprivate var _initialized = false                // True if initialized by Radio hardware
     
@@ -53,7 +52,7 @@ public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     // constants
     fileprivate let _log = Log.sharedInstance           // shared Log
     
-    fileprivate let kMicStreamCreateCmd = "stream create daxmic"
+//    fileprivate let kMicStreamCreateCmd = "stream create daxmic"
     
     // see FlexLib
     fileprivate let kOneOverZeroDBfs: Float = 1.0 / pow(2, 15)  // FIXME: really 16-bit for 32-bit numbers???
@@ -286,9 +285,6 @@ extension MicAudioStream {
         set { _micAudioStreamsQ.sync(flags: .barrier) { __micGainScalar = newValue } } }
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant (with message sent to Radio) - checked
-    
-    // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (no message to Radio)
     
     // FIXME: Should any of these send a message to the Radio?
@@ -333,13 +329,4 @@ extension MicAudioStream {
     public var delegate: MicAudioStreamHandler? {
         get { return _micAudioStreamsQ.sync { _delegate } }
         set { _micAudioStreamsQ.sync(flags: .barrier) { _delegate = newValue } } }
-    
-    // ----------------------------------------------------------------------------
-    // Mark: - Tokens for MicAudioStream messages (only populate values that != case value)
-    
-    enum MicAudioStreamToken: String {
-        case inUse = "in_use"
-        case ip
-        case port
-    }
 }

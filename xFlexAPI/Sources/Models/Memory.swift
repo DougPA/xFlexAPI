@@ -472,7 +472,7 @@ extension Memory {
     
 
     // ----------------------------------------------------------------------------
-    // Mark: - Tokens for Memory messages (only populate values that != case value)
+    // Mark: - Tokens for Memory messages 
     
     enum MemoryToken : String {
         case digitalLowerOffset = "digl_offset"
