@@ -95,6 +95,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     internal let kTnfRemoveCmd = "tnf remove "
     internal let kTransmitCmd = "transmit "
     internal let kTransmitSetCmd = "transmit set "
+    internal let kUsbCableCmd = "usb_cable "
     internal let kVersionCmd = Command.version.rawValue
     internal let kXmitCmd = "xmit "
     internal let kXvtrCmd = "xvtr "

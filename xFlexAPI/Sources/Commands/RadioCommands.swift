@@ -459,6 +459,18 @@ extension Radio {
         send(kRadioUptimeCmd, replyTo: callback == nil ? replyHandler : callback)
     }
     
+    // MARK: --- UsbCable ---
+    
+    /// Remove a UsbCable
+    ///
+    /// - Parameters:
+    ///   - id:             UsbCable serial number
+    ///   - callback:       ReplyHandler (optional)
+    /// - Returns:          Success / Failure
+    ///
+    public func usbCableRemove(_ id: String, callback: ReplyHandler? = nil) -> Bool {
+        return sendWithCheck(kUsbCableCmd + "remove" + " \(id)")
+    }
     // MARK: --- Xvtr ---
     
     /// Create an Xvtr
