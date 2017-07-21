@@ -880,7 +880,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             //      format: <daxChannel> <key=value> <key=value> ...<key=value>
             //            parseDaxiq( keyValuesArray(remainder))
             
-            _log.msg("Unprocessed \(msgType), \(remainder)", level: .warning, function: #function, file: #file, line: #line)
+            break // obsolete token, included to prevent log messages
             
         case .display:
             //     format: <displayType> <streamId> <key=value> <key=value> ...<key=value>
@@ -1718,6 +1718,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             case .cw:
                 cw = true
                 
+            case .digital:
+                digital = true
+                
             case .enforcePrivateIpEnabled:
                 willChangeValue(forKey: "enforcePrivateIpEnabled")
                 _enforcePrivateIpEnabled = bValue
@@ -1725,9 +1728,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
             case .filterSharpness:
                 filterSharpness = true
-                
-            case .digital:
-                digital = true
                 
             case .freqErrorPpb:
                 willChangeValue(forKey: "freqErrorPpb")

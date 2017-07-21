@@ -984,7 +984,7 @@ extension Radio {
         case atu
         case client
         case cwx
-        case daxiq
+        case daxiq      // obsolete token, included to prevent log messages
         case display
         case eq
         case file
