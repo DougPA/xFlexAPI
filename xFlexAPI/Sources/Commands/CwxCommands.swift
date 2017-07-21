@@ -118,9 +118,9 @@ extension Cwx {
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
     // listed in alphabetical order
-    @objc dynamic public var delay: Int {
-        get { return _delay }
-        set { if _delay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _delay = value ; _radio!.send(kCwxCmd + CwxToken.delay.rawValue + " \(value)") } } }
+    @objc dynamic public var breakInDelay: Int {
+        get { return _breakInDelay }
+        set { if _breakInDelay != newValue { let value = newValue.bound(kMinDelayMs, kMaxDelayMs) ;  _breakInDelay = value ; _radio!.send(kCwxCmd + CwxToken.breakInDelay.rawValue + " \(value)") } } }
     
     @objc dynamic public var qskEnabled: Bool {
         get { return _qskEnabled }
@@ -134,7 +134,7 @@ extension Cwx {
     // Mark: - Tokens for Cwx messages
     
     public enum CwxToken : String {
-        case delay
+        case breakInDelay = "break_in_delay"
         case qskEnabled = "qsk_enabled"
         case erase
         case sent

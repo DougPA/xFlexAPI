@@ -49,7 +49,7 @@ public final class Cwx : NSObject, KeyValueParser {
 
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     //                                                                                                  //
-    fileprivate var __delay = 0                         // QSK delay                                    //
+    fileprivate var __breakInDelay = 0                  // BreakIn delay                                //
     fileprivate var __qskEnabled = false                // QSK Enabled                                  //
     fileprivate var __wpm = 0                           // Speed (wpm)                                  //
     //                                                                                                  //
@@ -219,10 +219,10 @@ public final class Cwx : NSObject, KeyValueParser {
                 // Known tokens, in alphabetical order
                 switch token {
                     
-                case .delay:
-                    willChangeValue(forKey: "delay")
-                    _delay = iValue
-                    didChangeValue(forKey: "delay")
+                case .breakInDelay:
+                    willChangeValue(forKey: "breakInDelay")
+                    _breakInDelay = iValue
+                    didChangeValue(forKey: "breakInDelay")
                 
                 case .erase:
                     let values = sValue.components(separatedBy: ",")
@@ -265,9 +265,9 @@ extension Cwx {
     // MARK: - Internal properties - with synchronization
     
     // listed in alphabetical order
-    internal var _delay: Int {
-        get { return _cwxQ.sync { __delay } }
-        set { _cwxQ.sync(flags: .barrier) { __delay = newValue } } }
+    internal var _breakInDelay: Int {
+        get { return _cwxQ.sync { __breakInDelay } }
+        set { _cwxQ.sync(flags: .barrier) { __breakInDelay = newValue } } }
     
     internal var _qskEnabled: Bool {
         get { return _cwxQ.sync { __qskEnabled } }
