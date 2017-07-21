@@ -514,6 +514,10 @@ extension Radio {
         get {  return _atuMemoriesEnabled }
         set { if _atuMemoriesEnabled != newValue { _atuMemoriesEnabled = newValue ; send(kAtuSetCmd + AtuToken.memoriesEnabled.rawValue + "=\(newValue.asNumber())") } } }
     
+    @objc dynamic public var bandPersistenceEnabled: Bool {
+        get {  return _bandPersistenceEnabled }
+        set { if _bandPersistenceEnabled != newValue { _bandPersistenceEnabled = newValue ; send(kRadioSetCmd + RadioToken.bandPersistenceEnabled.rawValue + "=\(newValue.asNumber())") } } }
+    
     @objc dynamic public var binauralRxEnabled: Bool {
         get {  return _binauralRxEnabled }
         set { if _binauralRxEnabled != newValue { _binauralRxEnabled = newValue ; send(kRadioSetCmd + RadioToken.binauralRxEnabled.rawValue + "=\(newValue.asNumber())") } } }
@@ -942,6 +946,7 @@ extension Radio {
     
     internal enum RadioToken: String {
         case autoLevel = "auto_level"
+        case bandPersistenceEnabled = "band_persistence_enabled"
         case binauralRxEnabled = "binaural_rx"
         case calFreq = "cal_freq"
         case callsign

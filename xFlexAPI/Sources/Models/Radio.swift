@@ -196,6 +196,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate var __availablePanadapters = 0                           // (read only)
     fileprivate var __availableSlices = 0                                // (read only)
     // B
+    fileprivate var __bandPersistenceEnabled = false                     //
     fileprivate var __binauralRxEnabled = false                          // Binaural enable
     // C
     fileprivate var __calFreq = 0                                        // Calibration frequency
@@ -1693,6 +1694,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                     didChangeValue(forKey: "filterVoiceAutoLevel")
                 }
                 filterSharpness = false
+                
+            case .bandPersistenceEnabled:
+                willChangeValue(forKey: "bandPersistenceEnabled")
+                _bandPersistenceEnabled = bValue
+                didChangeValue(forKey: "bandPersistenceEnabled")
                 
             case .binauralRxEnabled:
                 willChangeValue(forKey: "binauralRxEnabled")
@@ -3362,6 +3368,10 @@ extension Radio {
     internal var _availableSlices: Int {
         get { return _radioQ.sync { __availableSlices } }
         set { _radioQ.sync(flags: .barrier) { __availableSlices = newValue } } }
+    
+    internal var _bandPersistenceEnabled: Bool {
+        get { return _radioQ.sync { __bandPersistenceEnabled } }
+        set { _radioQ.sync(flags: .barrier) { __bandPersistenceEnabled = newValue } } }
     
     internal var _binauralRxEnabled: Bool {
         get { return _radioQ.sync { __binauralRxEnabled } }
