@@ -10,14 +10,14 @@ import Foundation
 
 // --------------------------------------------------------------------------------
 // MARK: - Opus Class extensions
-//              - Dynamic public properties
+//              - Dynamic public properties that send commands to the Radio
 //              - Opus message enum
 // --------------------------------------------------------------------------------
 
 extension Opus {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties - KVO compliant with Radio update - checked
+    // MARK: - Public properties - KVO compliant with Radio update
     
     // listed in alphabetical order
     @objc dynamic public var remoteRxOn: Bool {
