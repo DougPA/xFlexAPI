@@ -420,7 +420,7 @@ extension Radio {
         
         send(kTnfRemoveCmd + " \(tnf.id)", replyTo: callback)
         NC.post(.tnfWillBeRemoved, object: tnf as Any?)
-        removeObject(tnf)
+        tnfs[tnf.id] = nil
     }
     
     // MARK: --- Transmit ---
