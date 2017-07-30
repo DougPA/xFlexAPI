@@ -43,7 +43,7 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _parameters: RadioParameters            // Struct of Radio parameters
+    fileprivate var _parameters: RadioParameters?           // Struct of Radio parameters
     fileprivate var _udpReceiveQ: DispatchQueue!            // serial GCD Queue for inbound UDP traffic
     fileprivate var _udpSendQ: DispatchQueue!               // serial GCD Queue for outbound UDP traffic
     fileprivate var _delegate: UdpManagerDelegate           // class to receive UDP data
@@ -62,12 +62,14 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     /// Initialize a UdpManager
     ///
     /// - Parameters:
-    ///   - radioParameters:    a RadioParameters tuple
-    ///   - udpReceiveQ:        a serial Q for GCDAsyncUdpSocket activity
+    ///   - udpReceiveQ:        a serial Q for Udp receive activity
+    ///   - udpSendQ:           a serial Q for Udp send activity
+    ///   - delegate:           a delegate for Udp activity
+    ///   - udpPort:            a port number
+    ///   - enableBroadcast:    whether to allow Broadcasts
     ///
-    public init(radioParameters: RadioParameters, udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
+    public init(udpReceiveQ: DispatchQueue, udpSendQ: DispatchQueue, delegate: UdpManagerDelegate, udpPort: UInt16 = 4991, enableBroadcast: Bool = false) {
         
-        _parameters = radioParameters
         _udpReceiveQ = udpReceiveQ
         _udpSendQ = udpSendQ
         _delegate = delegate
@@ -120,9 +122,11 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
     }
     /// Bind to the UDP Port
     ///
-    public func bind() {
+    public func bind(radioParameters: RadioParameters) {
         var success = false
         
+        _parameters = radioParameters
+
         // start from the Vita Default port number
         var tmpPort = port
         
@@ -148,10 +152,10 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
         
         // connect send socket
         do {
-            try _udpSendSocket?.connect(toHost: _parameters.ipAddress, onPort: kUdpSendPort)
+            try _udpSendSocket?.connect(toHost: _parameters!.ipAddress, onPort: kUdpSendPort)
         } catch let error {
             
-            _delegate.udpError("Unable to connect to UDP address = \(_parameters.ipAddress ) (port \(kUdpSendPort)) - \(error.localizedDescription)")
+            _delegate.udpError("Unable to connect to UDP address = \(_parameters!.ipAddress ) (port \(kUdpSendPort)) - \(error.localizedDescription)")
             // FIXME: implement logic to try again later
             _udpSendSocket?.close()
             _udpSendSocket = nil

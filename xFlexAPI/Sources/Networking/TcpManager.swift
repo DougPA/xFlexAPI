@@ -37,14 +37,12 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _tcpQ: DispatchQueue                // serial GCD Queue for sending/receiving Radio Commands
+    fileprivate var _tcpReceiveQ: DispatchQueue         // serial GCD Queue for receiving Radio Commands
+    fileprivate var _tcpSendQ: DispatchQueue            // serial GCD Queue for sending Radio Commands
     fileprivate var _delegate: TcpManagerDelegate       // class to receive TCP data
     fileprivate var _tcpSocket: GCDAsyncSocket!         // GCDAsync TCP socket object
-    fileprivate var seqNum = 0                          // Sequence number
-    
-    // constants
-    fileprivate let sendQ = DispatchQueue(label: "FlexAPITester" + ".sendQ") // Queue for sending commands
-    fileprivate let kConnectionTimeout = 0.5            // timeout in seconds
+    fileprivate var _seqNum = 0                         // Sequence number
+    fileprivate var _timeout = 0.0                      // timeout in seconds
     
     // ----------------------------------------------------------------------------
     // MARK: - Initialization
@@ -52,18 +50,22 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     /// Initialize a TcpManager
     ///
     /// - Parameters:
-    ///   - tcpQ:       a RadioParameters tuple
-    ///   - delegate:   a serial Queue for GCDAsyncSocket activity
+    ///   - tcpReceiveQ:    a serial Queue for Tcp receive activity
+    ///   - tcpSendQ:       a serial Queue for Tcp send activity
+    ///   - delegate:       a delegate fro Tcp activity
+    ///   - timeout:        connection timeout (seconds)
     ///
-    public init(tcpQ: DispatchQueue, delegate: TcpManagerDelegate) {
+    public init(tcpReceiveQ: DispatchQueue, tcpSendQ: DispatchQueue, delegate: TcpManagerDelegate, timeout: Double = 0.5) {
         
-        self._tcpQ = tcpQ
-        self._delegate = delegate
+        _tcpReceiveQ = tcpReceiveQ
+        _tcpSendQ = tcpSendQ
+        _delegate = delegate
+        _timeout = timeout
         
         super.init()
         
         // get a socket & set it's parameters
-        _tcpSocket = GCDAsyncSocket(delegate: self, delegateQueue: _tcpQ)
+        _tcpSocket = GCDAsyncSocket(delegate: self, delegateQueue: _tcpReceiveQ)
         _tcpSocket.isIPv4PreferredOverIPv6 = true
         _tcpSocket.isIPv6Enabled = false
     }
@@ -80,11 +82,11 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
     public func connect(radioParameters: RadioParameters) -> Bool {
         var success = true
         
-        seqNum = 0
+        _seqNum = 0
         
         do {
             // attempt to connect to the Radio (with timeout)
-            try _tcpSocket.connect(toHost: radioParameters.ipAddress, onPort: UInt16(radioParameters.port), withTimeout: kConnectionTimeout)
+            try _tcpSocket.connect(toHost: radioParameters.ipAddress, onPort: UInt16(radioParameters.port), withTimeout: _timeout)
             
         } catch _ {
             
@@ -111,23 +113,21 @@ public final class TcpManager: NSObject, GCDAsyncSocketDelegate {
         var lastSeqNum = 0
         var command = ""
         
-        sendQ.sync {
+        _tcpSendQ.sync {
             
             // assemble the command
-            command =  "C" + "\(diagnostic ? "D" : "")" + "\(self.seqNum)|" + cmd + "\n"
+            command =  "C" + "\(diagnostic ? "D" : "")" + "\(self._seqNum)|" + cmd + "\n"
             
-//            // optionally, register to be notified
-//            if let callback = callback { _delegate.addReplyHandler( String(self.seqNum), replyTuple: (replyTo: callback, command: cmd) ) }
             // register to be notified
-            _delegate.addReplyHandler( String(self.seqNum), replyTuple: (replyTo: callback, command: cmd) )
+            _delegate.addReplyHandler( String(self._seqNum), replyTuple: (replyTo: callback, command: cmd) )
             
             // send it, no timeout, tag = segNum
-            self._tcpSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: self.seqNum)
+            self._tcpSocket.write(command.data(using: String.Encoding.utf8, allowLossyConversion: false)!, withTimeout: -1, tag: self._seqNum)
             
-            lastSeqNum = seqNum
+            lastSeqNum = _seqNum
             
             // increment the Sequence Number
-            seqNum += 1
+            _seqNum += 1
         }
         self._delegate.sentMessage(command)
         
