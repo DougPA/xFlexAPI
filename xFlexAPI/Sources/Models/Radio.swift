@@ -124,7 +124,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // GCD Serial Queues
     fileprivate let _opusQ =            DispatchQueue(label: kApiId + ".opusQ")
     fileprivate let _parseQ =           DispatchQueue(label: kApiId + ".parseQ")
-    fileprivate let _tcpQ =             DispatchQueue(label: kApiId + ".tcpQ")
+    fileprivate let _tcpReceiveQ =      DispatchQueue(label: kApiId + ".tcpReceiveQ")
+    fileprivate let _tcpSendQ =         DispatchQueue(label: kApiId + ".tcpSendQ")
     fileprivate let _udpReceiveQ =      DispatchQueue(label: kApiId + ".udpReceiveQ")
     fileprivate let _udpSendQ =         DispatchQueue(label: kApiId + ".udpSendQ")
     fileprivate let _pingQ =            DispatchQueue(label: kApiId + ".pingQ")
@@ -369,10 +370,10 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         cwx = Cwx(radio: self, queue: _cwxQ)
         
         // initialize a Manager for the TCP Command stream
-        _tcp = TcpManager(tcpQ: _tcpQ, delegate: self)
+        _tcp = TcpManager(tcpReceiveQ: _tcpReceiveQ, tcpSendQ: _tcpSendQ, delegate: self)
         
         // initialize a Manager for the UDP Data Streams
-        _udp = UdpManager(radioParameters: radioParameters, udpReceiveQ: _udpReceiveQ, udpSendQ: _udpSendQ, delegate: self)
+        _udp = UdpManager(udpReceiveQ: _udpReceiveQ, udpSendQ: _udpSendQ, delegate: self)
         
         // subscribe to Pinger notifications
         addNotifications()
@@ -381,48 +382,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - public methods
     
-    /// Remove an object from its collection
-    ///
-    /// - Parameters:
-    ///   - object:         an object
-    ///
-    public func removeObject<T>(_ object: T) {
-        
-        // cases are in alphabetical order
-        switch object {
-            
-        case is AudioStream:
-            audioStreams[(object as! AudioStream).id] = nil
-            
-        case is Memory:
-            memories[(object as! Memory).id] = nil
-            
-        case is Meter:
-            meters[(object as! Meter).id] = nil
-            
-        case is MicAudioStream:
-            micAudioStreams[(object as! MicAudioStream).id] = nil
-            
-        case is Panadapter:
-            panadapters[(object as! Panadapter).id] = nil
-            
-        case is xFlexAPI.Slice:
-            slices[(object as! xFlexAPI.Slice).id] = nil
-            
-        case is Tnf:
-            tnfs[(object as! Tnf).id] = nil
-            
-        case is TxAudioStream:
-            txAudioStreams[(object as! TxAudioStream).id] = nil
-            
-        case is Waterfall:
-            waterfalls[(object as! Waterfall).id] = nil
-            
-        default:
-            _log.msg("Attempt to remove an unknown object type, \(object)", level: .error, function: #function, file: #file, line: #line)
-        }
-        
-    }
     /// Establish a basic connection to Radio
     ///
     /// - Parameters:
@@ -469,10 +428,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func disconnect() {
         
-        
-        // FIXME: Add missing components
-        
-        
         NC.post(.tcpWillDisconnect, object: selectedRadio as Any?)
         
         _log.msg("Radio @ \(String(describing: selectedRadio?.ipAddress)) will disconnect", level: .info, function: #function, file: #file, line: #line)
@@ -488,23 +443,23 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // ----- remove all objects -----
         
-        // remove all xvtrs
-        
         // clear all collections
         audioStreams.removeAll()
         equalizers.removeAll()
         iqStreams.removeAll()
+        memories.removeAll()
         meters.removeAll()
         micAudioStreams.removeAll()
         opusStreams.removeAll()
         panadapters.removeAll()
         profiles.removeAll()
+        replyHandlers.removeAll()
         slices.removeAll()
         tnfs.removeAll()
         txAudioStreams.removeAll()
+        usbCables.removeAll()
         waterfalls.removeAll()
-        
-        replyHandlers.removeAll()
+        xvtrs.removeAll()
         
         nickname = ""
         _smartSdrMB = ""
@@ -514,7 +469,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // clear lists
         antennaList.removeAll()
+        micList.removeAll()
         rfGainList.removeAll()
+        sliceList.removeAll()
         
     }
     /// Add a ReplyHandler object to the Reply List (to be invoked when the Command reply is received)
@@ -617,7 +574,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 self._tcp.readNext()
                 
                 // establish a UDP port for the Data Streams
-                self._udp.bind()
+                self._udp.bind(radioParameters: self.selectedRadio!)
                 
             case .udpBound(let port):
                 
@@ -1005,7 +962,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // YES, notify all observers
             NC.post(.audioStreamWillBeRemoved, object: audioStreams[streamId] as Any?)
             
-            removeObject(audioStreams[streamId])
+            audioStreams[streamId] = nil
             
         } else {
             
@@ -1140,14 +1097,14 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 // notify all observers
                 NC.post(.panadapterWillBeRemoved, object: panadapters[streamId] as Any?)
                 
-                removeObject(panadapters[streamId])
+                panadapters[streamId] = nil
                 
             case .waterfall:
                 
                 // notify all observers
                 NC.post(.waterfallWillBeRemoved, object: waterfalls[streamId] as Any?)
                 
-                removeObject(waterfalls[streamId])
+                waterfalls[streamId] = nil
             }
             
         } else {
@@ -1445,7 +1402,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             NC.post(.memoryWillBeRemoved, object: memories[memoryId] as Any?)
             
             // remove it from the its collection
-            removeObject(memories[memoryId])
+            memories[memoryId] = nil
             
         } else {
             
@@ -1496,7 +1453,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 NC.post(.meterWillBeRemoved, object: meters[meterId] as Any?)
                 
                 // remove it from the its collection
-                removeObject(meters[meterId])
+                meters[meterId] = nil
             }
             
         } else {
@@ -1548,7 +1505,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             NC.post(.micAudioStreamWillBeRemoved, object: micAudioStreams[streamId] as Any?)
             
             // remove it from the its collection
-            removeObject(micAudioStreams[streamId])
+            micAudioStreams[streamId] = nil
             
         } else {
             
@@ -1880,7 +1837,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             NC.post(.sliceWillBeRemoved, object: slices[sliceId] as Any?)
             
             // remove it from the its collection
-            removeObject(slices[sliceId])
+            slices[sliceId] = nil
             
         } else {
             // does the Slice exist?
@@ -2210,7 +2167,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             NC.post(.txAudioStreamWillBeRemoved, object: txAudioStreams[streamId] as Any?)
             
             // remove it from the its collection
-            removeObject(txAudioStreams[streamId])
+            txAudioStreams[streamId] = nil
             
         } else {
             
@@ -2230,8 +2187,34 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///   - keyValues:      a KeyValuesArray
     ///
     private func parseUsbCable(_ keyValues: KeyValuesArray) {
+        // TYPE: CAT
+        //      <id, > <type, > <enable, > <pluggedIn, > <name, > <source, > <sourceTxAnt, > <sourceRxAnt, > <sourceSLice, >
+        //      <autoReport, > <preamp, > <polarity, > <log, > <speed, > <dataBits, > <stopBits, > <parity, > <flowControl, >
+        //
         
-        // TODO: add code
+        // FIXME: Need other formats
+        
+        // get the UsbCable Id
+        let usbCableId = keyValues[0].key
+        
+        // does the UsbCable  exist?
+        if usbCables[usbCableId] == nil {
+            
+            // NO, is it a valid cable type?
+            if let cableType = UsbCable.UsbCableType(rawValue: keyValues[1].value) {
+                
+                // YES, create a new UsbCable & add it to the UsbCables collection
+                usbCables[usbCableId] = UsbCable(radio: self, id: usbCableId, queue: _usbCableQ, cableType: cableType)
+                
+            } else {
+                
+                // NO, log the error and ignore it
+                _log.msg("Invalid UsbCable Type, \(keyValues[1].value)", level: .error, function: #function, file: #file, line: #line)
+                return
+            }
+        }
+        // pass the remaining key values to the Usb Cable for parsing
+        usbCables[usbCableId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         
     }
     /// Parse a Waveform status message
@@ -2273,30 +2256,29 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         //      OR
         // Format: <index, > <"in_use", 0>
         
-        //        // get the Name
-        //        let name = String(keyValues[0].key)
-        //
-        //        // should the Xvtr be removed?
-        //        if notInUse {
-        //
-        //            // YES, notify all observers
-        //            NC.post(.xvtrWillBeRemoved, object: xvtrs[name] as Any?)
-        //
-        //            // remove it from the its collection
-        //            removeObject(xvtrs[name])
-        //
-        //        } else {
-        //
-        //            // does the Xvtr exist?
-        //            if xvtrs[name] == nil {
-        //
-        //                // NO, create a new Xvtr & add it to the Xvtrs collection
-        //                xvtrs[name] = Xvtr(radio: self, name: name, queue: _xvtrQ)
-        //            }
-        //            // pass the remaining key values to the Xvtr for parsing
-        //            xvtrs[name]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
-        //        }
+        // get the Name
+        let name = keyValues[0].key
         
+        // should the Xvtr be removed?
+        if notInUse {
+            
+            // YES, notify all observers
+            NC.post(.xvtrWillBeRemoved, object: xvtrs[name] as Any?)
+            
+            // remove it from the its collection
+            xvtrs[name] = nil
+            
+        } else {
+            
+            // does the Xvtr exist?
+            if xvtrs[name] == nil {
+                
+                // NO, create a new Xvtr & add it to the Xvtrs collection
+                xvtrs[name] = Xvtr(radio: self, id: name, queue: _xvtrQ)
+            }
+            // pass the remaining key values to the Xvtr for parsing
+            xvtrs[name]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+        }
     }
     
     // --------------------------------------------------------------------------------
@@ -4073,6 +4055,10 @@ extension Radio {
     public var waterfalls: [WaterfallId: Waterfall] {
         get { return _objectQ.sync { _waterfalls } }
         set { _objectQ.sync(flags: .barrier) { _waterfalls = newValue } } }
+    
+    public var usbCables: [UsbCableId: UsbCable] {
+        get { return _objectQ.sync { _usbCables } }
+        set { _objectQ.sync(flags: .barrier) { _usbCables = newValue } } }
     
     public var xvtrs: [XvtrId: Xvtr] {
         get { return _objectQ.sync { _xvtrs } }
