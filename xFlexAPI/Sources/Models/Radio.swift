@@ -58,7 +58,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     public private(set) var filters: [FilterMode: [FilterSpec]]!        // Dictionary of Filters
     
-    public let kApiFirmwareSupport = "1.10.16.x"                        // The Radio Firmware version supported by this API
+    public let kApiFirmwareSupport = "2.0.17.x"                         // The Radio Firmware version supported by this API
     
     // ----------------------------------------------------------------------------
     // MARK: - Internal properties
