@@ -33,6 +33,7 @@ public final class Meter : KeyValueParser {
     
     fileprivate var _initialized = false                            // True if initialized by Radio (hardware)
     fileprivate var _meterQ: DispatchQueue                          // GCD queue that guards this object
+    fileprivate var _voltsAmpsDenom: Float = 256.0                  // denominator for voltage/amperage depends on API version
 
     // constants
     fileprivate let _log = Log.sharedInstance                       // shared log
@@ -66,8 +67,12 @@ public final class Meter : KeyValueParser {
         
         self._radio = radio
         self.id = id
-        
         self._meterQ = queue
+
+        // set voltage/amperage denominator for older API versions (before 1.11)
+        if radio.radioApiVersionMajor == 1 && radio.radioApiVersionMinor <= 10 {
+            _voltsAmpsDenom = 1024.0
+        }
     }
     
     // ----------------------------------------------------------------------------
@@ -87,7 +92,7 @@ public final class Meter : KeyValueParser {
         switch units {
 
         case "Volts", "Amps":
-            value = Float(newValue) / 256.0
+            value = Float(newValue) / _voltsAmpsDenom
         
         case "SWR", "dBm", "dBFS":
             value = Float(newValue) / 128.0

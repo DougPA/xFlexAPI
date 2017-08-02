@@ -58,6 +58,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     
     public private(set) var filters: [FilterMode: [FilterSpec]]!        // Dictionary of Filters
     
+    public private(set) var radioApiVersionMajor = 0                    // numeric versions of Radio firmware version
+    public private(set) var radioApiVersionMinor = 0
+
     public let kApiFirmwareSupport = "2.0.17.x"                         // The Radio Firmware version supported by this API
     
     // ----------------------------------------------------------------------------
@@ -558,69 +561,84 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         connectionState = state
         
-        DispatchQueue.main.async { [unowned self] in
-            
+//        DispatchQueue.main.async { [unowned self] in
+        
             // take appropriate action
             switch state {
                 
             case .tcpConnected(let host, let port):
                 
                 // log it
-                self._log.msg("TCP connected to Radio IP \(host), Port \(port)", level: .verbose, function: #function, file: #file, line: #line)
+                _log.msg("TCP connected to Radio IP \(host), Port \(port)", level: .info, function: #function, file: #file, line: #line)
                 
                 // a tcp connection has been established
                 NC.post(.tcpDidConnect, object: nil)
                 
-                self._tcp.readNext()
+                _tcp.readNext()
                 
                 // establish a UDP port for the Data Streams
-                self._udp.bind(radioParameters: self.selectedRadio!)
+                _udp.bind(radioParameters: self.selectedRadio!)
                 
             case .udpBound(let port):
                 
                 // UDP (streams) connection established, initialize the radio
-                self._log.msg("UDP bound to Port \(port)", level: .verbose, function: #function, file: #file, line: #line)
+                _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
                 
                 NC.post(.udpDidBind, object: nil)
                 
                 // a UDP bind has been established
-                self._udp.beginReceiving()
-                
+                _udp.beginReceiving()
+            
             case .clientConnected():
                 
-                self._log.msg("Client connection established", level: .verbose, function: #function, file: #file, line: #line)
+                _log.msg("Client connection established", level: .verbose, function: #function, file: #file, line: #line)
                 
+                // DL3LSM: maybe this is also possible for 1.x versions
+                if radioApiVersionMajor >= 2 {
+                    
+                    // TODO: reply handler
+                    
+                    // From FlexLib:
+                    // When connecting to a WAN radio, the public IP address of the connected
+                    // client must be obtained from the radio.  This value is used to determine
+                    // if audio streams fromt the radio are meant for this client.
+                    // (IsAudioStreamStatusForThisClient() checks for LocalIP)
+                    send("client ip")
+                }
                 // send the initial commands
-                if !self._connectSimple { self.sendCommandList(self.primaryCommandsArray) }
+                if !_connectSimple { self.sendCommandList(self.primaryCommandsArray) }
                 
-                // TCP & UDP connections established, inform observers
-                NC.post(.clientDidConnect, object: self.selectedRadio as Any?)
+//                // TCP & UDP connections established, inform observers
+//                NC.post(.clientDidConnect, object: selectedRadio as Any?)
                 
                 // send the subscription commands
-                if !self._connectSimple { self.sendCommandList(self.subscriptionCommandsArray) }
+                if !_connectSimple { sendCommandList(subscriptionCommandsArray) }
                 
                 // send the secondary commands
-                if !self._connectSimple { self.sendCommandList(self.secondaryCommandsArray) }
+                if !_connectSimple { sendCommandList(secondaryCommandsArray) }
                 
                 // tell the radio which UDP port number was selected for incoming UDP streams
-                self.send(Command.clientUdpPort.rawValue + "\(self._udp.port)")
+                send(Command.clientUdpPort.rawValue + "\(_udp.port)")
                 
                 // start pinging
-                if self.pingerEnabled { self._pinger = Pinger(tcpManager: self._tcp, pingQ: self._pingQ) }
-                
+                if pingerEnabled { _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ) }
+
+                // TCP & UDP connections established, inform observers
+                NC.post(.clientDidConnect, object: selectedRadio as Any?)
+
             case .disconnected(let reason):
                 
                 // TCP connection disconnected
-                self._log.msg("Disconnected, reason = \(reason)", level: .error, function: #function, file: #file, line: #line)
+                _log.msg("Disconnected, reason = \(reason)", level: .error, function: #function, file: #file, line: #line)
                 
                 NC.post(.tcpDidDisconnect, object: reason)
                 
             case .update( _, _):
                 
                 // FIXME: need to handle Update State ???
-                self._log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
+                _log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
             }
-        }
+//        }
     }
     // --------------------------------------------------------------------------------
     // MARK: - First level parser
@@ -805,12 +823,12 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             }
             
             // is there an API Handle?
-            if let apiHandle = _connectionHandle {
+            if var apiHandle = _connectionHandle {
                 
-                // YES, is the Status Command directed to this client?
-                isMyHandle = (apiHandle == components[0] || components[0] == "0")
+                // add "0x" to apiHandle
+                apiHandle = "0x" + apiHandle
+                isMyHandle = (apiHandle == keyValues[0].key)
             }
-            
             
             if isMyHandle {
                 
@@ -2910,6 +2928,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         if xFlexVersionParts[0] != radioVersionParts[0] || xFlexVersionParts[1] != radioVersionParts[1] || xFlexVersionParts[2] != radioVersionParts[2] {
             _log.msg("Firmware update needed, Radio Version = \(selectedRadio.firmwareVersion!), xFlexAPI Firmware Support = \(kApiFirmwareSupport)", level: .warning, function: #function, file: #file, line: #line)
         }
+        // set integer numbers for major and minor for fast comparision
+        self.radioApiVersionMajor = Int(radioVersionParts[0]) ?? 0
+        self.radioApiVersionMinor = Int(radioVersionParts[1]) ?? 0
     }
     /// Replace spaces and equal signs in a CWX Macro with alternate characters
     ///
@@ -3125,7 +3146,8 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 
             } else {
                 
-                // YES, disconnect with error
+                // YES, disconnect with error (don't keep the UDP port open as it won't be reused with a new connection)
+                _udp.unbind()
                 setConnectionState(.disconnected(reason: .connectionFailed))
             }
         }
@@ -3158,10 +3180,6 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // YES, set state
             setConnectionState(.udpBound(port: port))
             
-        } else {
-            
-            // YES, disconnect with error
-            setConnectionState(.disconnected(reason: .connectionFailed))
         }
     }
     /// Receive a State Change message from UDP Manager

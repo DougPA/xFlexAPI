@@ -34,8 +34,8 @@ public extension NotificationCenter {
     /// post a Notification by Name
     ///
     /// - Parameters:
-    ///   - notification:       Notification Name
-    ///   - object:             associated object
+    ///   - notification:   Notification Name
+    ///   - object:         associated object
     ///
     public class func post(_ name: String, object: Any?) {
         
@@ -45,8 +45,8 @@ public extension NotificationCenter {
     /// post a Notification by Type
     ///
     /// - Parameters:
-    ///   - notification:       Notification Type
-    ///   - object:             associated object
+    ///   - notification:   Notification Type
+    ///   - object:         associated object
     ///
     public class func post(_ notification: NotificationType, object: Any?) {
         
@@ -56,10 +56,10 @@ public extension NotificationCenter {
     /// setup a Notification Observer by Name
     ///
     /// - Parameters:
-    ///   - observer: the object receiving Notifications
-    ///   - selector: a Selector to receive the Notification
-    ///   - type: Notification name
-    ///   - object: associated object (if any)
+    ///   - observer:       the object receiving Notifications
+    ///   - selector:       a Selector to receive the Notification
+    ///   - type:           Notification name
+    ///   - object:         associated object (if any)
     ///
     public class func makeObserver(_ observer: Any, with selector: Selector, of name: String, object: Any?) {
         
@@ -68,14 +68,25 @@ public extension NotificationCenter {
     /// setup a Notification Observer by Type
     ///
     /// - Parameters:
-    ///   - observer: the object receiving Notifications
-    ///   - selector: a Selector to receive the Notification
-    ///   - type: Notification type
-    ///   - object: associated object (if any)
+    ///   - observer:       the object receiving Notifications
+    ///   - selector:       a Selector to receive the Notification
+    ///   - type:           Notification type
+    ///   - object:         associated object (if any)
     ///
     public class func makeObserver(_ observer: Any, with selector: Selector, of type: NotificationType, object: Any?) {
         
         NotificationCenter.default.addObserver(observer, selector: selector, name: NSNotification.Name(rawValue: type.rawValue), object: object)
+    }
+    /// remove a Notification Observer by Type
+    ///
+    /// - Parameters:
+    ///   - observer:       the object receiving Notifications
+    ///   - type:           Notification type
+    ///   - object:         associated object (if any)
+    ///
+    public class func deleteObserver(_ observer: Any, of type: NotificationType, object: Any?) {
+        
+        NotificationCenter.default.removeObserver(observer, name: NSNotification.Name(rawValue: type.rawValue), object: object)
     }
 }
 
@@ -142,8 +153,8 @@ public extension String {
     /// Replace spaces with a specified value
     ///
     /// - Parameters:
-    ///   - value:          the String to replace spaces
-    /// - Returns:          the adjusted String
+    ///   - value:      the String to replace spaces
+    /// - Returns:      the adjusted String
     ///
     func replacingSpacesWith(_ value: String) -> String {
         return self.replacingOccurrences(of: " ", with: value)
@@ -185,7 +196,7 @@ public extension Int {
     
     /// Convert an Int Hz value to a Mhz string
     ///
-    /// - Returns:  the String equivalent
+    /// - Returns:      the String equivalent
     ///
     func hzToMhz() -> String {
         
