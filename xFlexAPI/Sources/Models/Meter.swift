@@ -87,7 +87,7 @@ public final class Meter : KeyValueParser {
         switch units {
 
         case "Volts", "Amps":
-            value = Float(newValue) / 1024.0
+            value = Float(newValue) / 256.0
         
         case "SWR", "dBm", "dBFS":
             value = Float(newValue) / 128.0
