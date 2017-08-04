@@ -85,18 +85,19 @@ public final class UdpManager: NSObject, GCDAsyncUdpSocketDelegate {
         _udpSocket.setIPv4Enabled(true)
         _udpSocket.setIPv6Enabled(false)
         
+        // get a socket for sending Vita Data
+        _udpSendSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpSendQ)
+        
+        _udpSendSocket!.setIPv4Enabled(true)
+        _udpSendSocket!.setIPv6Enabled(false)
+        
         if enableBroadcast {
             do {
-                try _udpSocket.enableBroadcast(true)
+                try _udpSendSocket!.enableBroadcast(true)
             } catch {
                 canBroadcast = false
             }
         }
-        
-        // get a socket for sending Vita Data
-        _udpSendSocket = GCDAsyncUdpSocket(delegate: self, delegateQueue: _udpSendQ)
-        _udpSendSocket?.setIPv4Enabled(true)
-        _udpSendSocket?.setIPv6Enabled(false)
     }
     
     // ----------------------------------------------------------------------------
