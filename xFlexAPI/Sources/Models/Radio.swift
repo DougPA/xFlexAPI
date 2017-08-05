@@ -286,6 +286,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate var __psocMbPa100Version = ""                            // Power amplifier software version
     fileprivate var __psocMbtrxVersion = ""                              // System supervisor software version
     // R
+    fileprivate var __radioAuthenticated = false                         // SmartLink status
     fileprivate var __radioModel = ""                                    // Radio Model (e.g. FLEX-6500) (read only)
     fileprivate var __radioOptions = ""                                  // (read only)
     fileprivate var __radioScreenSaver = ""                              // (read only)
@@ -298,6 +299,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate var __rfPower = 0                                        // Power level (0 - 100)
     fileprivate var __rttyMark = 0                                       // RTTY mark default
     // S
+    fileprivate var __serverConnected = false                            // SmartLink status
     fileprivate var __smartSdrMB = ""                                    // Microburst main CPU software version
     fileprivate var __snapTuneEnabled = false                            // Snap tune enable
     fileprivate var __softwareVersion: String = ""                       // (read only)
@@ -447,21 +449,79 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // ----- remove all objects -----
         
         // clear all collections
+        //      NOTE: order is important
+        
+        for (_, audioStream) in _audioStreams {
+            // notify all observers
+            NC.post(.audioStreamWillBeRemoved, object: audioStream as Any?)
+        }
         audioStreams.removeAll()
-        equalizers.removeAll()
+        
+        for (_, iqStream) in _iqStreams {
+            // notify all observers
+            NC.post(.iqStreamWillBeRemoved, object: iqStream as Any?)
+        }
         iqStreams.removeAll()
-        memories.removeAll()
-        meters.removeAll()
+        
+        for (_, micAudioStream) in _micAudioStreams {
+            // notify all observers
+            NC.post(.micAudioStreamWillBeRemoved, object: micAudioStream as Any?)
+        }
         micAudioStreams.removeAll()
-        opusStreams.removeAll()
-        panadapters.removeAll()
-        profiles.removeAll()
-        replyHandlers.removeAll()
-        slices.removeAll()
-        tnfs.removeAll()
+        
+        for (_, txAudioStream) in _txAudioStreams {
+            // notify all observers
+            NC.post(.txAudioStreamWillBeRemoved, object: txAudioStream as Any?)
+        }
         txAudioStreams.removeAll()
-        usbCables.removeAll()
+
+        for (_, opusStream) in _opusStreams {
+            // notify all observers
+            NC.post(.opusWillBeRemoved, object: opusStream as Any?)
+        }
+        opusStreams.removeAll()
+        
+        for (_, tnf) in _tnfs {
+            // notify all observers
+            NC.post(.tnfWillBeRemoved, object: tnf as Any?)
+        }
+        tnfs.removeAll()
+
+        for (_, slice) in _slices {
+            // notify all observers
+            NC.post(.sliceWillBeRemoved, object: slice as Any?)
+        }
+        slices.removeAll()
+        
+        for (_, panadapter) in _panadapters {
+            
+            let waterfallId = panadapter.waterfallId
+            let waterfall = waterfalls[waterfallId]
+
+            // notify all observers
+            NC.post(.panadapterWillBeRemoved, object: panadapter as Any?)
+            
+            NC.post(.waterfallWillBeRemoved, object: waterfall as Any?)
+        }
+        panadapters.removeAll()
         waterfalls.removeAll()
+        
+        for (_, profile) in profiles {
+            // notify all observers
+            NC.post(.profileWillBeRemoved, object: profile as Any?)
+        }
+        profiles.removeAll()
+
+        equalizers.removeAll()
+        
+        memories.removeAll()
+        
+        meters.removeAll()
+        
+        replyHandlers.removeAll()
+
+        usbCables.removeAll()
+        
         xvtrs.removeAll()
         
         nickname = ""
@@ -944,6 +1004,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         case .usbCable:
             //      format:
             parseUsbCable( keyValuesArray(remainder))
+            
+        case .wan:
+            parseWan( keyValuesArray(remainder) )
             
         case .waveform:
             //      format: <key=value> <key=value> ...<key=value>
@@ -2234,6 +2297,41 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         // pass the remaining key values to the Usb Cable for parsing
         usbCables[usbCableId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         
+    }
+    /// Parse a Wan status message
+    ///
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
+    ///
+    private func parseWan(_ keyValues: KeyValuesArray) {
+        
+        // process each key/value pair, <key=value>
+        for kv in keyValues {
+            
+            // Check for Unknown token
+            guard let token = WanToken(rawValue: kv.key.lowercased())  else {
+                
+                // unknown Token, log it and ignore this token
+                _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                continue
+            }
+            // get the Bool versions of the value
+            let bValue = (kv.value).bValue()
+
+            // Known tokens, in alphabetical order
+            switch token {
+                
+            case .serverConnected:
+                willChangeValue(forKey: "serverConnected")
+                _serverConnected = bValue
+                didChangeValue(forKey: "serverConnected")
+                
+            case .radioAuthenticated:
+                willChangeValue(forKey: "radioAuthenticated")
+                _radioAuthenticated = bValue
+                didChangeValue(forKey: "radioAuthenticated")
+            }
+        }
     }
     /// Parse a Waveform status message
     ///
@@ -3662,6 +3760,10 @@ extension Radio {
         get { return _radioQ.sync { __psocMbtrxVersion } }
         set { _radioQ.sync(flags: .barrier) { __psocMbtrxVersion = newValue } } }
     
+    internal var _radioAuthenticated: Bool {
+        get { return _radioQ.sync { __radioAuthenticated } }
+        set { _radioQ.sync(flags: .barrier) { __radioAuthenticated = newValue } } }
+    
     internal var _radioModel: String {
         get { return _radioQ.sync { __radioModel } }
         set { _radioQ.sync(flags: .barrier) { __radioModel = newValue } } }
@@ -3705,6 +3807,10 @@ extension Radio {
     internal var _rttyMark: Int {
         get { return _radioQ.sync { __rttyMark } }
         set { _radioQ.sync(flags: .barrier) { __rttyMark = newValue } } }
+    
+    internal var _serverConnected: Bool {
+        get { return _radioQ.sync { __serverConnected } }
+        set { _radioQ.sync(flags: .barrier) { __serverConnected = newValue } } }
     
     internal var _smartSdrMB: String {
         get { return _radioQ.sync { __smartSdrMB } }
@@ -3969,6 +4075,9 @@ extension Radio {
     @objc dynamic public var psocMbtrxVersion: String {
         return _psocMbtrxVersion }
     
+    @objc dynamic public var radioAuthenticated: Bool {
+        return _radioAuthenticated }
+    
     @objc dynamic public var radioModel: String {
         return _radioModel }
     
@@ -3983,6 +4092,9 @@ extension Radio {
     
     @objc dynamic public var region: String {
         return _region }
+    
+    @objc dynamic public var serverConnected: Bool {
+        return _serverConnected }
     
     @objc dynamic public var smartSdrMB: String {
         return _smartSdrMB }
