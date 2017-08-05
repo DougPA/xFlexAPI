@@ -1016,6 +1016,7 @@ extension Radio {
         case turf
         case txAudioStream = "tx_audio_stream"
         case usbCable = "usb_cable"
+        case wan
         case waveform
         case xvtr
     }
@@ -1085,6 +1086,13 @@ extension Radio {
         case psocMbPa100 = "psoc-mbpa100"
         case psocMbTrx = "psoc-mbtrx"
         case smartSdrMB = "smartsdr-mb"
+    }
+    // ----------------------------------------------------------------------------
+    // MARK: - Wan
+    
+    internal enum WanToken: String {
+        case serverConnected = "server_connected"
+        case radioAuthenticated = "radio_authenticated"
     }
     // ----------------------------------------------------------------------------
     // MARK: - Waveform
