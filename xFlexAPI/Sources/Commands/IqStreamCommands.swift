@@ -3,7 +3,7 @@
 //  xFlexAPI
 //
 //  Created by Douglas Adams on 7/20/17.
-//  Copyright © 2017 Douglas Adams. All rights reserved.
+//  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
 import Foundation
@@ -19,8 +19,18 @@ extension IqStream {
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - KVO compliant (with message sent to Radio)
     
-        // ----- NONE -----
-        
+    @objc dynamic public var rate: Int {
+        get { return _rate }
+        set {
+            if _rate != newValue {
+                if newValue == 24000 || newValue == 48000 || newValue == 96000 || newValue == 192000 {
+                    _rate = newValue
+                    _radio?.send(kIqStreamCmd + "\(_daxIqChannel) " + IqStreamToken.rate.rawValue + "=\(_rate)")
+                }
+            }
+        }
+    }
+
     // ----------------------------------------------------------------------------
     // Mark: - Tokens for IqStream messages
     
@@ -28,11 +38,11 @@ extension IqStream {
         case available
         case capacity
         case daxIqChannel = "daxiq"
+        case inUse = "in_use"
         case ip
         case pan
         case port
         case rate
         case streaming
     }
-
 }

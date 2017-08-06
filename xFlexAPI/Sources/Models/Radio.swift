@@ -621,84 +621,78 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         connectionState = state
         
-//        DispatchQueue.main.async { [unowned self] in
-        
-            // take appropriate action
-            switch state {
-                
-            case .tcpConnected(let host, let port):
-                
-                // log it
-                _log.msg("TCP connected to Radio IP \(host), Port \(port)", level: .info, function: #function, file: #file, line: #line)
-                
-                // a tcp connection has been established
-                NC.post(.tcpDidConnect, object: nil)
-                
-                _tcp.readNext()
-                
-                // establish a UDP port for the Data Streams
-                _udp.bind(radioParameters: self.selectedRadio!)
-                
-            case .udpBound(let port):
-                
-                // UDP (streams) connection established, initialize the radio
-                _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
-                
-                NC.post(.udpDidBind, object: nil)
-                
-                // a UDP bind has been established
-                _udp.beginReceiving()
+        // take appropriate action
+        switch state {
             
-            case .clientConnected():
+        case .tcpConnected(let host, let port):
+            
+            // log it
+            _log.msg("TCP connected to Radio IP \(host), Port \(port)", level: .info, function: #function, file: #file, line: #line)
+            
+            // a tcp connection has been established
+            NC.post(.tcpDidConnect, object: nil)
+            
+            _tcp.readNext()
+            
+            // establish a UDP port for the Data Streams
+            _udp.bind(radioParameters: self.selectedRadio!)
+            
+        case .udpBound(let port):
+            
+            // UDP (streams) connection established, initialize the radio
+            _log.msg("UDP bound to Port \(port)", level: .info, function: #function, file: #file, line: #line)
+            
+            NC.post(.udpDidBind, object: nil)
+            
+            // a UDP bind has been established
+            _udp.beginReceiving()
+            
+        case .clientConnected():
+            
+            _log.msg("Client connection established", level: .verbose, function: #function, file: #file, line: #line)
+            
+            // maybe this is also possible for 1.x versions
+            if radioApiVersionMajor >= 2 {
                 
-                _log.msg("Client connection established", level: .verbose, function: #function, file: #file, line: #line)
+                // TODO: reply handler
                 
-                // DL3LSM: maybe this is also possible for 1.x versions
-                if radioApiVersionMajor >= 2 {
-                    
-                    // TODO: reply handler
-                    
-                    // From FlexLib:
-                    // When connecting to a WAN radio, the public IP address of the connected
-                    // client must be obtained from the radio.  This value is used to determine
-                    // if audio streams fromt the radio are meant for this client.
-                    // (IsAudioStreamStatusForThisClient() checks for LocalIP)
-                    send("client ip")
-                }
-                // send the initial commands
-                if !_connectSimple { self.sendCommandList(self.primaryCommandsArray) }
-                
-//                // TCP & UDP connections established, inform observers
-//                NC.post(.clientDidConnect, object: selectedRadio as Any?)
-                
-                // send the subscription commands
-                if !_connectSimple { sendCommandList(subscriptionCommandsArray) }
-                
-                // send the secondary commands
-                if !_connectSimple { sendCommandList(secondaryCommandsArray) }
-                
-                // tell the radio which UDP port number was selected for incoming UDP streams
-                send(Command.clientUdpPort.rawValue + "\(_udp.port)")
-                
-                // start pinging
-                if pingerEnabled { _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ) }
-
-                // TCP & UDP connections established, inform observers
-                NC.post(.clientDidConnect, object: selectedRadio as Any?)
-
-            case .disconnected(let reason):
-                
-                // TCP connection disconnected
-                _log.msg("Disconnected, reason = \(reason)", level: .error, function: #function, file: #file, line: #line)
-                
-                NC.post(.tcpDidDisconnect, object: reason)
-                
-            case .update( _, _):
-                
-                // FIXME: need to handle Update State ???
-                _log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
+                // From FlexLib:
+                // When connecting to a WAN radio, the public IP address of the connected
+                // client must be obtained from the radio.  This value is used to determine
+                // if audio streams fromt the radio are meant for this client.
+                // (IsAudioStreamStatusForThisClient() checks for LocalIP)
+                send("client ip")
             }
-//        }
+            // send the initial commands
+            if !_connectSimple { self.sendCommandList(self.primaryCommandsArray) }
+            
+            // send the subscription commands
+            if !_connectSimple { sendCommandList(subscriptionCommandsArray) }
+            
+            // send the secondary commands
+            if !_connectSimple { sendCommandList(secondaryCommandsArray) }
+            
+            // tell the radio which UDP port number was selected for incoming UDP streams
+            send(Command.clientUdpPort.rawValue + "\(_udp.port)")
+            
+            // start pinging
+            if pingerEnabled { _pinger = Pinger(tcpManager: _tcp, pingQ: _pingQ) }
+            
+            // TCP & UDP connections established, inform observers
+            NC.post(.clientDidConnect, object: selectedRadio as Any?)
+            
+        case .disconnected(let reason):
+            
+            // TCP connection disconnected
+            _log.msg("Disconnected, reason = \(reason)", level: .error, function: #function, file: #file, line: #line)
+            
+            NC.post(.tcpDidDisconnect, object: reason)
+            
+        case .update( _, _):
+            
+            // FIXME: need to handle Update State ???
+            _log.msg("Update in process", level: .info, function: #function, file: #file, line: #line)
+        }
     }
     // --------------------------------------------------------------------------------
     // MARK: - First level parser
@@ -983,7 +977,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .stream:
             //     format: <streamId> <key=value> <key=value> ...<key=value>
-            parseStream( keyValuesArray(remainder))
+            parseStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
             
         case .tnf:
             //     format: <tnfId> <key=value> <key=value> ...<key=value>
@@ -1947,17 +1941,28 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     /// - Parameters:
     ///   - keyValues:      a KeyValuesArray
     ///
-    private func parseStream(_ keyValues: KeyValuesArray) {
+    private func parseStream(_ keyValues: KeyValuesArray, notInUse: Bool) {
         // Format: <streamId, > <"daxiq", value> <"pan", panStreamId> <"rate", value> <"ip", ip> <"port", port> <"streaming", 1|0> ,"capacity", value> <"available", value>
         
         //get the StreamId (remove the "0x" prefix)
         let streamId = String(keyValues[0].key.characters.dropFirst(2))
         
-        // does the Stream exist?
-        if iqStreams[streamId] == nil {
+        // should the Stream be removed?
+        if notInUse {
             
-            // NO, create a new Stream & add it to the Streams collection
-            iqStreams[streamId] = IqStream(radio: self, id: streamId, queue: _iqStreamQ)
+            // YES, notify all observers
+            NC.post(.iqStreamWillBeRemoved, object: iqStreams[streamId] as Any?)
+            
+            // YES
+            iqStreams[streamId] = nil
+
+        } else {
+            // does the Stream exist?
+            if iqStreams[streamId] == nil {
+                
+                // NO, create a new Stream & add it to the Streams collection
+                iqStreams[streamId] = IqStream(radio: self, id: streamId, queue: _iqStreamQ)
+            }
         }
         // pass the remaining key values to the IqStream for parsing
         iqStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
@@ -2433,6 +2438,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             // return it
             panadapter = pan
+            break
         }
         
         return panadapter
@@ -3394,7 +3400,16 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     ///
     public func daxIqVitaHandler(_ vitaPacket: Vita) {
         
-        // TODO: Add code
+        if let iqStream = iqStreams[vitaPacket.streamId] {
+            
+            // IQ Audio Stream
+            iqStream.vitaHandler(vitaPacket)
+            
+        } else {
+            
+            // Unknown
+            _log.msg("Received vita dax iq packet but no stream existing: \(vitaPacket.desc())", level: .error, function: #function, file: #file, line: #line)
+        }
     }
 }
 
@@ -4247,7 +4262,6 @@ extension Radio {
     
     public typealias CommandTuple = (command: String, diagnostic: Bool, replyHandler: ReplyHandler?)
     public typealias AntennaPort = String
-    public typealias AudioStreamId = String
     public typealias DaxStreamId = String
     public typealias DaxChannel = Int
     public typealias DaxIqChannel = Int

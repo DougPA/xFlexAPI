@@ -3,7 +3,7 @@
 //  xFlexAPI
 //
 //  Created by Douglas Adams on 1/4/17.
-//  Copyright © 2017 Douglas Adams. All rights reserved.
+//  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
 import Foundation
@@ -32,7 +32,7 @@ public enum NotificationType : String {
     
     case guiConnectionEstablished
     
-    case iqStreamInitialized
+    case iqStreamHasBeenAdded 
     case iqStreamWillBeRemoved
     
     case memoryHasBeenAdded

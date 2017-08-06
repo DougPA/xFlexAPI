@@ -3,7 +3,7 @@
 //  xFlexAPI
 //
 //  Created by Douglas Adams on 7/14/17.
-//  Copyright © 2017 Douglas Adams. All rights reserved.
+//  Copyright © 2017 Douglas Adams & Mario Illgen. All rights reserved.
 //
 
 import Foundation
@@ -212,6 +212,11 @@ extension Radio {
     ///
     public func iqStreamRemove(_ id: String, callback: ReplyHandler? = nil) {
         send(kStreamRemoveCmd + "0x\(id)", replyTo: callback)
+
+        // notify all observers
+        NC.post(.iqStreamWillBeRemoved, object: iqStreams[id])
+        
+        iqStreams[id] = nil
     }
     
     // MARK: --- Memory ---
@@ -251,7 +256,7 @@ extension Radio {
     ///
     /// - Parameter id:         Mic Audio Stream Id
     ///
-    public func micAudioStreamRemove(id: String, callback: ReplyHandler? = nil) {
+    public func micAudioStreamRemove(_ id: String, callback: ReplyHandler? = nil) {
         send(kStreamRemoveCmd + "0x\(id)", replyTo: callback)
     }
     

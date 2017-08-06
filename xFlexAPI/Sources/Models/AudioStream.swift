@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-public protocol AudioStreamHandler {
+public protocol AudioStreamHandler: class {
     
     // method to process audio data stream
     func audioStreamHandler(_ frame: AudioStreamFrame) -> Void
@@ -58,7 +58,7 @@ public final class AudioStream: NSObject {
     fileprivate var __rxGain = 50                       // rx gain of stream                            //
     fileprivate var __slice: xFlexAPI.Slice?            // Source Slice                                 //
     //                                                                                                  //
-    fileprivate var _delegate: AudioStreamHandler?      // Delegate for Audio stream                    //
+    fileprivate weak var _delegate: AudioStreamHandler? // Delegate for Audio stream                    //
     //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
@@ -138,10 +138,9 @@ public final class AudioStream: NSObject {
                 //_slice = _radio?.findSliceBy( daxChannel: iValue)     DL3LSM
                 _slice = _radio?.slices[kv.value]
                 didChangeValue(forKey: "slice")
-                let gain = _rxGain;
-                _rxGain = 0;
-                rxGain = gain;
-                
+                let gain = _rxGain
+                _rxGain = 0
+                rxGain = gain
             }
         }
         // if this is not yet initialized and inUse becomes true
@@ -336,13 +335,7 @@ extension AudioStream {
 
     @objc dynamic public var slice: xFlexAPI.Slice? {
         get { return _slice }
-        set {
-            if _slice != newValue {
-                _slice = newValue
-                // resend the RX Gain for the new slice - removed DL3LSM
-            }
-        }
-    }
+        set { if _slice != newValue { _slice = newValue } } }
 
     // ----------------------------------------------------------------------------
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization

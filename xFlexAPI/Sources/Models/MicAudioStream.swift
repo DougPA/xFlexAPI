@@ -8,7 +8,7 @@
 
 import Cocoa
 
-public protocol MicAudioStreamHandler {
+public protocol MicAudioStreamHandler: class {
     
     // method to process audio data stream
     func micAudioStreamHandler(_ frame: MicAudioStreamFrame) -> Void
@@ -52,7 +52,7 @@ public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     fileprivate var __micGain = 50                      // rx gain of stream                            //
     fileprivate var __micGainScalar: Float = 1.0        // scalar gain value for multiplying            //
                                                                                                         //
-    fileprivate var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream                    //
+    fileprivate weak var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream               //
     //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
         
