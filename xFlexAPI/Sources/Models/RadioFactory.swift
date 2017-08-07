@@ -26,7 +26,6 @@ public final class RadioFactory: NSObject, GCDAsyncUdpSocketDelegate {
     // ----------------------------------------------------------------------------
     // MARK: - Private properties
     
-    fileprivate var _notSeenInterval: TimeInterval = 3.0    // Interval that represents a timeout
     fileprivate var _udpSocket: GCDAsyncUdpSocket?          // socket to receive broadcasts
     fileprivate var _timeoutTimer: DispatchSourceTimer!     // timer fired every "checkInterval"
     fileprivate var _availableRadios =                      // Radios identified by IP Address
