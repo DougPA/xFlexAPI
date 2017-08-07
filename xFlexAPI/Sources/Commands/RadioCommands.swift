@@ -997,6 +997,7 @@ extension Radio {
     // MARK: - Status
     
     internal enum StatusToken : String {
+        case amplifier
         case audioStream = "audio_stream"
         case atu
         case client

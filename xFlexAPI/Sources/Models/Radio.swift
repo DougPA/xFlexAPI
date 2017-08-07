@@ -134,6 +134,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     fileprivate let _pingQ =            DispatchQueue(label: kApiId + ".pingQ")
     
     // GCD Concurrent Queues
+    fileprivate let _amplifierQ =       DispatchQueue(label: kApiId + ".amplifierQ", attributes: [.concurrent])
     fileprivate let _audioStreamQ =     DispatchQueue(label: kApiId + ".audioStreamQ", attributes: [.concurrent])
     fileprivate let _cwxQ =             DispatchQueue(label: kApiId + ".cwxQ", attributes: [.concurrent])
     fileprivate let _equalizerQ =       DispatchQueue(label: kApiId + ".equalizerQ", attributes: [.concurrent])
@@ -166,6 +167,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     //
     fileprivate var _connectionState = ConnectionState.disconnected(reason: .closed)  //
     // object collections
+    fileprivate var _amplifiers = [AmplifierId: Amplifier]()             // Dictionary of Amplifiers
     fileprivate var _audioStreams = [DaxStreamId: AudioStream]()         // Dictionary of Audio streams
     fileprivate var _equalizers = [EqualizerType: Equalizer]()           // Dictionary of Equalizers
     fileprivate var _iqStreams = [DaxStreamId: IqStream]()               // Dictionary of Dax Iq streams
@@ -846,13 +848,18 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             _log.msg("Unknown token - \(msgType)", level: .warning, function: #function, file: #file, line: #line)
             return
         }
+
         
-        // FIXME: file, mixer, stream, turf, usbCable & xvtr Not currently implemented
+        // FIXME: file, mixer & turf Not currently implemented
         
         
         // Known Message Types, in alphabetical order
         switch token {
             
+        case .amplifier:
+            //      format:
+            parseAmplifier(remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
+
         case .audioStream:
             //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
             parseAudioStream(remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
@@ -1017,8 +1024,38 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
     //      Note: All are executed on the parseQ
     // --------------------------------------------------------------------------------
     
-    // FIXME: Should parsers ignore Status message sent to other connection handles?
-    
+    /// Parse an Amplifier status message
+    ///
+    /// - Parameters:
+    ///   - keyValues:      a KeyValuesArray
+    ///   - notInUse:       true = "in_use=0", otherwise false
+    ///
+    private func parseAmplifier(_ keyValues: KeyValuesArray, notInUse: Bool) {
+        // Format:
+        
+//        //get the AmplifierId (remove the "0x" prefix)
+//        let streamId = String(keyValues[0].key.characters.dropFirst(2))
+//        
+//        // should the Amplifier be removed?
+//        if notInUse {
+//            
+//            // YES, notify all observers
+//            NC.post(.amplifierWillBeRemoved, object: amplifiers[streamId] as Any?)
+//            
+//            amplifiers[streamId] = nil
+//            
+//        } else {
+//            
+//            // does the Amplifier exist?
+//            if amplifiers[streamId] == nil {
+//                
+//                // NO, create a new AudioStream & add it to the AudioStreams collection
+//                amplifiers[streamId] = Amplifier(radio: self, id: streamId, queue: _amplifierQ)
+//            }
+//            // pass the remaining key values to the Amplifier for parsing
+//            amplifiers[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
+//        }
+    }
     /// Parse an AudioStream status message
     ///
     /// - Parameters:
@@ -4145,6 +4182,10 @@ extension Radio {
     // MARK: - Public properties - NON KVO compliant Setters / Getters with synchronization
     
     // collections
+    public var amplifiers: [AmplifierId: Amplifier] {
+        get { return _objectQ.sync { _amplifiers } }
+        set { _objectQ.sync(flags: .barrier) { _amplifiers = newValue } } }
+    
     public var audioStreams: [DaxStreamId: AudioStream] {
         get { return _objectQ.sync { _audioStreams } }
         set { _objectQ.sync(flags: .barrier) { _audioStreams = newValue } } }
@@ -4261,6 +4302,7 @@ extension Radio {
     // MARK: - Type Alias (alphabetical)
     
     public typealias CommandTuple = (command: String, diagnostic: Bool, replyHandler: ReplyHandler?)
+    public typealias AmplifierId = String
     public typealias AntennaPort = String
     public typealias DaxStreamId = String
     public typealias DaxChannel = Int

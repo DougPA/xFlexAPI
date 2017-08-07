@@ -19,6 +19,9 @@ public typealias NC = NotificationCenter
 //
 public enum NotificationType : String {
     
+    case amplifierHasBeenAdded
+    case amplifierWillBeRemoved
+
     case audioStreamHasBeenAdded
     case audioStreamWillBeRemoved
     

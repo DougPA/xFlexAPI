@@ -55,6 +55,8 @@
 		91B9F8121ED9212200F7799D /* GCDAsyncUdpSocket.h in Headers */ = {isa = PBXBuildFile; fileRef = 91B9F80B1ED9203300F7799D /* GCDAsyncUdpSocket.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C831001EFF4FA100836BE9 /* Xvtr.swift */; };
 		91C831031F001D0500836BE9 /* UsbCable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C831021F001D0500836BE9 /* UsbCable.swift */; };
+		91D9C7681F38985C004308CC /* Amplifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D9C7671F38985C004308CC /* Amplifier.swift */; };
+		91D9C76A1F3899E8004308CC /* AmplifierCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D9C7691F3899E8004308CC /* AmplifierCommands.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -108,6 +110,8 @@
 		91B9F80C1ED9203300F7799D /* GCDAsyncUdpSocket.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = GCDAsyncUdpSocket.m; sourceTree = "<group>"; };
 		91C831001EFF4FA100836BE9 /* Xvtr.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Xvtr.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91C831021F001D0500836BE9 /* UsbCable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = UsbCable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
+		91D9C7671F38985C004308CC /* Amplifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Amplifier.swift; sourceTree = "<group>"; };
+		91D9C7691F3899E8004308CC /* AmplifierCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmplifierCommands.swift; path = Sources/Commands/AmplifierCommands.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -124,6 +128,7 @@
 		915817EF1F204B2300FA6382 /* Commands */ = {
 			isa = PBXGroup;
 			children = (
+				91D9C7691F3899E8004308CC /* AmplifierCommands.swift */,
 				9158180A1F20FD8700FA6382 /* AudioStreamCommands.swift */,
 				915818081F20FB7700FA6382 /* CwxCommands.swift */,
 				9158180C1F20FFEC00FA6382 /* EqualizerCommands.swift */,
@@ -202,6 +207,7 @@
 		91B9F7CB1ED9170B00F7799D /* Models */ = {
 			isa = PBXGroup;
 			children = (
+				91D9C7671F38985C004308CC /* Amplifier.swift */,
 				91B9F7CC1ED9170B00F7799D /* AudioStream.swift */,
 				91B9F7CD1ED9170B00F7799D /* Cwx.swift */,
 				91B9F7CE1ED9170B00F7799D /* Equalizer.swift */,
@@ -348,6 +354,7 @@
 				91B9F7FD1ED9170B00F7799D /* Pinger.swift in Sources */,
 				91B9F7F71ED9170B00F7799D /* Radio.swift in Sources */,
 				91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */,
+				91D9C7681F38985C004308CC /* Amplifier.swift in Sources */,
 				915818031F20F7A600FA6382 /* MeterCommands.swift in Sources */,
 				915818001F204B4600FA6382 /* WaterfallCommands.swift in Sources */,
 				91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */,
@@ -355,6 +362,7 @@
 				91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */,
 				91B9F7F01ED9170B00F7799D /* IqStream.swift in Sources */,
 				915818071F20FAEC00FA6382 /* IqStreamCommands.swift in Sources */,
+				91D9C76A1F3899E8004308CC /* AmplifierCommands.swift in Sources */,
 				91B9F7EC1ED9170B00F7799D /* RadioParameters.swift in Sources */,
 				915817FB1F204B4600FA6382 /* PanadapterCommands.swift in Sources */,
 				915817FC1F204B4600FA6382 /* RadioCommands.swift in Sources */,
