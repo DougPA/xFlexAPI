@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-public protocol PanadapterStreamHandler {
+public protocol PanadapterStreamHandler: class {
     
     // method to process Panadapter data stream
     func panadapterStreamHandler(_ frame: PanadapterFrame) -> Void
@@ -85,8 +85,8 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
     fileprivate var __wnbLevel = 0                              // Wideband noise blanking level        //
     fileprivate var __wnbUpdating = false                       // WNB is updating                      //
     fileprivate var __xvtrLabel = ""                            // Label of selected XVTR profile       //
-                                                                                                        //
-    fileprivate var _delegate: PanadapterStreamHandler?         // Delegate for Panadapter stream       //
+    //                                                                                                  //
+    fileprivate weak var _delegate: PanadapterStreamHandler?    // Delegate for Panadapter stream       //
     //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     

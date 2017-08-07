@@ -11,7 +11,7 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-public protocol OpusStreamHandler {
+public protocol OpusStreamHandler: class {
     
     // method to process Opus data stream
     func opusStreamHandler(_ frame: OpusFrame) -> Void    
@@ -62,8 +62,8 @@ public final class Opus : NSObject, KeyValueParser, VitaHandler {
     fileprivate var __remoteRxOn = false                // Opus for receive                             //
     fileprivate var __remoteTxOn = false                // Opus for transmit                            //
     fileprivate var __rxStreamStopped = false           // Rx stream stopped                            //
-                                                                                                        //
-    fileprivate var _delegate: OpusStreamHandler?  {    // Delegate to receive Opus Data                //
+    //                                                                                                  //
+    fileprivate weak var _delegate: OpusStreamHandler? {    // Delegate for Opus Data Stream            //
         didSet { if _delegate == nil { _initialized = false ; rxSeq = nil } } }                         //
     //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------

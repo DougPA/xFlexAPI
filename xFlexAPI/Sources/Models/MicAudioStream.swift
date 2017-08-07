@@ -51,7 +51,7 @@ public final class MicAudioStream: NSObject, KeyValueParser, VitaHandler {
     fileprivate var __port = 0                          // Port number                                  //
     fileprivate var __micGain = 50                      // rx gain of stream                            //
     fileprivate var __micGainScalar: Float = 1.0        // scalar gain value for multiplying            //
-                                                                                                        //
+    //                                                                                                  //
     fileprivate weak var _delegate: MicAudioStreamHandler?   // Delegate for Audio stream               //
     //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------

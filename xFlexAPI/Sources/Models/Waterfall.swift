@@ -11,8 +11,8 @@ import Foundation
 // --------------------------------------------------------------------------------
 // MARK: - Protocols
 
-public protocol WaterfallStreamHandler
-{
+public protocol WaterfallStreamHandler: class {
+    
     // method to process Waterfall data stream
     func waterfallStreamHandler(_ dataFrame: WaterfallFrame ) -> Void
 }
@@ -46,7 +46,6 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     
     fileprivate var _initialized = false                    // True if initialized by Radio hardware
     fileprivate var _waterfallQ: DispatchQueue              // GCD queue that guards this object
-    fileprivate var _delegate: WaterfallStreamHandler?      // Delegate for Waterfall stream
     fileprivate let _log = Log.sharedInstance               // shared log
     
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
@@ -58,6 +57,8 @@ public final class Waterfall : NSObject, KeyValueParser, VitaHandler {
     fileprivate var __gradientIndex = 0                     // Index of selected color gradient         //
     fileprivate var __lineDuration = 0                      // Line duration (milliseconds)             //
     fileprivate var __panadapterId = ""                     // Panadaptor above this waterfall          //
+    //                                                                                                  //
+    fileprivate weak var _delegate: WaterfallStreamHandler? // Delegate for Waterfall stream            //
     //                                                                                                  //
     // ----- Backing properties - SHOULD NOT BE ACCESSED DIRECTLY, USE PUBLICS IN THE EXTENSION ------
     
