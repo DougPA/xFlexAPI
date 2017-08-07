@@ -127,7 +127,7 @@ public final class Panadapter : NSObject, KeyValueParser, VitaHandler {
             return
         }
         // parse out the values
-        let rfGainInfo = radio!.valuesArray(reply, delimiter: ",")
+        let rfGainInfo = reply.valuesArray( delimiter: "," )
         _rfGainLow = rfGainInfo[0].iValue()
         _rfGainHigh = rfGainInfo[1].iValue()
         _rfGainStep = rfGainInfo[2].iValue()

@@ -55,7 +55,7 @@ public struct Vita {
     // Vita Data packet into a Vita struct.
     
     // ----------------------------------------------------------------------------
-    // MARK: - Public properties
+    // MARK: - Internal properties
     
     // filled with defaults, values are changed when created
     //      Types are shown for clarity
@@ -80,6 +80,11 @@ public struct Vita {
     var trailer: UInt32 = 0                                             // Trailer, 4 bytes (if used)
     var headerSize: Int = MemoryLayout<VitaHeader>.size                 // Header size (bytes)
     
+    // ----------------------------------------------------------------------------
+    // MARK: - Private properties
+    
+    fileprivate let _log = Log.sharedInstance                            // shared log
+
     /// Initialize this Vita struct with the defaults above
     ///
     init() {
@@ -349,61 +354,70 @@ public struct Vita {
         if classIdPresent && classCode == .discovery {
             
             // YES, Payload is a series of strings of the form <key=value> separated by ' ' (space)
-            let tokenData = NSString(bytes: payload!, length: payloadSize, encoding: String.Encoding.ascii.rawValue)!
-            let keyValuePairs = tokenData.components(separatedBy: " ")
+            let payloadData = NSString(bytes: payload!, length: payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
             
-            // enumerate all of the "key=value" pairs
-            for keyValuePair in keyValuePairs {
-                let keysAndValues = keyValuePair.components(separatedBy: "=")
+            // parse into a KeyValuesArray
+            let keyValues = payloadData.keyValuesArray()
+            
+            // process each key/value pair, <key=value>
+            for kv in keyValues {
                 
-                // skip any invalid pair
-                if keysAndValues.count < 2 {
-                    assert(true, "Malformed VITA Token received in Discovery packet")
+                // check for unknown keys
+                guard let token = DiscoveryToken(rawValue: kv.key.lowercased()) else {
+                    
+                    // unknown Key, log it and ignore the Key
+                    _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
                     continue
                 }
-                let value = keysAndValues[1] as String
+                // get the Integer version of the value
+                let iValue = (kv.value).iValue()
                 
-                // parse the key and set the appropriate value
-                if let token = DiscoveryToken(rawValue: (keysAndValues[0] as String).lowercased()) {
+                switch token {
                     
-                    switch token {
-                        
-                    case .ip:
-                        params.ipAddress = value
-                        
-                    case .port:
-                        params.port = Int(value) ?? 0
-                        
-                    case .model:
-                        params.model = value
-                        
-                    case .serial:
-                        params.serialNumber = value
-                        
-                    case .name:
-                        params.name = value
-                        
-                    case .callsign:
-                        params.callsign = value
-                        
-                    case .protocolVersion:
-                        params.protocolVersion = value
-                        
-                    case .version:
-                        params.firmwareVersion = value
-                        
-                    case .status:
-                        params.status = value
-                        
-                    case .nickname:
-                        params.nickname = value
-                        
-                    case .inUseIp:
-                        params.inUseIp = value
-                        
-                    case .inUseHost:
-                        params.inUseHost = value
-                    }
+                case .callsign:
+                    params.callsign = kv.value
+                    
+                case .inUseHost:
+                    params.inUseHost = kv.value
+                case .inUseIp:
+                    params.inUseIp = kv.value
+                    
+                case .ip:
+                    params.ipAddress = kv.value
+                    
+                case .maxLicensedVersion:
+                    params.maxLicensedVersion = kv.value
+                    
+                case .model:
+                    params.model = kv.value
+                    
+                case .name:
+                    params.name = kv.value
+                    
+                case .nickname:
+                    params.nickname = kv.value
+                    
+                case .port:
+                    params.port = iValue 
+                    
+                case .protocolVersion:
+                    params.protocolVersion = kv.value
+                    
+                case .radioLicenseId:
+                    params.radioLicenseId = kv.value
+                    
+                case .requiresAdditionalLicense:
+                    params.requiresAdditionalLicense = kv.value
+                    
+                case .serial:
+                    params.serialNumber = kv.value
+                    
+                case .status:
+                    params.status = kv.value
+                    
+                case .version:
+                    params.firmwareVersion = kv.value
+                    
                 }
             }
             // is it a valid Discovery packet?
@@ -461,18 +475,21 @@ extension Vita {
     static let kTrailerPresentMask: UInt8 = 0x04
 
     enum DiscoveryToken : String {          // Discovery tokens
-        case ip
-        case port
-        case model
-        case serial
-        case name
         case callsign
-        case protocolVersion = "discovery_protocol_version"
-        case version
-        case status
-        case nickname
-        case inUseIp = "inuse_ip"
         case inUseHost = "inuse_host"
+        case inUseIp = "inuse_ip"
+        case ip
+        case maxLicensedVersion = "max_licensed_version"
+        case model
+        case name
+        case nickname
+        case port
+        case protocolVersion = "discovery_protocol_version"
+        case radioLicenseId = "radio_license_id"
+        case requiresAdditionalLicense = "requires_additional_license"
+        case serial
+        case status
+        case version
     }
     public enum PacketType : UInt8 {        // Packet Type
         case ifData = 0x00

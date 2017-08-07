@@ -855,11 +855,11 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .audioStream:
             //      format: <AudioStreamId> <key=value> <key=value> ...<key=value>
-            parseAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseAudioStream(remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
             
         case .atu:
             //      format: <key=value> <key=value> ...<key=value>
-            parseAtu( keyValuesArray(remainder))
+            parseAtu( remainder.keyValuesArray())
             
         case .client:
             //      kv                0         1            2
@@ -868,7 +868,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
             var isMyHandle = false
             
-            let keyValues = keyValuesArray(remainder)
+            let keyValues = remainder.keyValuesArray()
             
             guard keyValues.count >= 2 else {
                 
@@ -904,17 +904,17 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .cwx:
             // replace some characters to avoid parsing conflicts
-            parseCwx( keyValuesArray(fixString(remainder )))
+            parseCwx( fixString(remainder ).keyValuesArray() )
             
         case .daxiq:
             //      format: <daxChannel> <key=value> <key=value> ...<key=value>
-            //            parseDaxiq( keyValuesArray(remainder))
+            //            parseDaxiq( remainder.keyValuesArray())
             
             break // obsolete token, included to prevent log messages
             
         case .display:
             //     format: <displayType> <streamId> <key=value> <key=value> ...<key=value>
-            parseDisplay( keyValuesArray(remainder), notInUse: remainder.contains("removed"))
+            parseDisplay( remainder.keyValuesArray(), notInUse: remainder.contains("removed"))
             
         case .eq:
             //      format: txsc <key=value> <key=value> ...<key=value>
@@ -923,7 +923,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             // ignore old formats ("tx" & "rx")
             if remainder.contains("txsc") || remainder.contains("rxsc") {
                 
-                parseEqualizer( keyValuesArray(remainder) )
+                parseEqualizer( remainder.keyValuesArray() )
             }
             
         case .file:
@@ -932,23 +932,23 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .gps:
             //     format: <key=value>#<key=value>#...<key=value>
-            parseGps( keyValuesArray(remainder, delimiter: "#"))
+            parseGps( remainder.keyValuesArray(delimiter: "#") )
             
         case .interlock:
             //      format: <key=value> <key=value> ...<key=value>
-            parseInterlock( keyValuesArray(remainder))
+            parseInterlock( remainder.keyValuesArray())
             
         case .memory:
             //      format: <memoryId> <key=value>,<key=value>,...<key=value>
-            parseMemory( keyValuesArray(remainder), notInUse: remainder.contains("removed"))
+            parseMemory( remainder.keyValuesArray(), notInUse: remainder.contains("removed"))
             
         case .meter:
             //     format: <meterNumber.key=value>#<meterNumber.key=value>#...<meterNumber.key=value>
-            parseMeter( keyValuesArray(remainder, delimiter: "#"), notInUse: remainder.contains("removed"))
+            parseMeter( remainder.keyValuesArray(delimiter: "#"), notInUse: remainder.contains("removed"))
             
         case .micAudioStream:
             //      format: <MicAudioStreamId> <key=value> <key=value> ...<key=value>
-            parseMicAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseMicAudioStream( remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
             
         case .mixer:
             
@@ -956,7 +956,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .opusStream:
             //     format: <opusId> <key=value> <key=value> ...<key=value>
-            parseOpus( keyValuesArray(remainder))
+            parseOpus( remainder.keyValuesArray())
             
         case .profile:
             //     format: global list=<value>^<value>^...<value>^
@@ -965,27 +965,27 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             //     format: tx current=<value>
             //     format: mic list=<value>^<value>^...<value>^
             //     format: mic current=<value>
-            parseProfile( keyValuesArray(remainder))
+            parseProfile( remainder.keyValuesArray())
             
         case .radio:
             //     format: <key=value> <key=value> ...<key=value>
-            parseRadio( keyValuesArray(remainder))
+            parseRadio( remainder.keyValuesArray())
             
         case .slice:
             //     format: <sliceId> <key=value> <key=value> ...<key=value>
-            parseSlice( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseSlice( remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
             
         case .stream:
             //     format: <streamId> <key=value> <key=value> ...<key=value>
-            parseStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseStream( remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
             
         case .tnf:
             //     format: <tnfId> <key=value> <key=value> ...<key=value>
-            parseTnf( keyValuesArray(remainder))
+            parseTnf( remainder.keyValuesArray())
             
         case .transmit:
             //      format: <key=value> <key=value> ...<key=value>
-            parseTransmit( keyValuesArray(remainder))
+            parseTransmit( remainder.keyValuesArray())
             
         case .turf:
             
@@ -993,22 +993,22 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case .txAudioStream:
             //      format: <TxAudioStreamId> <key=value> <key=value> ...<key=value>
-            parseTxAudioStream( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseTxAudioStream( remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
             
         case .usbCable:
             //      format:
-            parseUsbCable( keyValuesArray(remainder))
+            parseUsbCable( remainder.keyValuesArray())
             
         case .wan:
-            parseWan( keyValuesArray(remainder) )
+            parseWan( remainder.keyValuesArray() )
             
         case .waveform:
             //      format: <key=value> <key=value> ...<key=value>
-            parseWaveform( keyValuesArray(remainder))
+            parseWaveform( remainder.keyValuesArray())
             
         case .xvtr:
             //      format: <name> <key=value> <key=value> ...<key=value>
-            parseXvtr( keyValuesArray(remainder), notInUse: remainder.contains("in_use=0"))
+            parseXvtr( remainder.keyValuesArray(), notInUse: remainder.contains("in_use=0"))
         }
     }
     
@@ -1624,7 +1624,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         //      OR
         // Format:  <profileType, > <"current", value>
         
-        let values = valuesArray(keyValues[1].value, delimiter: "^")
+        let values = keyValues[1].value.valuesArray( delimiter: "^" )
         
         // determine the type of Profile & save it
         if let profileType = ProfileToken(rawValue: keyValues[0].key.lowercased()), let subType = ProfileSubType(rawValue: keyValues[1].key.lowercased()) {
@@ -2625,23 +2625,23 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case kInfoCmd:
             // process the reply
-            parseInfoReply(keyValuesArray(reply))
+            parseInfoReply( reply.keyValuesArray() )
             
         case kAntListCmd:
             // save the list
-            antennaList = valuesArray(reply, delimiter: ",")
+            antennaList = reply.valuesArray( delimiter: "," )
             
         case kMeterListCmd:
             // process the reply
-            parseMeterListReply(reply)
+            parseMeterListReply( reply )
             
         case kMicListCmd:
             // save the list
-            micList = valuesArray(reply, delimiter: ",")
+            micList = reply.valuesArray(  delimiter: "," )
             
         case kSliceListCmd:
             // save the list
-            sliceList = valuesArray(reply)
+            sliceList = reply.valuesArray()
             
         case kRadioUptimeCmd:
             // save the returned Uptime (seconds)
@@ -2649,7 +2649,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             
         case kVersionCmd:
             // process the reply
-            parseVersionReply(keyValuesArray(reply, delimiter: "#"))
+            parseVersionReply( reply.keyValuesArray(delimiter: "#") )
             
         default:
             
@@ -2689,7 +2689,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
             } else if command.hasPrefix(kSliceCmd + "get_error"){
                 
                 // save the errors, format: <rx_error_value>,<tx_error_value>
-                sliceErrors = valuesArray(reply, delimiter: ",")
+                sliceErrors = reply.valuesArray( delimiter: "," )
                 
             } else {
                 _log.msg(command + ", unprocessed reply - \(reply)", level: .error, function: #function, file: #file, line: #line)
@@ -2835,7 +2835,7 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         
         // drop the "meter " string
         let meters = String(reply.characters.dropFirst(6))
-        let keyValues = keyValuesArray(meters, delimiter: "#")
+        let keyValues = meters.keyValuesArray(delimiter: "#")
         
         var meterKeyValues = KeyValuesArray()
         
@@ -3114,47 +3114,47 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
         }
         return filterDict
     }
-    /// Parse a String of <key=value>'s separated by the given Delimiter
-    ///
-    /// - Parameters:
-    ///   - keyValueString:     String containing the key value pairs & delimiters
-    ///   - delimiter:          the delimiter between key values (defaults to space)
-    /// - Returns:              a KeyValues array
-    ///
-    private func keyValuesArray(_ keyValueString: String?, delimiter: String = " ") -> KeyValuesArray {
-        var kvArray = KeyValuesArray()
-        
-        // make sure the string isn't nil
-        guard let keyValueString = keyValueString else { return kvArray }
-        
-        // split it into an array of <key=value> values
-        let keyAndValues = keyValueString.components(separatedBy: delimiter)
-        
-        for index in 0..<keyAndValues.count {
-            // separate each entry into a Key and a Value
-            let kv = keyAndValues[index].components(separatedBy: "=")
-            
-            // when "delimiter" is last character there will be an empty entry, don't include it
-            if kv[0] != "" {
-                // if no "=", set value to empty String (helps with strings with a prefix to KeyValues)
-                // make sure there are no whitespaces before or after the entries
-                if kv.count == 1 { kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),"") ) }
-                if kv.count == 2 { kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),kv[1].trimmingCharacters(in: NSCharacterSet.whitespaces)) ) }
-            }
-        }
-        return kvArray
-    }
-    /// Parse a String of <value>'s separated by the given Delimiter
-    ///
-    /// - Parameters:
-    ///   - valueString:    String containing the values & delimiters
-    ///   - delimiter:      the delimiter between values (defaults to space)
-    /// - Returns:          a values array
-    ///
-    func valuesArray(_ valuesString: String, delimiter: String = " ") -> ValuesArray {
-        
-        return valuesString.components(separatedBy: delimiter)
-    }
+//    /// Parse a String of <key=value>'s separated by the given Delimiter
+//    ///
+//    /// - Parameters:
+//    ///   - keyValueString:     String containing the key value pairs & delimiters
+//    ///   - delimiter:          the delimiter between key values (defaults to space)
+//    /// - Returns:              a KeyValues array
+//    ///
+//    static func keyValuesArray(_ keyValueString: String?, delimiter: String = " ") -> KeyValuesArray {
+//        var kvArray = KeyValuesArray()
+//        
+//        // make sure the string isn't nil
+//        guard let keyValueString = keyValueString else { return kvArray }
+//        
+//        // split it into an array of <key=value> values
+//        let keyAndValues = keyValueString.components(separatedBy: delimiter)
+//        
+//        for index in 0..<keyAndValues.count {
+//            // separate each entry into a Key and a Value
+//            let kv = keyAndValues[index].components(separatedBy: "=")
+//            
+//            // when "delimiter" is last character there will be an empty entry, don't include it
+//            if kv[0] != "" {
+//                // if no "=", set value to empty String (helps with strings with a prefix to KeyValues)
+//                // make sure there are no whitespaces before or after the entries
+//                if kv.count == 1 { kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),"") ) }
+//                if kv.count == 2 { kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),kv[1].trimmingCharacters(in: NSCharacterSet.whitespaces)) ) }
+//            }
+//        }
+//        return kvArray
+//    }
+//    /// Parse a String of <value>'s separated by the given Delimiter
+//    ///
+//    /// - Parameters:
+//    ///   - valueString:    String containing the values & delimiters
+//    ///   - delimiter:      the delimiter between values (defaults to space)
+//    /// - Returns:          a values array
+//    ///
+//    func valuesArray(_ valuesString: String, delimiter: String = " ") -> ValuesArray {
+//        
+//        return valuesString.components(separatedBy: delimiter)
+//    }
     func txFilterHighLimits(_ low: Int, _ high: Int) -> Int {
         
         let newValue = ( high < low + 50 ? low + 50 : high )

@@ -159,6 +159,51 @@ public extension String {
     func replacingSpacesWith(_ value: String) -> String {
         return self.replacingOccurrences(of: " ", with: value)
     }
+//}
+//
+//public extension Optional where Wrapped == String {
+
+    /// Parse a String of <key=value>'s separated by the given Delimiter
+    ///
+    /// - Parameters:
+    ///   - keyValueString:     String containing the key value pairs & delimiters
+    ///   - delimiter:          the delimiter between key values (defaults to space)
+    /// - Returns:              a KeyValues array
+    ///
+    public func keyValuesArray(delimiter: String = " ") -> Radio.KeyValuesArray {
+        var kvArray = Radio.KeyValuesArray()
+        
+//        // make sure the string isn't nil
+//        guard let kvString = self else { return kvArray }
+        
+        // split it into an array of <key=value> values
+        let keyAndValues = self.components(separatedBy: delimiter)
+        
+        for index in 0..<keyAndValues.count {
+            // separate each entry into a Key and a Value
+            let kv = keyAndValues[index].components(separatedBy: "=")
+            
+            // when "delimiter" is last character there will be an empty entry, don't include it
+            if kv[0] != "" {
+                // if no "=", set value to empty String (helps with strings with a prefix to KeyValues)
+                // make sure there are no whitespaces before or after the entries
+                if kv.count == 1 { kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),"") ) }
+                if kv.count == 2 { kvArray.append( (kv[0].trimmingCharacters(in: NSCharacterSet.whitespaces),kv[1].trimmingCharacters(in: NSCharacterSet.whitespaces)) ) }
+            }
+        }
+        return kvArray
+    }
+    /// Parse a String of <value>'s separated by the given Delimiter
+    ///
+    /// - Parameters:
+    ///   - valueString:    String containing the values & delimiters
+    ///   - delimiter:      the delimiter between values (defaults to space)
+    /// - Returns:          a values array
+    ///
+    func valuesArray(delimiter: String = " ") -> Radio.ValuesArray {
+        
+        return self.components(separatedBy: delimiter)
+    }
 }
 
 // ----------------------------------------------------------------------------

@@ -32,18 +32,21 @@ public final class RadioParameters : Equatable {
         let params = RadioParameters(lastSeen: Date())
         
         // other values are derived from the array
-        params.ipAddress = valuesArray[0]
-        params.port = Int(valuesArray[1]) ?? 0
-        params.model = valuesArray[2]
-        params.serialNumber = valuesArray[3]
-        params.name = valuesArray[4]
-        params.callsign = valuesArray[5]
-        params.protocolVersion = valuesArray[6]
-        params.firmwareVersion = valuesArray[7]
-        params.status = valuesArray[8]
-        params.nickname = valuesArray[9]
-        params.inUseIp = valuesArray[10]
-        params.inUseHost = valuesArray[11]
+        params.callsign = valuesArray[0]
+        params.firmwareVersion = valuesArray[1]
+        params.inUseHost = valuesArray[2]
+        params.inUseIp = valuesArray[3]
+        params.ipAddress = valuesArray[4]
+        params.maxLicensedVersion = valuesArray[5]
+        params.model = valuesArray[6]
+        params.name = valuesArray[7]
+        params.nickname = valuesArray[8]
+        params.port = Int(valuesArray[9]) ?? 0
+        params.protocolVersion = valuesArray[10]
+        params.radioLicenseId = valuesArray[11]
+        params.requiresAdditionalLicense = valuesArray[12]
+        params.serialNumber = valuesArray[13]
+        params.status = valuesArray[14]
         
         return params
     }
@@ -61,18 +64,22 @@ public final class RadioParameters : Equatable {
     // MARK: - Public properties
 
     public var lastSeen: Date               // data/time last udp from Radio
-    public var ipAddress: String            // IP Address (dotted decimal)
-    public var port: Int                    // port # broadcast received on
-    public var model: String                // Radio model (e.g. FLEX-6500)
-    public var serialNumber: String         // Radio Serial #
-    public var name: String?                // ??
+
     public var callsign: String?            // user assigned call sign
-    public var protocolVersion: String?     // currently (2016) 2.0.0.0
     public var firmwareVersion: String?     // Radio firmware version (e.g. 1.9.13.89)
-    public var status: String?              // available, connected, update, etc.
-    public var nickname: String?            // user assigned Radio name
-    public var inUseIp: String?             // ??
     public var inUseHost: String?           // ??
+    public var inUseIp: String?             // ??
+    public var ipAddress: String            // IP Address (dotted decimal)
+    public var maxLicensedVersion: String?  // Highest licensed version
+    public var model: String                // Radio model (e.g. FLEX-6500)
+    public var name: String?                // ??
+    public var nickname: String?            // user assigned Radio name
+    public var port: Int                    // port # broadcast received on
+    public var protocolVersion: String?     // currently (2016) 2.0.0.0
+    public var radioLicenseId: String?      // The current License of the Radio
+    public var requiresAdditionalLicense: String? // License needed, 1=true, 0= false
+    public var serialNumber: String         //
+    public var status: String?              // available, connected, update, etc.
 
     // ----------------------------------------------------------------------------
     // MARK: - Initialization
@@ -104,44 +111,53 @@ public final class RadioParameters : Equatable {
         
         switch propertyName {
             
-        case "ipAddress":
-            return ipAddress
-            
-        case "port":
-            return port.description
-            
-        case "model":
-            return model
-            
-        case "serialNumber":
-            return serialNumber
-            
-        case "name":
-            return name
-            
         case "callsign":
             return callsign
-            
-        case "protocolVersion":
-            return protocolVersion
             
         case "firmwareVersion":
             return firmwareVersion
             
-        case "status":
-            return status
-            
-        case "lastSeen":
-            return lastSeen.description
-            
-        case "nickname":
-            return nickname
+        case "inUseHost":
+            return inUseHost
             
         case "inUseIp":
             return inUseIp
             
-        case "inUseHost":
-            return inUseHost
+        case "ipAddress":
+            return ipAddress
+            
+        case "lastSeen":
+            return lastSeen.description
+            
+        case "maxLicensedVersion":
+            return maxLicensedVersion
+            
+        case "model":
+            return model
+            
+        case "name":
+            return name
+            
+        case "nickname":
+            return nickname
+            
+        case "port":
+            return port.description
+            
+        case "protocolVersion":
+            return protocolVersion
+            
+        case "radioLicenseId":
+            return radioLicenseId
+            
+        case "requiresAdditionalLicense":
+            return requiresAdditionalLicense
+            
+        case "serialNumber":
+            return serialNumber
+            
+        case "status":
+            return status
             
         default:
             return "Unknown"
@@ -156,18 +172,21 @@ public final class RadioParameters : Equatable {
         var values = [String]()
         
         // all values except "lastSeen"
-        values.append(ipAddress)
-        values.append(port.description)
-        values.append(model)
-        values.append(serialNumber)
-        values.append(name ?? "")
         values.append(callsign ?? "")
-        values.append(protocolVersion ?? "")
         values.append(firmwareVersion ?? "")
-        values.append(status ?? "")
-        values.append(nickname ?? "")
-        values.append(inUseIp ?? "")
         values.append(inUseHost ?? "")
+        values.append(inUseIp ?? "")
+        values.append(ipAddress)
+        values.append(maxLicensedVersion ?? "")
+        values.append(model)
+        values.append(name ?? "")
+        values.append(nickname ?? "")
+        values.append(port.description)
+        values.append(protocolVersion ?? "")
+        values.append(radioLicenseId ?? "")
+        values.append(requiresAdditionalLicense ?? "")
+        values.append(serialNumber)
+        values.append(status ?? "")
         
         return values
     }
