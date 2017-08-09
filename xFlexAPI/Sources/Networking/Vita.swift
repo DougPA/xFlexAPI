@@ -348,12 +348,13 @@ public struct Vita {
     ///
     public func parseDiscoveryPacket() -> RadioParameters? {
         
-        let params = RadioParameters(lastSeen: Date(), ipAddress: "", port: 0)
-        
         // is this a Discovery packet?
         if classIdPresent && classCode == .discovery {
             
-            // YES, Payload is a series of strings of the form <key=value> separated by ' ' (space)
+            // YES, create a minimal RadioParameters with now as "lastSeen"
+            let radio = RadioParameters()
+            
+            // Payload is a series of strings of the form <key=value> separated by ' ' (space)
             let payloadData = NSString(bytes: payload!, length: payloadSize, encoding: String.Encoding.ascii.rawValue)! as String
             
             // parse into a KeyValuesArray
@@ -366,64 +367,66 @@ public struct Vita {
                 guard let token = DiscoveryToken(rawValue: kv.key.lowercased()) else {
                     
                     // unknown Key, log it and ignore the Key
-                    _log.msg("Unknown token - \(kv.key)", level: .debug, function: #function, file: #file, line: #line)
+                    _log.msg("Unknown token - \(kv.key)", level: .warning, function: #function, file: #file, line: #line)
                     continue
                 }
-                // get the Integer version of the value
-                let iValue = (kv.value).iValue()
                 
                 switch token {
                     
                 case .callsign:
-                    params.callsign = kv.value
+                    radio.callsign = kv.value
                     
                 case .inUseHost:
-                    params.inUseHost = kv.value
-                case .inUseIp:
-                    params.inUseIp = kv.value
+                    radio.inUseHost = kv.value
                     
-                case .ip:
-                    params.ipAddress = kv.value
+                case .inUseIp:
+                    radio.inUseIp = kv.value
+                    
+                case .ipAddress:
+                    radio.ipAddress = kv.value
                     
                 case .maxLicensedVersion:
-                    params.maxLicensedVersion = kv.value
+                    radio.maxLicensedVersion = kv.value
                     
                 case .model:
-                    params.model = kv.value
+                    radio.model = kv.value
                     
                 case .name:
-                    params.name = kv.value
+                    radio.name = kv.value
                     
                 case .nickname:
-                    params.nickname = kv.value
+                    radio.nickname = kv.value
                     
                 case .port:
-                    params.port = iValue 
+                    radio.port = kv.value.iValue()
                     
                 case .protocolVersion:
-                    params.protocolVersion = kv.value
+                    radio.protocolVersion = kv.value
                     
                 case .radioLicenseId:
-                    params.radioLicenseId = kv.value
+                    radio.radioLicenseId = kv.value
                     
                 case .requiresAdditionalLicense:
-                    params.requiresAdditionalLicense = kv.value
+                    radio.requiresAdditionalLicense = kv.value
                     
-                case .serial:
-                    params.serialNumber = kv.value
+                case .serialNumber:
+                    radio.serialNumber = kv.value
                     
                 case .status:
-                    params.status = kv.value
+                    radio.status = kv.value
                     
-                case .version:
-                    params.firmwareVersion = kv.value
+                case .firmwareVersion:
+                    radio.firmwareVersion = kv.value
                     
+                // satisfy the switch statement, not a real token
+                case .lastSeen:
+                    break
                 }
             }
             // is it a valid Discovery packet?
-            if params.ipAddress != "" && params.port != 0 && params.model != "" && params.serialNumber != "" {
+            if radio.ipAddress != "" && radio.port != 0 && radio.model != "" && radio.serialNumber != "" {
                 // YES
-                return params
+                return radio
             }
         }
         // Not a Discovery packet
@@ -478,7 +481,7 @@ extension Vita {
         case callsign
         case inUseHost = "inuse_host"
         case inUseIp = "inuse_ip"
-        case ip
+        case ipAddress = "ip"
         case maxLicensedVersion = "max_licensed_version"
         case model
         case name
@@ -487,9 +490,11 @@ extension Vita {
         case protocolVersion = "discovery_protocol_version"
         case radioLicenseId = "radio_license_id"
         case requiresAdditionalLicense = "requires_additional_license"
-        case serial
+        case serialNumber = "serial"
         case status
-        case version
+        case firmwareVersion = "version"
+
+        case lastSeen   // not a real token
     }
     public enum PacketType : UInt8 {        // Packet Type
         case ifData = 0x00

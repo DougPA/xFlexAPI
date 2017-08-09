@@ -18,73 +18,51 @@ import Foundation
 public final class RadioParameters : Equatable {
     
     // ----------------------------------------------------------------------------
-    // MARK: - Static methods
-    
-    /// Create a RadioParameters instance from a valuesArray
-    ///
-    /// - Parameters:
-    ///   - valuesArray:    an array of Values
-    /// - Returns:          a RadioParameters instance
-    ///
-    public static func parametersFromArray(valuesArray: [String]) -> RadioParameters {
-        
-        // lastSeen will be "Now"
-        let params = RadioParameters(lastSeen: Date())
-        
-        // other values are derived from the array
-        params.callsign = valuesArray[0]
-        params.firmwareVersion = valuesArray[1]
-        params.inUseHost = valuesArray[2]
-        params.inUseIp = valuesArray[3]
-        params.ipAddress = valuesArray[4]
-        params.maxLicensedVersion = valuesArray[5]
-        params.model = valuesArray[6]
-        params.name = valuesArray[7]
-        params.nickname = valuesArray[8]
-        params.port = Int(valuesArray[9]) ?? 0
-        params.protocolVersion = valuesArray[10]
-        params.radioLicenseId = valuesArray[11]
-        params.requiresAdditionalLicense = valuesArray[12]
-        params.serialNumber = valuesArray[13]
-        params.status = valuesArray[14]
-        
-        return params
-    }
-    /// Returns a Boolean value indicating whether two RadioParameter instances are equal.
-    ///
-    /// - Parameters:
-    ///   - lhs:            A value to compare.
-    ///   - rhs:            Another value to compare.
-    ///
-    public static func ==(lhs: RadioParameters, rhs: RadioParameters) -> Bool {
-        return lhs.serialNumber == rhs.serialNumber && lhs.ipAddress == rhs.ipAddress
-    }
-    
-    // ----------------------------------------------------------------------------
     // MARK: - Public properties
-
-    public var lastSeen: Date               // data/time last udp from Radio
-
+    
+    public var lastSeen: Date               // data/time last broadcast from Radio
+    
     public var callsign: String?            // user assigned call sign
-    public var firmwareVersion: String?     // Radio firmware version (e.g. 1.9.13.89)
-    public var inUseHost: String?           // ??
-    public var inUseIp: String?             // ??
+    public var firmwareVersion: String?     // Radio firmware version (e.g. 2.0.1.17)
+    public var inUseHost: String?           //
+    public var inUseIp: String?             //
     public var ipAddress: String            // IP Address (dotted decimal)
     public var maxLicensedVersion: String?  // Highest licensed version
     public var model: String                // Radio model (e.g. FLEX-6500)
-    public var name: String?                // ??
+    public var name: String?                //
     public var nickname: String?            // user assigned Radio name
     public var port: Int                    // port # broadcast received on
-    public var protocolVersion: String?     // currently (2016) 2.0.0.0
+    public var protocolVersion: String?     // e.g. 2.0.0.1
     public var radioLicenseId: String?      // The current License of the Radio
-    public var requiresAdditionalLicense: String? // License needed, 1=true, 0= false
-    public var serialNumber: String         //
-    public var status: String?              // available, connected, update, etc.
+    public var requiresAdditionalLicense: String? // License needed?
+    public var serialNumber: String         // serial number
+    public var status: String?              // available, in_use, connected, update, etc.
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Private properties
+    
+    fileprivate let _log = Log.sharedInstance           // shared Log
 
+    fileprivate let kLastSeen = "lastSeen"
+    fileprivate let kCallsign = "callsign"
+    fileprivate let kFirmwareVersion = "firmwareVersion"
+    fileprivate let kInUseHost = "inUseHost"
+    fileprivate let kIpAddress = "ipAddress"
+    fileprivate let kMaxLicensedVersion = "maxLicensedVersion"
+    fileprivate let kModel = "model"
+    fileprivate let kName = "name"
+    fileprivate let kNickname = "nickname"
+    fileprivate let kPort = "port"
+    fileprivate let kProtocolVersion = "protocolVersion"
+    fileprivate let kRadioLicenseId = "radioLicenseId"
+    fileprivate let kRequiresAdditionalLicense = "requiresAdditionalLicense"
+    fileprivate let kSerialNumber = "serialNumber"
+    fileprivate let kStatus = "status"
+    
     // ----------------------------------------------------------------------------
     // MARK: - Initialization
     
-    /// Initialize a RadioParameters struct
+    /// Initialize an empty RadioParameters struct
     ///
     /// - Parameters:
     ///   - lastSeen:       the DateTime
@@ -97,10 +75,72 @@ public final class RadioParameters : Equatable {
         self.model = model
         self.serialNumber = serialNumber
     }
+    /// Initialize a RadioParameters instance from a dictionary
+    ///
+    /// - Parameters:
+    ///   - dict:           a Dictionary of Values
+    ///
+    public init(_ dict: [String : Any]) {
+        
+        // lastSeen will be "Now"
+        self.lastSeen = Date()
+        
+        self.callsign = dict[kCallsign] as? String ?? ""
+        self.firmwareVersion = dict[kFirmwareVersion] as? String ?? ""
+        self.inUseHost = dict[kInUseHost] as? String ?? ""
+        self.inUseIp = dict[kInUseHost] as? String ?? ""
+        self.ipAddress = dict[kIpAddress] as? String ?? ""
+        self.maxLicensedVersion = dict[kMaxLicensedVersion] as? String ?? ""
+        self.model = dict[kModel] as? String ?? ""
+        self.name = dict[kName] as? String ?? ""
+        self.nickname = dict[kNickname] as? String ?? ""
+        self.port = dict[kPort] as? Int ?? 0
+        self.protocolVersion = dict[kProtocolVersion] as? String ?? ""
+        self.radioLicenseId = dict[kRadioLicenseId] as? String ?? ""
+        self.requiresAdditionalLicense = dict[kRequiresAdditionalLicense] as? String ?? ""
+        self.serialNumber = dict[kSerialNumber] as? String ?? ""
+        self.status = dict[kStatus] as? String ?? ""
+    }
+    
+    // ----------------------------------------------------------------------------
+    // MARK: - Static methods
+    
+    /// Returns a Boolean value indicating whether two RadioParameter instances are equal.
+    ///         Equality is defined as equal serialNumbers
+    ///
+    /// - Parameters:
+    ///   - lhs:            A value to compare.
+    ///   - rhs:            Another value to compare.
+    ///
+    public static func ==(lhs: RadioParameters, rhs: RadioParameters) -> Bool {
+        return lhs.serialNumber == rhs.serialNumber
+    }
     
     // ----------------------------------------------------------------------------
     // MARK: - Public methods
     
+    public func dictFromParams() -> [String : Any ] {
+
+        var dict = [String : Any]()
+        
+        dict[kCallsign] = self.callsign
+        dict[kFirmwareVersion] = self.firmwareVersion
+        dict[kInUseHost] = self.inUseHost
+        dict[kInUseHost] = self.inUseIp
+        dict[kIpAddress] = self.ipAddress
+        dict[kMaxLicensedVersion] = self.maxLicensedVersion
+        dict[kModel] = self.model
+        dict[kName] = self.name
+        dict[kNickname] = self.nickname
+        dict[kPort] = self.port
+        dict[kProtocolVersion] = self.protocolVersion
+        dict[kRadioLicenseId] = self.radioLicenseId
+        dict[kRequiresAdditionalLicense] = self.requiresAdditionalLicense
+        dict[kSerialNumber] = self.serialNumber
+        dict[kStatus] = self.status
+        
+        return dict
+    }
     ///  Return a String value given a property name
     ///
     /// - Parameters:
@@ -111,83 +151,56 @@ public final class RadioParameters : Equatable {
         
         switch propertyName {
             
-        case "callsign":
+        case kCallsign:
             return callsign
             
-        case "firmwareVersion":
+        case kFirmwareVersion:
             return firmwareVersion
             
-        case "inUseHost":
+        case kInUseHost:
             return inUseHost
             
-        case "inUseIp":
+        case kInUseHost:
             return inUseIp
             
-        case "ipAddress":
+        case kIpAddress:
             return ipAddress
             
-        case "lastSeen":
+        case kLastSeen:
             return lastSeen.description
             
-        case "maxLicensedVersion":
+        case kMaxLicensedVersion:
             return maxLicensedVersion
             
-        case "model":
+        case kModel:
             return model
             
-        case "name":
+        case kName:
             return name
             
-        case "nickname":
+        case kNickname:
             return nickname
             
-        case "port":
+        case kPort:
             return port.description
             
-        case "protocolVersion":
+        case kProtocolVersion:
             return protocolVersion
             
-        case "radioLicenseId":
+        case kRadioLicenseId:
             return radioLicenseId
             
-        case "requiresAdditionalLicense":
+        case kRequiresAdditionalLicense:
             return requiresAdditionalLicense
             
-        case "serialNumber":
+        case kSerialNumber:
             return serialNumber
             
-        case "status":
+        case kStatus:
             return status
             
         default:
             return "Unknown"
         }
-    }
-    /// Return an array containing the Radio Parameters
-    ///
-    /// - Returns:      an array of values
-    ///
-    public func valuesArray() -> [String] {
-        
-        var values = [String]()
-        
-        // all values except "lastSeen"
-        values.append(callsign ?? "")
-        values.append(firmwareVersion ?? "")
-        values.append(inUseHost ?? "")
-        values.append(inUseIp ?? "")
-        values.append(ipAddress)
-        values.append(maxLicensedVersion ?? "")
-        values.append(model)
-        values.append(name ?? "")
-        values.append(nickname ?? "")
-        values.append(port.description)
-        values.append(protocolVersion ?? "")
-        values.append(radioLicenseId ?? "")
-        values.append(requiresAdditionalLicense ?? "")
-        values.append(serialNumber)
-        values.append(status ?? "")
-        
-        return values
     }
 }

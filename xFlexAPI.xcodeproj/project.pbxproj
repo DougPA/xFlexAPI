@@ -40,7 +40,6 @@
 		91B9F7F51ED9170B00F7799D /* Opus.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D41ED9170B00F7799D /* Opus.swift */; };
 		91B9F7F61ED9170B00F7799D /* Panadapter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D51ED9170B00F7799D /* Panadapter.swift */; };
 		91B9F7F71ED9170B00F7799D /* Radio.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D61ED9170B00F7799D /* Radio.swift */; };
-		91B9F7F81ED9170B00F7799D /* RadioFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D71ED9170B00F7799D /* RadioFactory.swift */; };
 		91B9F7F91ED9170B00F7799D /* Slice.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D81ED9170B00F7799D /* Slice.swift */; };
 		91B9F7FA1ED9170B00F7799D /* Tnf.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7D91ED9170B00F7799D /* Tnf.swift */; };
 		91B9F7FB1ED9170B00F7799D /* TxAudioStream.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91B9F7DA1ED9170B00F7799D /* TxAudioStream.swift */; };
@@ -57,6 +56,7 @@
 		91C831031F001D0500836BE9 /* UsbCable.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91C831021F001D0500836BE9 /* UsbCable.swift */; };
 		91D9C7681F38985C004308CC /* Amplifier.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D9C7671F38985C004308CC /* Amplifier.swift */; };
 		91D9C76A1F3899E8004308CC /* AmplifierCommands.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91D9C7691F3899E8004308CC /* AmplifierCommands.swift */; };
+		91FBE1331F3B865E00B5E2C5 /* RadioFactory.swift in Sources */ = {isa = PBXBuildFile; fileRef = 91FBE1321F3B865E00B5E2C5 /* RadioFactory.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -95,7 +95,6 @@
 		91B9F7D41ED9170B00F7799D /* Opus.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Opus.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7D51ED9170B00F7799D /* Panadapter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Panadapter.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7D61ED9170B00F7799D /* Radio.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Radio.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
-		91B9F7D71ED9170B00F7799D /* RadioFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioFactory.swift; sourceTree = "<group>"; };
 		91B9F7D81ED9170B00F7799D /* Slice.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Slice.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7D91ED9170B00F7799D /* Tnf.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = Tnf.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91B9F7DA1ED9170B00F7799D /* TxAudioStream.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = TxAudioStream.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
@@ -112,6 +111,7 @@
 		91C831021F001D0500836BE9 /* UsbCable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; lineEnding = 0; path = UsbCable.swift; sourceTree = "<group>"; xcLanguageSpecificationIdentifier = xcode.lang.swift; };
 		91D9C7671F38985C004308CC /* Amplifier.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Amplifier.swift; sourceTree = "<group>"; };
 		91D9C7691F3899E8004308CC /* AmplifierCommands.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = AmplifierCommands.swift; path = Sources/Commands/AmplifierCommands.swift; sourceTree = "<group>"; };
+		91FBE1321F3B865E00B5E2C5 /* RadioFactory.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = RadioFactory.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -219,7 +219,6 @@
 				91B9F7D41ED9170B00F7799D /* Opus.swift */,
 				91B9F7D51ED9170B00F7799D /* Panadapter.swift */,
 				91B9F7D61ED9170B00F7799D /* Radio.swift */,
-				91B9F7D71ED9170B00F7799D /* RadioFactory.swift */,
 				91B9F7D81ED9170B00F7799D /* Slice.swift */,
 				91B9F7D91ED9170B00F7799D /* Tnf.swift */,
 				91B9F7DA1ED9170B00F7799D /* TxAudioStream.swift */,
@@ -234,6 +233,7 @@
 		91B9F7DC1ED9170B00F7799D /* Networking */ = {
 			isa = PBXGroup;
 			children = (
+				91FBE1321F3B865E00B5E2C5 /* RadioFactory.swift */,
 				91B9F7DD1ED9170B00F7799D /* Pinger.swift */,
 				91B9F7DE1ED9170B00F7799D /* TcpManager.swift */,
 				91B9F7DF1ED9170B00F7799D /* UdpManager.swift */,
@@ -359,6 +359,7 @@
 				915818001F204B4600FA6382 /* WaterfallCommands.swift in Sources */,
 				91B9F7E51ED9170B00F7799D /* Extensions.swift in Sources */,
 				91B9F7FB1ED9170B00F7799D /* TxAudioStream.swift in Sources */,
+				91FBE1331F3B865E00B5E2C5 /* RadioFactory.swift in Sources */,
 				91C831011EFF4FA100836BE9 /* Xvtr.swift in Sources */,
 				91B9F7F01ED9170B00F7799D /* IqStream.swift in Sources */,
 				915818071F20FAEC00FA6382 /* IqStreamCommands.swift in Sources */,
@@ -379,7 +380,6 @@
 				91B9F8001ED9170B00F7799D /* Vita.swift in Sources */,
 				911EF8E51F22668200F37791 /* UsbCableCommands.swift in Sources */,
 				915817F91F204B4600FA6382 /* MicAudioStreamCommands.swift in Sources */,
-				91B9F7F81ED9170B00F7799D /* RadioFactory.swift in Sources */,
 				91B9F7F41ED9170B00F7799D /* MicAudioStream.swift in Sources */,
 				915817FD1F204B4600FA6382 /* SliceCommands.swift in Sources */,
 				91B9F7EB1ED9170B00F7799D /* Notification.swift in Sources */,
