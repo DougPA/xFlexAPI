@@ -2000,9 +2000,9 @@ public final class Radio : NSObject, TcpManagerDelegate, UdpManagerDelegate {
                 // NO, create a new Stream & add it to the Streams collection
                 iqStreams[streamId] = IqStream(radio: self, id: streamId, queue: _iqStreamQ)
             }
+            // pass the remaining key values to the IqStream for parsing
+            iqStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
         }
-        // pass the remaining key values to the IqStream for parsing
-        iqStreams[streamId]!.parseKeyValues( Array(keyValues.dropFirst(1)) )
     }
     /// Parse a Tnf status message
     ///
